@@ -16,11 +16,6 @@ public class VerifyActivity extends AppCompatActivity {
         setContentView(R.layout.activity_verify);
     }
 
-    public void nextActivityMembership(View v){
-        Intent i = new Intent(this, MembershipActivity.class);
-        startActivity(i);
-    }
-
     public void verify(View v){
         EditText otp1 = findViewById(R.id.activity_verify_et_number1);
         String otp1Data = otp1.getText().toString().trim();
@@ -47,7 +42,6 @@ public class VerifyActivity extends AppCompatActivity {
 //            Otp num (String)
             String otp = otp1Data + otp2Data + otp3Data + otp4Data + otp5Data + otp6Data;
             Intent i = new Intent(this, MembershipActivity.class);
-            i.putExtra(otp, "Otp");
             Log.d(otp, "Otp");
             startActivity(i);
         }
