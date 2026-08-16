@@ -47,14 +47,14 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
         holder.recImage.setImageResource(R.drawable.boxfit);
         holder.recTitle.setText(gymClass.getName());
-        holder.recInstructor.setText(gymClass.getTrainer() != null ? gymClass.getTrainer().getName() : "Unknown");
+        holder.recInstructor.setText(gymClass.getTrainer().getName());
 
         GymClass.Intensity intensity = gymClass.getIntensity(userTdee);
         holder.recIntensity.setText(intensity.name());
 
-        holder.recDate.setText(gymClass.getStartDateTime() != null ? dateFormat.format(gymClass.getStartDateTime()) : "N/A");
-        holder.recStartTime.setText(gymClass.getStartDateTime() != null ? timeFormat.format(gymClass.getStartDateTime()) : "N/A");
-        holder.recEndTime.setText(gymClass.getEndDateTime() != null ? timeFormat.format(gymClass.getEndDateTime()) : "N/A");
+        holder.recDate.setText(dateFormat.format(gymClass.getStartDateTime()));
+        holder.recStartTime.setText(timeFormat.format(gymClass.getStartDateTime()));
+        holder.recEndTime.setText(timeFormat.format(gymClass.getEndDateTime()));
 
         holder.recDesc.setText(gymClass.getDescription());
         holder.recCurCap.setText(String.valueOf(gymClass.getCurrentCapacity()));
@@ -70,11 +70,11 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
                 Intent intent = new Intent(context, InfoActivity.class);
                 intent.putExtra("Image", R.drawable.boxfit);
                 intent.putExtra("Title", current.getName());
-                intent.putExtra("Instructor", current.getTrainer() != null ? current.getTrainer().getName() : "Unknown");
+                intent.putExtra("Instructor", current.getTrainer().getName());
                 intent.putExtra("Intensity", current.getIntensity(userTdee).name());
-                intent.putExtra("Date", current.getStartDateTime() != null ? dateFormat.format(current.getStartDateTime()) : "N/A");
-                intent.putExtra("StartTime", current.getStartDateTime() != null ? timeFormat.format(current.getStartDateTime()) : "N/A");
-                intent.putExtra("EndTime", current.getEndDateTime() != null ? timeFormat.format(current.getEndDateTime()) : "N/A");
+                intent.putExtra("Date", dateFormat.format(current.getStartDateTime()));
+                intent.putExtra("StartTime", timeFormat.format(current.getStartDateTime()));
+                intent.putExtra("EndTime", timeFormat.format(current.getEndDateTime()));
                 intent.putExtra("CurCap", String.valueOf(current.getCurrentCapacity()));
                 intent.putExtra("MaxCap", String.valueOf(current.getMaxCapacity()));
                 intent.putExtra("Desc", current.getDescription());

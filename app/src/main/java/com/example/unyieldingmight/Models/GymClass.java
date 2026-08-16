@@ -53,8 +53,8 @@ public class GymClass {
     }
 
     public Intensity getIntensity(float userTdee) {
-        float effectiveTdee = userTdee <= 0 ? 2000f : userTdee;
-        float ratio = avgCaloriesBurnedPerDay / effectiveTdee;
+//        float effectiveTdee = userTdee <= 0 ? 2000f : userTdee;
+        float ratio = avgCaloriesBurnedPerDay / userTdee;
 
         if (ratio <= 0.15f) {
             return Intensity.BEGINNER;

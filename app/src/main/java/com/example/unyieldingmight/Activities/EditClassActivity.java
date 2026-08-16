@@ -2,6 +2,7 @@ package com.example.unyieldingmight.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.stream.Stream;
 
 public class EditClassActivity extends AppCompatActivity {
 
@@ -64,8 +66,15 @@ public class EditClassActivity extends AppCompatActivity {
             String maxCapString = maxcapacity.getText().toString().trim();
             String avgCalString = avgcalorie.getText().toString().trim();
 
-            if (updatedTitle.isEmpty() || dateString.isEmpty() || startTimeString.isEmpty() || 
-                endTimeString.isEmpty() || maxCapString.isEmpty() || avgCalString.isEmpty()) {
+//            if (updatedTitle.isEmpty() || dateString.isEmpty() || startTimeString.isEmpty() ||
+//                endTimeString.isEmpty() || maxCapString.isEmpty() || avgCalString.isEmpty()) {
+//                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+//                return;
+//            }
+
+            boolean isEmpty = Stream.of(updatedTitle, updatedDesc, dateString, startTimeString, endTimeString, maxCapString, avgCalString).anyMatch(String::isEmpty);
+
+            if(isEmpty){
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 return;
             }
