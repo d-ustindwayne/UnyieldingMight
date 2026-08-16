@@ -14,9 +14,9 @@ import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
 //    Object of class, named classData
-    Class classData;
+    Class1 class1Data;
 //    List of classData, named classList
-    List<Class> classList;
+    List<Class1> class1List;
     RecyclerView recyclerView;
     Adapter adapter;
 //    UI widget
@@ -47,19 +47,19 @@ public class HomeActivity extends AppCompatActivity {
 //        Constructor for recycler view, where context is the activity and spanCount is the no. of columns
         GridLayoutManager gridLayoutManager = new GridLayoutManager(HomeActivity.this, 1);
         recyclerView.setLayoutManager(gridLayoutManager);
-        classList = new ArrayList<>();
-        classData = new Class("Boxfit", "Dara", "Heavy", R.string.boxfit, "26/05/2026", "10:00", "13:00", "0", "10",R.drawable.boxfit);
-        classList.add(classData);
-        classData = new Class("Crossfit", "Dustin", "Medium", R.string.crossfit, "27/05/2026", "12:00", "14:00", "2", "20",R.drawable.boxfit);
-        classList.add(classData);
+        class1List = new ArrayList<>();
+        class1Data = new Class1("Boxfit", "Dara", "Heavy", R.string.boxfit, "26/05/2026", "10:00", "13:00", "0", "10",R.drawable.boxfit);
+        class1List.add(class1Data);
+        class1Data = new Class1("Crossfit", "Dustin", "Medium", R.string.crossfit, "27/05/2026", "12:00", "14:00", "2", "20",R.drawable.boxfit);
+        class1List.add(class1Data);
 
-        adapter = new Adapter(HomeActivity.this, classList);
+        adapter = new Adapter(HomeActivity.this, class1List);
         recyclerView.setAdapter(adapter);
 }
 //  Search function
     private void searchList(String text){
-        List<Class> dataSearchList = new ArrayList<>();
-        for (Class data : classList){
+        List<Class1> dataSearchList = new ArrayList<>();
+        for (Class1 data : class1List){
             if (data.getTitle().toLowerCase().contains(text.toLowerCase())) {
                 dataSearchList.add(data);
             }

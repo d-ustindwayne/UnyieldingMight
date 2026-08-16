@@ -1,6 +1,6 @@
 package com.example.unyieldingmight;
 // Variables used to hold data which is going to be displayed in recycler_item.xml and activity_detail.xml
-public class Class {
+public class Class1 {
     private String title;
     private String instructor;
     private String intensity;
@@ -15,7 +15,7 @@ public class Class {
     private int image;
 //  Constructor
 
-    public Class(String title, String instructor, String intensity, int description, String date, String startTime, String endTime, String curCap, String maxCap, int image) {
+    public Class1(String title, String instructor, String intensity, int description, String date, String startTime, String endTime, String curCap, String maxCap, int image) {
         this.image = image;
         this.title = title;
         this.instructor = instructor;
@@ -28,6 +28,7 @@ public class Class {
         this.description = description;
 
     }
+
     public String getTitle() {
         return title;
     }

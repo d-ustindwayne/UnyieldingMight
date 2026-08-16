@@ -15,12 +15,12 @@ import androidx.recyclerview.widget.RecyclerView;
 public class Adapter extends RecyclerView.Adapter<ViewHolder> {
     private Context context;
 //    A list of type class
-    private List<Class> dataList;
-    public void setSearchList(List<Class> dataSearchList){
+    private List<Class1> dataList;
+    public void setSearchList(List<Class1> dataSearchList){
         this.dataList = dataSearchList;
         notifyDataSetChanged();
     }
-    public Adapter(Context context, List<Class> dataList){
+    public Adapter(Context context, List<Class1> dataList){
         this.context = context;
         this.dataList = dataList;
     }
