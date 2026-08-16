@@ -11,11 +11,11 @@
         android:background="#0E0E0E">
 
         <TextView
-            android:id="@+id/textView5"
+            android:id="@+id/activity_register_tv_register"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/manrope_extrabold"
-            android:text="Register"
+            android:text="@string/register"
             android:textColor="#fff"
             android:textSize="34sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -26,12 +26,12 @@
             app:layout_constraintVertical_bias="0.174" />
 
         <EditText
-            android:id="@+id/editTextTextEmailAddress2"
+            android:id="@+id/activity_register_et_email"
             android:layout_width="314dp"
             android:layout_height="72dp"
             android:ems="10"
             android:fontFamily="@font/jura"
-            android:hint="Email"
+            android:hint="@string/et_email"
             android:inputType="textEmailAddress"
             android:textColor="#fff"
             android:textColorHint="#fff"
@@ -43,12 +43,12 @@
             app:layout_constraintVertical_bias="0.318" />
 
         <EditText
-            android:id="@+id/editTextTextPassword2"
+            android:id="@+id/activity_register_et_password"
             android:layout_width="314dp"
             android:layout_height="72dp"
             android:ems="10"
             android:fontFamily="@font/jura"
-            android:hint="Password"
+            android:hint="@string/et_password"
             android:inputType="textPassword"
             android:textColor="#fff"
             android:textColorHint="#fff"
@@ -60,12 +60,12 @@
             app:layout_constraintVertical_bias="0.427" />
 
         <EditText
-            android:id="@+id/editTextTextPassword3"
+            android:id="@+id/activity_register_et_confirmPassword"
             android:layout_width="314dp"
             android:layout_height="74dp"
             android:ems="10"
             android:fontFamily="@font/jura"
-            android:hint="Confirm Password"
+            android:hint="@string/et_confirmPassword"
             android:textColor="#fff"
             android:textColorHint="#fff"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -76,12 +76,13 @@
             app:layout_constraintVertical_bias="0.538" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/activity_register_btn_register"
             android:layout_width="161dp"
             android:layout_height="53dp"
             android:backgroundTint="#fff"
             android:fontFamily="@font/manrope_extrabold"
-            android:text="REGISTER"
+            android:onClick="nextActivityVerify"
+            android:text="@string/btn_register"
             android:textColor="#0E0E0E"
             android:textSize="16sp"
             app:cornerRadius="0dp"
@@ -92,32 +93,19 @@
             app:layout_constraintVertical_bias="0.682" />
 
         <TextView
-            android:id="@+id/textView6"
+            android:id="@+id/activity_register_tv_loginNow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:height="48dp"
             android:fontFamily="@font/manrope_bold"
-            android:text="Already have an account?"
+            android:onClick="nextActivityLogin"
+            android:text="@string/already_have_an_account_login_now"
             android:textColor="#fff"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.193"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.763" />
+            app:layout_constraintVertical_bias="0.807" />
 
-        <TextView
-            android:id="@+id/textView7"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/manrope_bold"
-            android:onClick="nA"
-            android:text="Login now"
-            android:textColor="#fff"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.856"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.763" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>
