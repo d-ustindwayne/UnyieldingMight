@@ -188,7 +188,7 @@ public class Database {
         
         EmailVerification ev = new EmailVerification().email(email).verify();
         EmailVerificationData evData = ev.getData();
-        if (evData != null && evData.safe_to_send() != null && evData.safe_to_send().equalsIgnoreCase("false")) {
+        if (evData != null && evData.safe_to_send() != null && evData.safe_to_send().equals("true")) {
         Log.w("DATABASE_ERROR", "Registration blocked by QEV for: " + email + ". Factor safe_to_send is false.");
             return false;
         }
