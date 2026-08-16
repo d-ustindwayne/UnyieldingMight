@@ -47,5 +47,11 @@
     <string name="physical_stats">Physical Stats</string>
     <string name="weight">Weight</string>
     <string name="height">Height</string>
+
+    <string-array name="level_array" >
+        <item>Upcoming</item>
+        <item>Ongoing</item>
+        <item>Complete</item>
+    </string-array>
 </resources>
 

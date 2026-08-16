@@ -8,7 +8,6 @@
     android:textAlignment="center">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/activity_createclass_spinner_level"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout_editor_absoluteX="0dp"
@@ -19,7 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/manrope_extrabold"
-            android:text="@string/create_a_class"
+            android:text="Create a Class"
             android:textColor="#FFF"
             android:textSize="34sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -28,19 +27,21 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.067" />
 
+
         <EditText
             android:id="@+id/activity_createclass_et_trainername"
             android:layout_width="374dp"
             android:layout_height="48dp"
             android:ems="10"
-            android:hint="@string/enter_trainer_name"
+            android:hint="Enter trainer name..."
             android:inputType="text"
             android:maxLength="50"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.315"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.202" />
+            app:layout_constraintVertical_bias="0.199" />
 
         <TextView
             android:id="@+id/activity_createclass_tv_trainername"
@@ -60,14 +61,15 @@
             android:layout_width="374dp"
             android:layout_height="48dp"
             android:ems="10"
-            android:hint="@string/enter_category"
+            android:hint="Enter category..."
             android:inputType="text"
             android:maxLength="50"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.308"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.42" />
+            app:layout_constraintVertical_bias="0.395" />
 
         <TextView
             android:id="@+id/activity_createclass_tv_category"
@@ -77,24 +79,25 @@
             android:textColor="#fff"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.093"
+            app:layout_constraintHorizontal_bias="0.094"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.398" />
+            app:layout_constraintVertical_bias="0.375" />
 
         <EditText
             android:id="@+id/activity_createclass_et_classname"
             android:layout_width="374dp"
             android:layout_height="48dp"
             android:ems="10"
-            android:hint="@string/enter_class_name"
+            android:hint="Enter class name..."
             android:inputType="text"
             android:maxLength="50"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.315"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.15" />
+            app:layout_constraintVertical_bias="0.149" />
 
         <TextView
             android:id="@+id/activity_createclass_tv_classname"
@@ -114,13 +117,14 @@
             android:layout_width="374dp"
             android:layout_height="48dp"
             android:ems="10"
-            android:hint="@string/enter_capacity"
+            android:hint="Enter capacity"
             android:inputType="number"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.3"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.48" />
+            app:layout_constraintVertical_bias="0.449" />
 
         <TextView
             android:id="@+id/activity_createclass_tv_capacity"
@@ -130,10 +134,21 @@
             android:textColor="#fff"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.092"
+            app:layout_constraintHorizontal_bias="0.089"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.457" />
+            app:layout_constraintVertical_bias="0.419" />
+
+        <Spinner
+            android:id="@+id/activity_createclass_spinner_level"
+            android:layout_width="374dp"
+            android:layout_height="48dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.3"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.506" />
 
         <TextView
             android:id="@+id/activity_createclass_tv_level"
@@ -146,31 +161,7 @@
             app:layout_constraintHorizontal_bias="0.085"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.566" />
-
-        <TextView
-            android:id="@+id/activity_createclass_tv_setstatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Set Status:"
-            android:textColor="#fff"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.092"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.613" />
-
-        <Spinner
-            android:id="@+id/spinner"
-            android:layout_width="374dp"
-            android:layout_height="48dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.486"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.591" />
+            app:layout_constraintVertical_bias="0.484" />
 
         <EditText
             android:id="@+id/activity_createclass_multiline_description"
@@ -178,15 +169,15 @@
             android:layout_height="194dp"
             android:ems="10"
             android:gravity="start|top"
-            android:hint="@string/enter_description"
+            android:hint="Enter description..."
             android:inputType="textMultiLine"
             android:maxLength="500"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.486"
+            app:layout_constraintHorizontal_bias="0.485"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.836" />
+            app:layout_constraintVertical_bias="0.843" />
 
         <TextView
             android:id="@+id/activity_createclass_tv_description"
@@ -208,22 +199,23 @@
             android:text="Upcoming"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.1"
+            app:layout_constraintHorizontal_bias="0.056"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.638" />
+            app:layout_constraintVertical_bias="0.585" />
 
-        <RadioButton
-            android:id="@+id/activity_createclass_radiobutton_upcoming2"
+        <TextView
+            android:id="@+id/activity_createclass_tv_setstatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ongoing"
+            android:text="Set Status:"
+            android:textColor="#fff"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.097"
+            app:layout_constraintHorizontal_bias="0.095"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.671" />
+            app:layout_constraintVertical_bias="0.545" />
 
         <RadioButton
             android:id="@+id/activity_createclass_radiobutton_upcoming3"
@@ -232,10 +224,22 @@
             android:text="Complete"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.099"
+            app:layout_constraintHorizontal_bias="0.055"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.705" />
+            app:layout_constraintVertical_bias="0.652" />
+
+        <RadioButton
+            android:id="@+id/activity_createclass_radiobutton_upcoming2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ongoing"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.054"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.618" />
 
         <Button
             android:id="@+id/activity_createclass_btn_post"
@@ -254,6 +258,95 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.957" />
+
+        <Button
+            android:id="@+id/btnDatePicker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:backgroundTint="#FFFFFF"
+            android:text="Pick Date"
+            android:textColor="@color/black"
+            android:textColorLink="#F7FFFFFF"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.105"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.24" />
+
+        <TextView
+            android:id="@+id/tvSelectedDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No date selected"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.11"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.277" />
+
+        <Button
+            android:id="@+id/btnStartTime"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:background="#FFFFFF"
+            android:backgroundTint="#FFFFFF"
+            android:elevation="4dp"
+            android:text="Start Time"
+            android:textAllCaps="false"
+            android:textColor="#000000"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.117"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.311" />
+
+        <TextView
+            android:id="@+id/tvStartTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No start time"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.108"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.338" />
+
+        <Button
+            android:id="@+id/btnEndTime"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:background="#FFFFFF"
+            android:backgroundTint="#FFFFFF"
+            android:elevation="4dp"
+            android:text="End Time"
+            android:textAllCaps="false"
+            android:textColor="#000000"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.75"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.311" />
+
+        <TextView
+            android:id="@+id/tvEndTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No end time"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.636"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.338" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>
