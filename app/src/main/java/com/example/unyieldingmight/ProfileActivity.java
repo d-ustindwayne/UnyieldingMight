@@ -24,10 +24,36 @@ public class ProfileActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
     }
-    public void nextActivityStats(View v){
+    public void proceed(View v){
+        EditText day = findViewById(R.id.activity_profile_et_day);
+        String dayData = day.getText().toString().trim();
+
+        EditText month = findViewById(R.id.activity_profile_et_month);
+        String monthData = month.getText().toString().trim();
+
+        EditText year = findViewById(R.id.activity_profile_et_year);
+        String yearData = year.getText().toString().trim();
+
+        EditText street = findViewById(R.id.activity_profile_et_street);
+        String streetData = street.getText().toString().trim();
+
+        EditText city = findViewById(R.id.activity_profile_et_city);
+        String cityData = city.getText().toString().trim();
+
+        EditText state = findViewById(R.id.activity_profile_et_state);
+        String stateData = state.getText().toString().trim();
+
+        EditText postCode = findViewById(R.id.activity_profile_et_postcode);
+        String postCodeData = postCode.getText().toString().trim();
+
+//        Spinner for country
+        Spinner country = findViewById(R.id.activity_profile_spin_country);
+        String countryData = country.getSelectedItem().toString();
+
+        Log.d(countryData, "Spinner Value");
+
         Intent i = new Intent(this, StatsActivity.class);
-        startActivity(i);
-    }
+        startActivity(i);}
     public void previousActivityMembership(View v){
         Intent i = new Intent(this, MembershipActivity.class);
         startActivity(i);
