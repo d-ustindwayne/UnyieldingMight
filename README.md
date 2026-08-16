@@ -5,8 +5,8 @@ Welcome to **Unyielding Might (UM)**, an Android application designed to elimina
 While UM offers premium gym amenities, its standout feature is its expert-led fitness classes (free for members, paid for non-members). 
 To make this class model sustainable, this app provides a dual-purpose solution:
 
-**Customers:** Easily browse, pay for, and book classes.
-**Admins:** Efficiently manage schedules, capacity, and attendance.
+**Customers:** Register, browse, and book classes.
+**Admins:** Gym classes are editable. 
 
 This repository documents the software architecture, design patterns, and unit testing strategies used to build a reliable, scalable mobile experience.
 
@@ -61,7 +61,7 @@ To run and deploy the application onto an Android Emulator or a physical testing
 
 ## Tech Stack
 - Platform: Android
-- Language: Kotlin / Java
+- Language: Java
 - Architecture: Client-Server Model (CSM) / Event-Driven Architecture
 - Build System: Gradle
 - Database: SQL Server Management Studio
