@@ -11,28 +11,17 @@ import java.util.Calendar;
 import android.app.TimePickerDialog;
 
 public class CreateclassActivity extends AppCompatActivity {
-    Button btnDatePicker;
-    TextView tvSelectedDate;
-    Button btnStartTime, btnEndTime;
-    TextView tvStartTime, tvEndTime;
+    Button activity_createclass_btn_datepicker = findViewById(R.id.activity_createclass_btn_datepicker);
+    TextView activity_createclass_tv_selecteddate = findViewById(R.id.activity_createclass_tv_selecteddate);
+    Button activity_createclass_btn_starttime = findViewById(R.id.activity_createclass_btn_starttime), activity_createclass_btn_endtime = findViewById(R.id.activity_createclass_btn_endtime);
+    TextView activity_createclass_tv_startTtime = findViewById(R.id.activity_createclass_tv_startTtime), activity_createclass_tv_endtime = findViewById(R.id.activity_createclass_tv_endtime);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_createclass);
 
-        btnDatePicker  = findViewById(R.id.btnDatePicker);
-        tvSelectedDate = findViewById(R.id.tvSelectedDate);
-        btnStartTime   = findViewById(R.id.btnStartTime);
-        btnEndTime     = findViewById(R.id.btnEndTime);
-        tvStartTime    = findViewById(R.id.tvStartTime);
-        tvEndTime      = findViewById(R.id.tvEndTime);
-
-        Calendar calendar = Calendar.getInstance();
-        int currentHour   = calendar.get(Calendar.HOUR_OF_DAY);
-        int currentMinute = calendar.get(Calendar.MINUTE);
-
-        btnDatePicker.setOnClickListener(v -> {
+        activity_createclass_btn_datepicker.setOnClickListener(v -> {
             Calendar cal = Calendar.getInstance();
             int year  = cal.get(Calendar.YEAR);
             int month = cal.get(Calendar.MONTH);
@@ -42,19 +31,25 @@ public class CreateclassActivity extends AppCompatActivity {
                     CreateclassActivity.this,
                     (view, selectedYear, selectedMonth, selectedDay) -> {
                         String date = selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear;
-                        tvSelectedDate.setText("Selected Date: " + date);
+                        activity_createclass_tv_selecteddate.setText("Selected Date: " + date);
                     },
                     year, month, day
             );
             datePickerDialog.show();
         });
 
-        btnStartTime.setOnClickListener(v -> {
+        Calendar calendar = Calendar.getInstance();
+        int currentHour   = calendar.get(Calendar.HOUR_OF_DAY);
+        int currentMinute = calendar.get(Calendar.MINUTE);
+
+
+
+        activity_createclass_btn_starttime.setOnClickListener(v -> {
             TimePickerDialog timePicker = new TimePickerDialog(
                     CreateclassActivity.this,
                     (view, hourOfDay, minute) -> {
                         String time = formatTime(hourOfDay, minute);
-                        tvStartTime.setText("Start Time: " + time);
+                        activity_createclass_tv_startTtime.setText("Start Time: " + time);
                     },
                     currentHour, currentMinute, false
             );
@@ -62,12 +57,12 @@ public class CreateclassActivity extends AppCompatActivity {
             timePicker.show();
         });
 
-        btnEndTime.setOnClickListener(v -> {
+        activity_createclass_btn_endtime.setOnClickListener(v -> {
             TimePickerDialog timePicker = new TimePickerDialog(
                     CreateclassActivity.this,
                     (view, hourOfDay, minute) -> {
                         String time = formatTime(hourOfDay, minute);
-                        tvEndTime.setText("End Time: " + time);
+                        activity_createclass_tv_endtime.setText("End Time: " + time);
                     },
                     currentHour, currentMinute, false
             );
