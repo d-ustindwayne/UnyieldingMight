@@ -16,17 +16,17 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class Adapter extends RecyclerView.Adapter<ViewHolder> {
+public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     private Context context;
     private ArrayList<GymClass> dataList;
     private float userTdee;
 
-    public void setSearchList(ArrayList<GymClass> dataSearchList){
+    public void setSearchList(ArrayList<GymClass> dataSearchList) {
         this.dataList = dataSearchList;
         notifyDataSetChanged();
     }
 
-    public Adapter(Context context, ArrayList<GymClass> dataList, float userTdee){
+    public Adapter(Context context, ArrayList<GymClass> dataList, float userTdee) {
         this.context = context;
         this.dataList = dataList;
         this.userTdee = userTdee;
@@ -48,7 +48,7 @@ public class Adapter extends RecyclerView.Adapter<ViewHolder> {
         holder.recImage.setImageResource(R.drawable.boxfit);
         holder.recTitle.setText(gymClass.getName());
         holder.recInstructor.setText(gymClass.getTrainer() != null ? gymClass.getTrainer().getName() : "Unknown");
-        
+
         GymClass.Intensity intensity = gymClass.getIntensity(userTdee);
         holder.recIntensity.setText(intensity.name());
 
@@ -88,24 +88,25 @@ public class Adapter extends RecyclerView.Adapter<ViewHolder> {
     public int getItemCount() {
         return dataList != null ? dataList.size() : 0;
     }
-}
 
-class ViewHolder extends RecyclerView.ViewHolder{
-    CardView recCard;
-    ImageView recImage;
-    TextView recTitle, recInstructor, recIntensity, recDate, recStartTime, recEndTime, recCurCap, recMaxCap, recDesc;
-    public ViewHolder(@NonNull View itemView) {
-        super(itemView);
-        recCard = itemView.findViewById(R.id.recycler_class_card);
-        recImage = itemView.findViewById(R.id.recycler_class_iv_class);
-        recTitle = itemView.findViewById(R.id.recycler_class_tv_title);
-        recInstructor = itemView.findViewById(R.id.recycler_class_tv_instructor);
-        recIntensity = itemView.findViewById(R.id.recycler_class_tv_intensity);
-        recDate = itemView.findViewById(R.id.recycler_class_tv_date);
-        recStartTime = itemView.findViewById(R.id.recycler_class_tv_startTime);
-        recEndTime = itemView.findViewById(R.id.recycler_class_tv_endTime);
-        recCurCap = itemView.findViewById(R.id.recycler_class_tv_currentCapacity);
-        recMaxCap = itemView.findViewById(R.id.recycler_class_tv_maxCapacity);
-        recDesc = itemView.findViewById(R.id.classDescription);
+    public static class ViewHolder extends RecyclerView.ViewHolder{
+        CardView recCard;
+        ImageView recImage;
+        TextView recTitle, recInstructor, recIntensity, recDate, recStartTime, recEndTime, recCurCap, recMaxCap, recDesc;
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            recCard = itemView.findViewById(R.id.recycler_class_card);
+            recImage = itemView.findViewById(R.id.recycler_class_iv_class);
+            recTitle = itemView.findViewById(R.id.recycler_class_tv_title);
+            recInstructor = itemView.findViewById(R.id.recycler_class_tv_instructor);
+            recIntensity = itemView.findViewById(R.id.recycler_class_tv_intensity);
+            recDate = itemView.findViewById(R.id.recycler_class_tv_date);
+            recStartTime = itemView.findViewById(R.id.recycler_class_tv_startTime);
+            recEndTime = itemView.findViewById(R.id.recycler_class_tv_endTime);
+            recCurCap = itemView.findViewById(R.id.recycler_class_tv_currentCapacity);
+            recMaxCap = itemView.findViewById(R.id.recycler_class_tv_maxCapacity);
+            recDesc = itemView.findViewById(R.id.classDescription);
+        }
     }
+
 }
