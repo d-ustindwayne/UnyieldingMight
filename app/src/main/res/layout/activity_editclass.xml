@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0E0E0E"
+    android:fillViewport="true"
+    android:textAlignment="center">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/activity_editclass_tv_heading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/manrope_extrabold"
+            android:text="Edit Class"
+            android:textColor="#FFF"
+            android:textSize="34sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.048" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/activity_editclass_til_classname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Class Name"
+            android:textColorHint="@color/white"
+            app:hintTextColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.143">
+
+            <EditText
+                android:id="@+id/activity_editclass_et_classname"
+                android:layout_width="314dp"
+                android:layout_height="72dp"
+                android:ems="10"
+
+                android:fontFamily="@font/jura"
+                android:inputType="text"
+                android:maxLength="50"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/activity_editclass_til_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Date"
+            android:textColorHint="@color/white"
+            app:hintTextColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.505"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.261">
+
+            <EditText
+                android:id="@+id/activity_editclass_et_date"
+                android:layout_width="314dp"
+                android:layout_height="72dp"
+                android:ems="10"
+                android:fontFamily="@font/jura"
+                android:inputType="text"
+                android:maxLength="50"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/activity_editclass_til_starttime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Start Time"
+            android:textColorHint="@color/white"
+            app:hintTextColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.192"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.379">
+
+            <EditText
+                android:id="@+id/activity_editclass_et_starttime"
+                android:layout_width="157dp"
+                android:layout_height="72dp"
+                android:ems="10"
+                android:fontFamily="@font/jura"
+                android:inputType="text"
+                android:maxLength="50"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/activity_editclass_til_endtime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="End Time"
+            android:textColorHint="@color/white"
+            app:hintTextColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.811"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.379">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/activity_editclass_et_endtime"
+                android:layout_width="157dp"
+                android:layout_height="72dp"
+                android:fontFamily="@font/jura"
+                android:textColor="@color/white" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/activity_editclass_til_maxcapacity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Max Capacity"
+            android:textColorHint="@color/white"
+            app:hintTextColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <EditText
+                android:id="@+id/activity_editclass_et_maxcapacity"
+                android:layout_width="314dp"
+                android:layout_height="72dp"
+                android:ems="10"
+                android:fontFamily="@font/jura"
+                android:inputType="number"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white"
+                android:textColorLink="@color/white" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:id="@+id/activity_editclass_btn_done"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/white"
+            android:fontFamily="@font/manrope_extrabold"
+            android:text="DONE"
+            android:textAlignment="center"
+            android:textColor="#000"
+            android:textSize="16sp"
+            app:cornerRadius="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.871" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/activity_editclass_til_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Description"
+            android:textColorHint="@color/white"
+            app:hintTextColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.505"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.7">
+
+            <EditText
+                android:id="@+id/activity_editclass_et_description"
+                android:layout_width="314dp"
+                android:layout_height="149dp"
+                android:ems="10"
+                android:fontFamily="@font/jura"
+                android:gravity="start|top"
+                android:inputType="textMultiLine"
+
+                android:maxLength="500"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

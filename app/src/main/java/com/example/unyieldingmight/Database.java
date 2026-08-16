@@ -245,7 +245,7 @@ public class Database {
 
     public static ArrayList<GymClass> getGymClassesAvailable() {
         ArrayList<GymClass> classes = new ArrayList<>();
-        String sql = "SELECT * FROM GymClasses WHERE ClassStatus = 'ONGOING'";
+        String sql = "SELECT * FROM GymClass WHERE ClassStatus = 'ONGOING'";
         Connection conn = getConnection();
         if (conn == null) return classes;
         try (PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -315,7 +315,7 @@ public class Database {
     }
 
     public static boolean updateClassStatus(int classId, ClassStatus status) {
-        String sql = "UPDATE GymClasses SET ClassStatus = ? WHERE ClassId = ?";
+        String sql = "UPDATE GymClass SET ClassStatus = ? WHERE ClassId = ?";
         Connection conn = getConnection();
         if (conn == null) return false;
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -372,12 +372,12 @@ public class Database {
         if (conn == null) return false;
         try {
             conn.setAutoCommit(false);
-            String checkSql = "SELECT CurrentCapacity, MaxCapacity FROM GymClasses WITH (UPDLOCK) WHERE ClassId = ?";
+            String checkSql = "SELECT CurrentCapacity, MaxCapacity FROM GymClass WITH (UPDLOCK) WHERE ClassId = ?";
             try (PreparedStatement pstmt = conn.prepareStatement(checkSql)) {
                 pstmt.setInt(1, classId);
                 try (ResultSet rs = pstmt.executeQuery()) {
                     if (rs.next() && rs.getInt("CurrentCapacity") < rs.getInt("MaxCapacity")) {
-                        String upSql = "UPDATE GymClasses SET CurrentCapacity = CurrentCapacity + 1 WHERE ClassId = ?";
+                        String upSql = "UPDATE GymClass SET CurrentCapacity = CurrentCapacity + 1 WHERE ClassId = ?";
                         try (PreparedStatement upPstmt = conn.prepareStatement(upSql)) {
                             upPstmt.setInt(1, classId); upPstmt.executeUpdate();
                         }

@@ -61,6 +61,11 @@
         <item>kg</item>
         <item>lb</item>
     </string-array>
+    <string-array name="gender_array">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Other</item>
+    </string-array>
     <string name="crossfit">The boys</string>
     <string name="boxfit">Lorem Ipsum</string>
 
@@ -106,4 +111,18 @@
         libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
+
+    <string name="class_created">Class Created!</string>
+    <string name="view_class">View Class</string>
+    <string name="successful">Successful!</string>
+    <string name="exit_page">Exit Page</string>
+    <string name="are_you_sure">Are you sure you want to delete this class?</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="class_deleted">Class Deleted</string>
+    <string name="back_to_home">Back to Home</string>
+
+    <string name="UnyieldingMight">Unyielding Might</string>
+    <string name="nav_open">Open</string>
+    <string name="nav_close">Close</string>
 </resources>
