@@ -50,6 +50,18 @@ android {
         viewBinding = true
     }
 
+    sourceSets {
+        getByName("main") {
+            java.setSrcDirs(listOf("src/main/kotlin"))
+        }
+        getByName("test") {
+            java.setSrcDirs(listOf("src/test/kotlin"))
+        }
+        getByName("androidTest") {
+            java.setSrcDirs(listOf("src/androidTest/kotlin"))
+        }
+    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -95,4 +107,9 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation(libs.material.v130alpha03)
+    
+    // Coroutines & Lifecycle
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.lifecycle.runtime.ktx)
 }

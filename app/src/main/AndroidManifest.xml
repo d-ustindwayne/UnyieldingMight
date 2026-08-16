@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UnyieldingMight">
         <activity
-            android:name=".Activities.MainActivity"
+            android:name=".activities.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.UnyieldingMight">
             <intent-filter>
@@ -23,18 +23,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activities.LoginActivity"/>
-        <activity android:name=".Activities.RegisterActivity"/>
-        <activity android:name=".Activities.VerifyActivity"/>
-        <activity android:name=".Activities.MembershipActivity"/>
-        <activity android:name=".Activities.ProfileActivity"/>
-        <activity android:name=".Activities.LinkmembershipActivity"/>
-        <activity android:name=".Activities.ActivitylevelActivity"/>
-        <activity android:name=".Activities.StatsActivity"/>
-        <activity android:name=".Activities.DoneActivity"/>
-        <activity android:name=".Activities.HomeActivity"/>
-        <activity android:name=".Activities.InfoActivity"/>
-        <activity android:name=".Activities.EditClassActivity"/>
+        <activity android:name=".activities.LoginActivity"/>
+        <activity android:name=".activities.RegisterActivity"/>
+        <activity android:name=".activities.VerifyActivity"/>
+        <activity android:name=".activities.MembershipActivity"/>
+        <activity android:name=".activities.ProfileActivity"/>
+        <activity android:name=".activities.LinkmembershipActivity"/>
+        <activity android:name=".activities.ActivitylevelActivity"/>
+        <activity android:name=".activities.StatsActivity"/>
+        <activity android:name=".activities.DoneActivity"/>
+        <activity android:name=".activities.HomeActivity"/>
+        <activity android:name=".activities.InfoActivity"/>
+        <activity android:name=".activities.EditClassActivity"/>
 
         <meta-data
             android:name="preloaded_fonts"
