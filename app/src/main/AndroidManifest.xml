@@ -29,6 +29,7 @@
         <activity android:name=".ActivitylevelActivity"></activity>
         <activity android:name=".StatsActivity"></activity>
         <activity android:name=".DoneActivity"></activity>
+        <activity android:name=".CreateclassActivity"></activity>
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

@@ -47,5 +47,16 @@
     <string name="physical_stats">Physical Stats</string>
     <string name="weight">Weight</string>
     <string name="height">Height</string>
+    <string name="create_a_class">Create a Class</string>
+    <string name="enter_class_name">Enter class name...</string>
+    <string name="enter_trainer_name">Enter trainer name...</string>
+    <string name="enter_category">Enter category...</string>
+    <string name="enter_capacity">Enter capacity...</string>
+    <string name="enter_description">Enter description...</string>
+    <string-array name="level_array">
+        <item>Light</item>
+        <item>Heavy</item>
+        <item>Extreme</item>
+    </string-array>
 </resources>
 

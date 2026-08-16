@@ -32,6 +32,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/manrope_extrabold"
             android:text="@string/link_your_membership"
+            android:textAlignment="center"
             android:textColor="#fff"
             android:textSize="34sp"
             app:layout_constraintBottom_toBottomOf="parent"
