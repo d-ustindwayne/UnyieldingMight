@@ -54,6 +54,8 @@ public class EmailNewsletter extends EmailFunction implements Observer {
     }
 
     public EmailNewsletter updateList(String... updates) {
+        // For newsletter feature.
+        // Listing all updates that will be included in the newsletter created
         if (!emailType.equals(NewsletterType.UPDATES)) return null;
 
         StringBuilder updateList = new StringBuilder();
@@ -72,7 +74,7 @@ public class EmailNewsletter extends EmailFunction implements Observer {
 
     @Override
     public void update() {
-        // If used as a standalone observer, it uses default branding
+        // Sends the email to subscriber
         this.createEmail().sendEmail();
     }
 }

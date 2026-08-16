@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 
 public class Security {
     public static String hashData(String text) throws Exception {
+        // Encrypting data using SHA256
         MessageDigest md = MessageDigest.getInstance("SHA-256");
 
         byte[] hashBytes = md.digest(text.getBytes(StandardCharsets.UTF_8));
@@ -17,9 +18,4 @@ public class Security {
         }
         return hexString.toString();
     }
-
-    public static boolean validated(String data1, String data2) {
-        return data1.equals(data2);
-    }
-
 }

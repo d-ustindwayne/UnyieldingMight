@@ -1,5 +1,7 @@
 package com.example.unyieldingmight.Services;
 
+import android.util.Log;
+
 import com.example.unyieldingmight.BuildConfig;
 import com.example.unyieldingmight.Models.EmailVerificationData;
 import com.google.gson.Gson;
@@ -16,6 +18,7 @@ public class EmailVerification {
     private StringBuilder responseString;
     private int responseCode;
 
+    // Set the email to the object
     public EmailVerification email(String email) {
         this.email = email;
         return this;
@@ -24,28 +27,33 @@ public class EmailVerification {
     public EmailVerification verify() {
         if (email == null) { return null; }
 
+        // Creating the whole URL
         responseString = new StringBuilder();
         String urlString = String.format("%semail=%s&apikey=%s", apiURI, email, apiKey);
         HttpURLConnection urlConnection = null;
 
         try {
             URL url = new URL(urlString);
+            // Creates a connection to the URL and gets its response
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
             urlConnection.setRequestProperty("Accept", "application/json");
             responseCode = urlConnection.getResponseCode();
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
+                // Get the response and be stored as a string
                 BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String line;
                 while ((line = reader.readLine()) != null) {
                     responseString.append(line);
                 }
+                // Prevent memory leak
                 reader.close();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(e.getMessage(), "VERIFICATION ERROR");
         } finally {
+            // Close the connection
             if (urlConnection != null) {
                 urlConnection.disconnect();
             }
@@ -55,6 +63,7 @@ public class EmailVerification {
     }
 
     public EmailVerificationData getData() {
+        // Map the response from JSON to EmailVerificationData class
         try {
             Gson gson = new Gson();
             return gson.fromJson(responseString.toString(), EmailVerificationData.class);

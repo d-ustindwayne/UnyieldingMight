@@ -1,5 +1,9 @@
 package com.example.unyieldingmight.Services;
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
 import com.example.unyieldingmight.BuildConfig;
 
 import java.util.Properties;
@@ -40,34 +44,15 @@ public abstract class EmailFunction {
         return this;
     }
 
-    public EmailFunction createEmail(String subject, String body) {
+    public void createEmail(String subject, String body) {
         this.subjectText = subject;
         this.bodyText = body;
-        return createEmail();
+        createEmail();
     }
 
     public EmailFunction createEmail() {
         try {
-            Properties props = new Properties();
-            props.put("mail.smtp.auth", "true");
-            props.put("mail.smtp.host", BuildConfig.SMTP_HOST);
-            
-            // Check if port is 465 (SSL) or 587 (TLS)
-            String port = BuildConfig.SMTP_PORT;
-            props.put("mail.smtp.port", port);
-            
-            if ("465".equals(port)) {
-                props.put("mail.smtp.socketFactory.port", port);
-                props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-                props.put("mail.smtp.socketFactory.fallback", "false");
-                props.put("mail.smtp.ssl.enable", "true");
-            } else {
-                props.put("mail.smtp.starttls.enable", "true");
-                props.put("mail.smtp.starttls.required", "true");
-            }
-            
-            props.put("mail.smtp.ssl.protocols", "TLSv1.2");
-            props.put("mail.debug", "true");
+            Properties props = getProperties();
 
             Session session = Session.getInstance(props, new Authenticator() {
                 @Override
@@ -76,7 +61,8 @@ public abstract class EmailFunction {
                 }
             });
 
-            emailMessage = new MimeMessage(session);
+            // Email content configuration
+            emailMessage = new MimeMessage(session); // Multipurpose Internet Mail Extensions Message Class
             emailMessage.setFrom(new InternetAddress(fromEmail, fromName));
             emailMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(toEmail, toName));
             emailMessage.setSubject(subjectText);
@@ -86,10 +72,26 @@ public abstract class EmailFunction {
             );
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(e.getMessage(), "EMAIL FUNCTION ERROR");
             this.responseString = "Creation Error: " + e.getMessage();
         }
         return this;
+    }
+
+    @NonNull
+    private static Properties getProperties() {
+        // SMTP Configuration
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.host", BuildConfig.SMTP_HOST);
+        props.put("mail.smtp.port", BuildConfig.SMTP_PORT);
+        props.put("mail.smtp.socketFactory.port", BuildConfig.SMTP_PORT);
+        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        props.put("mail.smtp.socketFactory.fallback", "false");
+        props.put("mail.smtp.ssl.enable", "true");
+        props.put("mail.smtp.ssl.protocols", "TLSv1.2");
+        props.put("mail.debug", "true");
+        return props;
     }
 
     public void sendEmail() {
@@ -103,11 +105,9 @@ public abstract class EmailFunction {
         try {
             Transport.send(emailMessage);
             this.responseString = "Success: Email sent successfully!";
-            android.util.Log.d("MAIL_DEBUG", "Email sent to " + toEmail);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(e.getMessage(), "EMAIL SENDING ERROR");
             this.responseString = "Send Error: " + e.getMessage();
-            android.util.Log.e("MAIL_DEBUG", "Failed to send to " + toEmail + ": " + e.getMessage());
         }
     }
 }

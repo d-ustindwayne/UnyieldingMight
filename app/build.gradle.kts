@@ -22,15 +22,7 @@ android {
                 load(propertiesFile.inputStream())
             }
         }
-
-        val STRIPE_SK = properties.getProperty("STRIPE_SK") ?: ""
-        buildConfigField("String", "STRIPE_SK", "\"$STRIPE_SK\"")
-        val STRIPE_PK = properties.getProperty("STRIPE_PK") ?: ""
-        buildConfigField("String", "STRIPE_PK", "\"$STRIPE_PK\"")
-        val STRIPE_RK = properties.getProperty("STRIPE_RK") ?: ""
-        buildConfigField("String", "STRIPE_RK", "\"$STRIPE_RK\"")
-        val BREVO_apiKey = properties.getProperty("BREVO_APIKEY") ?: ""
-        buildConfigField("String", "BREVO_APIKEY", "\"$BREVO_apiKey\"")
+        
         val QEV_apiKey = properties.getProperty("QEV_APIKEY") ?: ""
         buildConfigField("String", "QEV_APIKEY", "\"$QEV_apiKey\"")
         val DB_HOST = properties.getProperty("DB_HOST") ?: ""

@@ -40,9 +40,14 @@ public class Database {
         reconnect();
     }
 
-    /**PreparedStatement is a precompiled query and those ? will be replaced
-     * with values to be set | to prevent sql injection
+    /**
+     * PreparedStatement is a precompiled query and those ? will be replaced
+     * with values to be set | to prevent SQL injection
      */
+
+    // Connection to the database is always checked for each function (if conn == null)
+
+    // ResultSet is the result from the query executed
 
     // Only one instantiation
     public static Database getInstance() {
@@ -56,7 +61,7 @@ public class Database {
             if (getInstance().connection == null || getInstance().connection.isClosed()) {
                 getInstance().reconnect();
             }
-        } catch (SQLException e) { Log.e(e.toString(), "Connection Error"); }
+        } catch (SQLException e) { Log.e(e.getMessage(), "Connection Error"); }
         return getInstance().connection;
     }
 
@@ -67,7 +72,7 @@ public class Database {
             // URL for database connection + parameter
             String url = DB_URL + ";ssl=request;loginTimeout=30"; // Establish secure connection + timeout
             this.connection = DriverManager.getConnection(url, DB_USER, DB_PASSWORD);
-        } catch (Exception e) { Log.e(e.toString(), "Reconnection Error"); }
+        } catch (Exception e) { Log.e(e.getMessage(), "Reconnection Error"); }
     }
 
     public static User getCurrentUser() { return getInstance().currentUser; }
@@ -91,6 +96,7 @@ public class Database {
             pstmt.setString(1, email);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
+                    // Create address for the customer
                     Address address = new Address.Builder()
                         .street(rs.getString("Street"))
                         .city(rs.getString("City"))
@@ -99,12 +105,14 @@ public class Database {
                         .postcode(rs.getString("Postcode"))
                         .build();
 
+                    // Gender condition
                     String gdStr = rs.getString("Gender");
                     Gender gd;
                     if ("MALE".equalsIgnoreCase(gdStr) || "M".equalsIgnoreCase(gdStr)) gd = Gender.MALE;
                     else if ("FEMALE".equalsIgnoreCase(gdStr) || "F".equalsIgnoreCase(gdStr)) gd = Gender.FEMALE;
                     else gd = Gender.OTHER;
 
+                    // Create the profile for the customer
                     Profile profile = new Profile.Builder()
                         .email(rs.getString("Email"))
                         .firstName(rs.getString("FirstName"))
@@ -116,6 +124,7 @@ public class Database {
                         .userClass(rs.getString("UserClass"))
                         .build();
 
+                    // Activity Multiplier condition
                     float multiplierVal = rs.getFloat("ActivityMultiplier");
                     ActivityMultiplier multiplier;
                     if (multiplierVal == 1.2f) multiplier = ActivityMultiplier.INACTIVE;
@@ -124,6 +133,7 @@ public class Database {
                     else if (multiplierVal == 1.725f) multiplier = ActivityMultiplier.HEAVY;
                     else multiplier = ActivityMultiplier.EXTREME;
 
+                    // Create the Customer class
                     return new Customer.Builder()
                         .customerId(rs.getInt("CustomerId"))
                         .profile(profile)
@@ -135,11 +145,12 @@ public class Database {
                         .build();
                 }
             }
-        } catch (Exception e) { Log.e(e.toString(), "Customer Data Fetching Failed"); }
+        } catch (Exception e) { Log.e(e.getMessage(), "Customer Data Fetching Failed"); }
         return null;
     }
 
     public static User loginUser(String email, String password) {
+        // Validates the user credential and returns the user
         User user = getUser(email, password);
         if (user != null) {
             getInstance().currentUser = user;
@@ -147,6 +158,7 @@ public class Database {
         return user;
     }
 
+    // Fetch the user from the database
     public static User getUser(String email, String password) {
         String sql = "SELECT * FROM UserProfile WHERE Email = ?";
         Connection conn = getConnection();
@@ -160,15 +172,17 @@ public class Database {
                     try {
                         inputHash = Security.hashData(password);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        Log.e(e.getMessage(), "ERROR");
                         return null;
                     }
 
-                    if (Security.validated(storedHash, inputHash)) {
+                    // Check the hashed input and the hashed password stored in the database
+                    if (storedHash.equals(inputHash)) {
                         String roleStr = rs.getString("UserClass");
                         User.Role role = (roleStr != null && roleStr.equalsIgnoreCase("ADMIN"))
                                 ? User.Role.ADMIN : User.Role.CUSTOMER;
 
+                        // Create user class for the logged user
                         return new User(
                             rs.getInt("ProfileId"),
                             rs.getString("FirstName") + " " + rs.getString("LastName"),
@@ -179,13 +193,15 @@ public class Database {
                     }
                 }
             }
-        } catch (SQLException e) { Log.e(e.toString(), "SQL ERROR"); }
+        } catch (SQLException e) { Log.e(e.getMessage(), "SQL ERROR"); }
         return null;
     }
 
+    // Create a record of the given information in the ProfileAddress, UserProfile, and Customer Table
     public static boolean registerCustomer(String firstName, String lastName, String email, String password,
   String street, String region, String city, String country, String postcode, float height, float weight, float multiplier, Integer membershipId, Date dob, String gender) {
-        
+
+        // Verify the email if it is
         EmailVerification ev = new EmailVerification().email(email).verify();
         EmailVerificationData evData = ev.getData();
         if (evData != null && evData.success() != null && "true".equalsIgnoreCase(evData.success())) {
@@ -193,6 +209,7 @@ public class Database {
             boolean isValid = "valid".equalsIgnoreCase(evData.result());
             boolean isDisposable = "true".equalsIgnoreCase(evData.disposable());
 
+            // Check if email is not safe, not valid, or disposable
             if (!(isSafe || isValid) || isDisposable) {
                 Log.w("DATABASE_ERROR", "Registration blocked by QEV for: " + email + ". Reason: " + evData.reason());
                 return false;
@@ -200,11 +217,9 @@ public class Database {
         }
 
         Connection conn = getConnection();
-        if (conn == null) {
-            Log.e("DATABASE_ERROR", "Registration failed: No connection to database.");
-            return false;
-        }
+        if (conn == null) return false;
         try {
+            // Disables auto commit | preventing multiple record and primary key skipping increment
             conn.setAutoCommit(false);
 
             int addressId = -1;
@@ -240,8 +255,9 @@ public class Database {
             }
             float tdee = Conversion.rounded(bmr * multiplier);
 
-            String custSql = "INSERT INTO Customer (MembershipId, Email, Height, Weight, ActivityMultiplier, TDEE) VALUES (?, ?, ?, ?, ?, ?)";
-            try (PreparedStatement pstmt = conn.prepareStatement(custSql, Statement.RETURN_GENERATED_KEYS)) {
+            // Insert the Customer's stats information
+            String customerSql = "INSERT INTO Customer (MembershipId, Email, Height, Weight, ActivityMultiplier, TDEE) VALUES (?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement pstmt = conn.prepareStatement(customerSql, Statement.RETURN_GENERATED_KEYS)) {
                 if (membershipId != null) pstmt.setInt(1, membershipId); else pstmt.setNull(1, Types.INTEGER);
                 pstmt.setString(2, email);
                 pstmt.setFloat(3, height); pstmt.setFloat(4, weight);
@@ -251,6 +267,7 @@ public class Database {
                 try (ResultSet rs = pstmt.getGeneratedKeys()) { if (rs.next()) customerId = rs.getInt(1); }
             }
 
+            // Insert the Customer's personal information
             String profSql = "INSERT INTO UserProfile (Email, ProfilePassword, FirstName, LastName, DateOfBirth, Gender, AddressId, CustomerId, UserClass) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'CUSTOMER')";
             try (PreparedStatement pstmt = conn.prepareStatement(profSql)) {
@@ -258,7 +275,7 @@ public class Database {
                 try {
                     hashedPassword = Security.hashData(password);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Log.e(e.getMessage(), "ERROR");
                     conn.rollback();
                     return false;
                 }
@@ -277,15 +294,16 @@ public class Database {
             return true;
         } catch (SQLException e) {
             Log.e("DATABASE_ERROR", "Registration failed: " + e.getMessage());
-            try { conn.rollback(); } catch (SQLException ex) { }
-            e.printStackTrace();
+            // To return to the previous state
+            try { conn.rollback(); } catch (Exception err) { Log.e(err.getMessage(), "ROLLBACK ERROR"); }
             return false;
         } finally {
-            try { conn.setAutoCommit(true); } catch (SQLException e) { }
+            try { conn.setAutoCommit(true); } catch (SQLException e) { Log.e(e.getMessage(), "SQL ERROR"); }
         }
     }
 
     public static ArrayList<GymClass> getGymClassesAvailable() {
+        // Check all gym classes that are available by "ClassStatus = 'ONGOING'"
         ArrayList<GymClass> classes = new ArrayList<>();
         String sql = "SELECT gc.*, t.FirstName as T_FirstName, t.LastName as T_LastName, t.ProfileDescription as T_Desc " +
                 "FROM GymClass gc " +
@@ -298,11 +316,17 @@ public class Database {
             while (rs.next()) {
                 classes.add(mapResultSetToGymClass(rs));
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) { Log.e(e.getMessage(), "ERROR"); };
         return classes;
     }
 
     public static MembershipResult validateMembership(int membershipId, String email) {
+        /**
+         * Check validation of membership by checking
+         * - if the email input is the same on the one on the membership table
+         * - if email is already linked to another account
+         * - if membershipId is not found
+         */
         String sql = "SELECT m.*, c.CustomerId, pa.Street, pa.City, pa.Region, pa.Postcode, pa.Country " +
                 "FROM Membership m " +
                 "LEFT JOIN Customer c ON m.MembershipId = c.MembershipId " +
@@ -345,6 +369,7 @@ public class Database {
                         Log.w("DATABASE", "'Gender' column not found in Membership table.");
                     }
 
+                    // Set the fetched data to instantiate a new Membership object
                     Membership membership = new Membership(
                             rs.getInt("MembershipId"),
                             dbEmail,
@@ -370,6 +395,7 @@ public class Database {
                     }
 
                     Log.d("DATABASE", "Membership Created: " + membership.toString());
+                    // Record the status and the membership
                     return new MembershipResult(MembershipResult.Status.SUCCESS, membership);
                 } else {
                     return new MembershipResult(MembershipResult.Status.NOT_FOUND, null);
@@ -381,14 +407,16 @@ public class Database {
         return null;
     }
 
+    // For getting recommended gym class
     public static ArrayList<GymClass> getRecommendedGymClasses(Customer customer) {
         ArrayList<GymClass> allOngoing = getGymClassesAvailable();
         ArrayList<GymClass> recommended = new ArrayList<>();
         float userTdee = customer.getTDEE();
 
+        // Check all gym classes that burns at least 12% of user's tdee
         for (GymClass gc : allOngoing) {
             float classBurn = gc.getAvgCaloriesBurnedPerDay();
-            if (classBurn >= (userTdee * 0.15f)) {
+            if (classBurn >= (userTdee * 0.12f)) {
                 recommended.add(gc);
             }
         }
@@ -404,17 +432,19 @@ public class Database {
             pstmt.setInt(2, classId);
             int rows = pstmt.executeUpdate();
             if (rows > 0) {
+                // Sends email about the class being finished or cancelled.
                 NewsletterType type = (status == ClassStatus.COMPLETE) ? NewsletterType.CLASS_FINISHED : NewsletterType.CLASS_CANCELLED;
                 NewsletterSubscribers subscribers = getNewsletterSubscribers();
                 subscribers.setLatestUpdateType(type);
                 subscribers.notifyObserver();
                 return true;
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) { Log.e(e.getMessage(), "ERROR"); };
         return false;
     }
 
     public static ArrayList<GymBooking> getBookingHistory() {
+        // Get current user's booking history
         ArrayList<GymBooking> history = new ArrayList<>();
         User user = getCurrentUser();
         if (user == null) return history;
@@ -444,12 +474,13 @@ public class Database {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            Log.e(e.getMessage(), "ERROR");
         }
         return history;
     }
 
     public static boolean editClass(int classId, String name, String description, Timestamp startDateTime, Timestamp endDateTime, int maxCapacity, float avgCalorieBurnedPerDay) {
+        // Edit class information
         Connection conn = getConnection();
         if (conn == null) return false;
         String sql = "UPDATE GymClass SET ClassName = ?, ClassDescription = ?, StartDateTime = ?, EndDateTime = ?, MaxCapacity = ?, AvgCaloriesBurnedPerDay = ? WHERE ClassId = ?";
@@ -470,7 +501,6 @@ public class Database {
 
     public static boolean bookClass(int classId) {
         User user = getCurrentUser();
-        if (user == null) return false;
         Connection conn = getConnection();
         if (conn == null) return false;
         try {
@@ -516,10 +546,10 @@ public class Database {
             }
             conn.rollback();
         } catch (SQLException e) {
-            try { conn.rollback(); } catch (SQLException ex) { }
-            e.printStackTrace();
+            try { conn.rollback(); } catch (SQLException err) { Log.e(err.getMessage(), "SQL ERROR"); }
+            Log.e(e.getMessage(), "ERROR");
         } finally {
-            try { conn.setAutoCommit(true); } catch (SQLException e) { }
+            try { conn.setAutoCommit(true); } catch (SQLException ex) { Log.e(ex.getMessage(), "SQL ERROR"); }
         }
         return false;
     }
@@ -537,7 +567,7 @@ public class Database {
                 return rs.next();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            Log.e(e.getMessage(), "ERROR");
         }
         return false;
     }
