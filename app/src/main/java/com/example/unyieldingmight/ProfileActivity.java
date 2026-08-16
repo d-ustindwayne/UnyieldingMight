@@ -4,9 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.Spinner;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -26,14 +24,6 @@ public class ProfileActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
     }
-    public void nextActivityStats(View v){
-
-    }
-    public void previousActivityMembership(View v){
-        Intent i = new Intent(this, MembershipActivity.class);
-        startActivity(i);
-    }
-
     public void proceed(View v){
         EditText day = findViewById(R.id.activity_profile_et_day);
         String dayData = day.getText().toString().trim();
@@ -63,6 +53,9 @@ public class ProfileActivity extends AppCompatActivity {
         Log.d(countryData, "Spinner Value");
 
         Intent i = new Intent(this, StatsActivity.class);
+        startActivity(i);}
+    public void previousActivityMembership(View v){
+        Intent i = new Intent(this, MembershipActivity.class);
         startActivity(i);
     }
 }

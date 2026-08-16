@@ -37,7 +37,7 @@ public class InfoActivity extends AppCompatActivity {
             infoEndTime.setText(bundle.getString("EndTime"));
             infoCurCap.setText(bundle.getString("CurCap"));
             infoMaxCap.setText(bundle.getString("MaxCap"));
-            infoDesc.setText(bundle.getInt("Desc"));
+            infoDesc.setText(bundle.getString("Desc"));
         }
     }
 }

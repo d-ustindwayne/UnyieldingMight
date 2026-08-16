@@ -27,7 +27,6 @@ public class User {
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
-
     public Role getUserClass() { return userClass; }
     public void setUserClass(Role userClass) { this.userClass = userClass; }
 
