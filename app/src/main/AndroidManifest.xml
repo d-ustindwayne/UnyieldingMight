@@ -26,6 +26,9 @@
         <activity android:name=".MembershipActivity"></activity>
         <activity android:name=".ProfileActivity"></activity>
         <activity android:name=".LinkmembershipActivity"></activity>
+        <activity android:name=".ActivitylevelActivity"></activity>
+        <activity android:name=".StatsActivity"></activity>
+        <activity android:name=".DoneActivity"></activity>
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

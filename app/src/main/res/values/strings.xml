@@ -34,4 +34,18 @@
     <string name="membership_id">Membership ID</string>
     <string name="to_see_your_membership_id_check_the_back_of_your_membership_card_below_your_picture">To see your Membership ID, check the back of your Membership Card, below your picture</string>
     <string name="btn_link">LINK</string>
+    <string name="all_done">All Done!</string>
+    <string name="your_profile_is_set_let_s_book_your_first_class">Your profile is set. Let\'s book your first class!</string>
+    <string name="btn_get_started">GET STARTED</string>
+    <string name="moderate">Moderate</string>
+    <string name="heavy">Heavy</string>
+    <string name="extreme">Extreme</string>
+    <string name="light">Light</string>
+    <string name="inactive">Inactive</string>
+    <string name="how_often_do_you_exercise">How often do you exercise?</string>
+    <string name="activity_level">Activity Level</string>
+    <string name="physical_stats">Physical Stats</string>
+    <string name="weight">Weight</string>
+    <string name="height">Height</string>
 </resources>
+

@@ -12,7 +12,11 @@ public class LinkmembershipActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_linkmembership);
     }
-    public void previousActivity(View v){
+    public void nextActivityActivityLevel(View v){
+        Intent i = new Intent(this, ActivitylevelActivity.class);
+        startActivity(i);
+    }
+    public void previousActivityMembership(View v){
         Intent i = new Intent(this, MembershipActivity.class);
         startActivity(i);
     }

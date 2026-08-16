@@ -12,7 +12,11 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
     }
-    public void previousActivity(View v){
+    public void nextActivityStats(View v){
+        Intent i = new Intent(this, StatsActivity.class);
+        startActivity(i);
+    }
+    public void previousActivityMembership(View v){
         Intent i = new Intent(this, MembershipActivity.class);
         startActivity(i);
     }
