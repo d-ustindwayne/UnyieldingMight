@@ -6,7 +6,7 @@ public class EmailOTP extends EmailFunction {
     private final String OTP;
     private boolean authenticated = false;
 
-    public EmailOTP(String email) {
+    public EmailOTP() {
         super();
         this.OTP = generateOTP();
     }

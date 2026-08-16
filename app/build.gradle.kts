@@ -36,7 +36,7 @@ android {
         val DB_HOST = properties.getProperty("DB_HOST") ?: ""
         buildConfigField("String", "DB_HOST", "\"$DB_HOST\"")
         val DB_PORT = properties.getProperty("DB_PORT") ?: ""
-        buildConfigField("int", "DB_PORT", "\"$DB_PORT\"")
+        buildConfigField("String", "DB_PORT", "\"$DB_PORT\"")
         val DB_USER = properties.getProperty("DB_USER") ?: ""
         buildConfigField("String", "DB_USER", "\"$DB_USER\"")
         val DB_PASSWORD = properties.getProperty("DB_PASSWORD") ?: ""

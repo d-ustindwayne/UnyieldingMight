@@ -4,7 +4,7 @@
         private final NewsletterType emailType;
         private String introMessage;
 
-        public EmailNewsletter(String email, NewsletterType type) {
+        public EmailNewsletter(NewsletterType type) {
             super();
             this.emailType = type;
             switch (emailType) {

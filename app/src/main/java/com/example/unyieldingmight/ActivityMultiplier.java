@@ -1,7 +1,7 @@
 package com.example.unyieldingmight;
 
 public enum ActivityMultiplier {
-    Inactive(1.2f),
+    INACTIVE(1.2f),
     LIGHT(1.275f),
     MODERATE(1.55f),
     HEAVY(1.725f),

@@ -9,8 +9,8 @@ public class Profile {
     private final Address address;
     private final Date dateOfBirth;
     private final Gender gender;
-    private final String FirstName;
-    private final String LastName;
+    private final String firstName;
+    private final String lastName;
 
     private Profile(Builder builder) {
         this.email = builder.email;
@@ -19,8 +19,8 @@ public class Profile {
         this.address = builder.address;
         this.dateOfBirth = builder.dateOfBirth;
         this.gender = builder.gender;
-        this.FirstName = builder.FirstName;
-        this.LastName = builder.LastName;
+        this.firstName = builder.firstName;
+        this.lastName = builder.lastName;
     }
 
     public String getEmail() {
@@ -45,12 +45,12 @@ public class Profile {
         return gender;
     }
 
-    public String getFirstName() {
-        return FirstName;
+    public String fetFirstName() {
+        return firstName;
     }
 
-    public String getLastName() {
-        return LastName;
+    public String letLastName() {
+        return lastName;
     }
 
     public static class Builder {
@@ -60,8 +60,8 @@ public class Profile {
         private Address address;
         private Date dateOfBirth;
         private Gender gender;
-        private String FirstName;
-        private String LastName;
+        private String firstName;
+        private String lastName;
 
         public Builder email(String email) {
             this.email = email;
@@ -94,12 +94,12 @@ public class Profile {
         }
 
         public Builder firstName(String firstName) {
-            this.FirstName = firstName;
+            this.firstName = firstName;
             return this;
         }
 
         public Builder lastName(String lastName) {
-            this.LastName = lastName;
+            this.lastName = lastName;
             return this;
         }
 

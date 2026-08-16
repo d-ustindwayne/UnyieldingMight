@@ -10,7 +10,7 @@ appcompat = "1.7.1"
 material = "1.13.0"
 activity = "1.13.0"
 constraintlayout = "2.2.1"
-stripeAndroid = "32.0.0"
+stripeAndroid = "23.7.0"
 
 [libraries]
 brevo = { module = "com.brevo:brevo", version.ref = "brevo" }
