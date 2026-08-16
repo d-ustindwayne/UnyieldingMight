@@ -196,8 +196,6 @@ public class VerifyActivity extends AppCompatActivity {
             return false;
         });
 
-// Repeat this for et2 (to et3), et3 (to et4), etc.
-
         if(otp1Data.isEmpty() || otp2Data.isEmpty() || otp3Data.isEmpty() || otp4Data.isEmpty() || otp5Data.isEmpty() || otp6Data.isEmpty()){
             Toast.makeText(this, "Input fields cannot be empty", Toast.LENGTH_SHORT).show();
         }
