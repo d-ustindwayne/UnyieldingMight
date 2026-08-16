@@ -1,5 +1,6 @@
 package com.example.unyieldingmight;
 
+import com.google.gson.Gson;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -7,11 +8,22 @@ import java.net.URL;
 
 public class EmailVerification {
 
-    public static String verifyEmail(String inputEmail) {
-        String apiKey = BuildConfig.QEV_APIKEY;
-        String urlString = String.format("https://api.quickemailverification.com/v1/verify?email=%s&apikey=%s", inputEmail, apiKey);
+    private String apiKey = BuildConfig.QEV_APIKEY;
+    private String apiURI = "https://api.quickemailverification.com/v1/verify?";
+    private String email;
+    private StringBuilder responseString;
+    private int responseCode;
 
-        StringBuilder result = new StringBuilder();
+    public EmailVerification email(String email) {
+        this.email = email;
+        return this;
+    }
+
+    public EmailVerification verify() {
+        if (email == null) { return null; }
+
+        responseString = new StringBuilder();
+        String urlString = String.format("%semail=%s&apikey=%s", apiURI, email, apiKey);
         HttpURLConnection urlConnection = null;
 
         try {
@@ -19,29 +31,38 @@ public class EmailVerification {
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
             urlConnection.setRequestProperty("Accept", "application/json");
-
-            int responseCode = urlConnection.getResponseCode();
+            responseCode = urlConnection.getResponseCode();
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    result.append(line);
+                    responseString.append(line);
                 }
                 reader.close();
-            } else {
-                return "Error: " + responseCode;
             }
-
         } catch (Exception e) {
-            e.printStackTrace();
-            return "Exception: " + e.getMessage();
+            responseString.append(e.getMessage());
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
             }
         }
 
-        return result.toString();
+        return this;
     }
+
+    public EmailVerificationData getData() {
+        try {
+            Gson gson = new Gson();
+            return gson.fromJson(responseString.toString(), EmailVerificationData.class);
+        } catch (Exception e) {
+            this.responseString.append(e.getMessage());
+            return null;
+        }
+    }
+
+    public String getResponseString() { return responseString.toString(); }
+
+    public int getResponseCode() { return responseCode; }
 }
