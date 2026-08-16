@@ -1,5 +1,6 @@
 package com.example.unyieldingmight.Models;
 
+import com.example.unyieldingmight.BuildConfig;
 import com.example.unyieldingmight.Services.EmailNewsletter;
 
 public class Customer implements Observer {
@@ -71,18 +72,18 @@ public class Customer implements Observer {
     @Override
     public void update() {
         // 1. Determine what happened from the Subject
-        NewsletterSubscribers subscribers = com.example.unyieldingmight.Services.Database.getNewsletterSubscribers();
+        NewsletterSubscribers subscribers = com.example.
+                unyieldingmight.Services.Database.getNewsletterSubscribers();
         NewsletterType updateType = subscribers.getLatestUpdateType();
 
         if (updateType != null) {
             // 2. Automatically send an email notification using Jakarta Mail
             // Ensure SMTP settings in local.properties are correct.
-            String verifiedSenderEmail = "diaz59@gmail.com";
 
             // Personalize the email by passing the customer's name to the constructor
             EmailNewsletter emailNotification = new EmailNewsletter(updateType, profile.getFirstName());
 
-            emailNotification.setSender("Dustin @ UnyieldingMight", verifiedSenderEmail)
+            emailNotification.setSender("Dustin @ UnyieldingMight", BuildConfig.SMTP_USER)
                     .setReceiver(profile.getFirstName(), profile.getEmail())
                     .createEmail()
                     .sendEmail();
