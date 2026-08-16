@@ -93,13 +93,6 @@ public class CreateclassActivity extends AppCompatActivity {
             ).show();
         });
 
-        // Spinner when selecting the intensity or level of the exercise
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-                this, R.array.level_array, R.layout.my_selected_item
-        );
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        activity_createclass_spinner_level.setAdapter(adapter);
-
         // Post button
         activity_createclass_btn_post.setOnClickListener(v -> {
             // Get all values

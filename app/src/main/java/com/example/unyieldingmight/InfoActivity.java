@@ -60,7 +60,26 @@ public class InfoActivity extends AppCompatActivity {
                     new Thread(() -> {
                         Intent intent = getIntent();
                         int classID = intent.getIntExtra("ClassId", 0);
+                        String title = intent.getStringExtra("Title");
+                        String date = intent.getStringExtra("Date");
+                        String startTime = intent.getStringExtra("StartTime");
+                        String endTime = intent.getStringExtra("EndTime");
+                        String maxCap = intent.getStringExtra("MaxCap");
+                        String intensity = intent.getStringExtra("Intensity");
+                        String desc = intent.getStringExtra("Desc");
+
                         Log.d(String.valueOf(classID), "ClassID");
+
+                        Intent i = new Intent(InfoActivity.this, EditclassActivity.class);
+                        i.putExtra("ClassId", classID);
+                        i.putExtra("Title", title);
+                        i.putExtra("Date", date);
+                        i.putExtra("StartTime", startTime);
+                        i.putExtra("EndTime", endTime);
+                        i.putExtra("MaxCap", maxCap);
+                        i.putExtra("Intensity", intensity);
+                        i.putExtra("Desc", desc);
+                        startActivity(i);
                     }).start();
                 }
             });

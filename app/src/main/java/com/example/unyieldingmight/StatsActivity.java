@@ -18,6 +18,7 @@ public class StatsActivity extends AppCompatActivity {
 
         Spinner spinner1 = findViewById(R.id.activity_stats_spin_height);
         Spinner spinner2 = findViewById(R.id.activity_stats_spin_weight);
+        Spinner spinner3 = findViewById(R.id.activity_stats_spin_gender);
 
         ArrayAdapter<CharSequence> adapter1 = ArrayAdapter.createFromResource(
                 this,
@@ -34,6 +35,15 @@ public class StatsActivity extends AppCompatActivity {
         );
         adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner2.setAdapter(adapter2);
+
+        ArrayAdapter<CharSequence> adapter3 = ArrayAdapter.createFromResource(
+                this,
+//                New array added in strings.xml btw
+                R.array.gender_array,
+                R.layout.my_selected_item
+        );
+        adapter3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner3.setAdapter(adapter3);
     }
 
     public void previousActivityProfile(View v){
@@ -57,11 +67,18 @@ public class StatsActivity extends AppCompatActivity {
         Spinner wMeasure = findViewById(R.id.activity_stats_spin_weight);
         String wMeasureData = wMeasure.getSelectedItem().toString();
 
+//        Gender
+        Spinner gender = findViewById(R.id.activity_stats_spin_gender);
+        String genderData = gender.getSelectedItem().toString();
+
+
         Log.d(hMeasureData, "Height Unit");
         Log.d(wMeasureData, "Measure Unit");
 
         Log.d(String.valueOf(heightData), "Height");
         Log.d(String.valueOf(weightData), "Measure");
+
+        Log.d(genderData, "Gender");
 
         Intent i = new Intent(this, ActivitylevelActivity.class);
         startActivity(i);
