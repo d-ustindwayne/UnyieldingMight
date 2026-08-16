@@ -34,7 +34,6 @@ public class LoginActivity extends AppCompatActivity {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                // Prevent going back to splash/main
             }
         });
     }

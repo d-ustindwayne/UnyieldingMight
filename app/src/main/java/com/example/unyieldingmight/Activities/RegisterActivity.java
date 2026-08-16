@@ -42,9 +42,6 @@ public class RegisterActivity extends AppCompatActivity {
         EditText confirmPassword = findViewById(R.id.activity_register_et_confirmPassword);
         String confirmPasswordData = confirmPassword.getText().toString().trim();
 
-//        if(firstName.isEmpty() || lastName.isEmpty() || emailData.isEmpty() || passwordData.isEmpty() || confirmPasswordData.isEmpty()){
-//            Toast.makeText(this, "Input fields cannot be empty", Toast.LENGTH_SHORT).show();
-//        }
         boolean isEmpty = Stream.of(firstName, lastName, emailData, passwordData, confirmPasswordData).anyMatch(String::isEmpty);
         if(isEmpty){
             Toast.makeText(this, "Input fields cannot be empty", Toast.LENGTH_SHORT).show();

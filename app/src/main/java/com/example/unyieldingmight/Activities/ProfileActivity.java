@@ -62,12 +62,6 @@ public class ProfileActivity extends AppCompatActivity {
         }
         String country = spCountry.getSelectedItem().toString();
 
-//        if (day.isEmpty() || month.isEmpty() || year.isEmpty() || street.isEmpty() ||
-//            city.isEmpty() || region.isEmpty() || postcode.isEmpty()) {
-//            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-
         boolean isEmpty = Stream.of(day, month, year, street, city, region, postcode).anyMatch(String::isEmpty);
         if(isEmpty){
             Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
