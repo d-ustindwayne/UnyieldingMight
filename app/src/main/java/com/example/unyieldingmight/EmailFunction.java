@@ -16,7 +16,7 @@ public abstract class EmailFunction {
     private SendSmtpEmail email;
 
     public String getResponseString() {
-        return responseString;w
+        return responseString;
     }
 
     protected EmailFunction() {
