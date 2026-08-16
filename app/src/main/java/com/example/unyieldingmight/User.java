@@ -1,6 +1,6 @@
 package com.example.unyieldingmight;
 
-public class user {
+public class User {
     private final int customerId;
     private final boolean isMember;
     private final double height;
@@ -8,7 +8,7 @@ public class user {
     private final double activityMultiplier;
     private final double TDEE;
 
-    user(Builder builder){
+    User(Builder builder){
         this.customerId = builder.customerId;
         this.isMember = builder.isMember;
         this.height = builder.height;
@@ -78,6 +78,10 @@ public class user {
         public Builder TDEE(double TDEE){
             this.TDEE = TDEE;
             return this;
+        }
+
+        public User build(){
+            return new User(this);
         }
     }
 }
