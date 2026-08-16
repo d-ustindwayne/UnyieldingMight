@@ -48,9 +48,24 @@ public abstract class EmailFunction {
         try {
             Properties props = new Properties();
             props.put("mail.smtp.auth", "true");
-            props.put("mail.smtp.starttls.enable", "true");
             props.put("mail.smtp.host", BuildConfig.SMTP_HOST);
-            props.put("mail.smtp.port", BuildConfig.SMTP_PORT);
+            
+            // Check if port is 465 (SSL) or 587 (TLS)
+            String port = BuildConfig.SMTP_PORT;
+            props.put("mail.smtp.port", port);
+            
+            if ("465".equals(port)) {
+                props.put("mail.smtp.socketFactory.port", port);
+                props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+                props.put("mail.smtp.socketFactory.fallback", "false");
+                props.put("mail.smtp.ssl.enable", "true");
+            } else {
+                props.put("mail.smtp.starttls.enable", "true");
+                props.put("mail.smtp.starttls.required", "true");
+            }
+            
+            props.put("mail.smtp.ssl.protocols", "TLSv1.2");
+            props.put("mail.debug", "true");
 
             Session session = Session.getInstance(props, new Authenticator() {
                 @Override

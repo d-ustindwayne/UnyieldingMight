@@ -8,10 +8,12 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.Objects;
+
 public class ActivitylevelActivity extends AppCompatActivity {
     private SeekBar sbActivityLevel;
     private TextView tvDescription;
-    private float multiplier = 1.2f;
+    private float multiplier;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +58,7 @@ public class ActivitylevelActivity extends AppCompatActivity {
 
     public void nextActivityDone(View v) {
         Intent i = new Intent(this, DoneActivity.class);
-        i.putExtras(getIntent().getExtras());
+        i.putExtras(Objects.requireNonNull(getIntent().getExtras()));
         i.putExtra("ActivityMultiplier", multiplier);
         startActivity(i);
     }

@@ -54,7 +54,6 @@
     </string-array>
     <string-array name="height_array">
         <item>cm</item>
-        <item>m</item>
         <item>in</item>
         <item>feet</item>
     </string-array>

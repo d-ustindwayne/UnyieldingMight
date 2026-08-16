@@ -6,12 +6,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 public class ProfileActivity extends AppCompatActivity {
     private String email, password;
     private EditText etDay, etMonth, etYear, etStreet, etCity, etState, etPostcode;
-
+    private Spinner spCountry;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,6 +28,7 @@ public class ProfileActivity extends AppCompatActivity {
         etCity = findViewById(R.id.activity_profile_et_city);
         etState = findViewById(R.id.activity_profile_et_state);
         etPostcode = findViewById(R.id.activity_profile_et_postcode);
+        Spinner spCountry = findViewById(R.id.activity_profile_spin_country);
     }
 
     public void previousActivityMembership(View v) {
@@ -41,6 +43,7 @@ public class ProfileActivity extends AppCompatActivity {
         String city = etCity.getText().toString().trim();
         String state = etState.getText().toString().trim();
         String postcode = etPostcode.getText().toString().trim();
+        String country = spCountry.getSelectedItem().toString();
 
         if (day.isEmpty() || month.isEmpty() || year.isEmpty() || street.isEmpty() || 
             city.isEmpty() || state.isEmpty() || postcode.isEmpty()) {
@@ -57,10 +60,9 @@ public class ProfileActivity extends AppCompatActivity {
         i.putExtra("DOB", dob);
         i.putExtra("Street", street);
         i.putExtra("City", city);
-        i.putExtra("Suburb", state); // Mapping "state/region" to "suburb" field for now
+        i.putExtra("Suburb", state);
         i.putExtra("Postcode", postcode);
-        i.putExtra("Country", "New Zealand"); // Hardcoded for now, or get from spinner if added
-        i.putExtra("Gender", "M"); // Defaulting for now as GUI lacks gender selection
+        i.putExtra("Country", country);
         startActivity(i);
     }
 }

@@ -10,6 +10,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.util.Objects;
+
 public class StatsActivity extends AppCompatActivity {
     private EditText etHeight, etWeight;
     private Spinner spinHeightUnit, spinWeightUnit;
@@ -40,6 +42,7 @@ public class StatsActivity extends AppCompatActivity {
     }
 
     public void proceedToActivityLevel(View v) {
+//        Gender genderStr = Gender.valueOf(spGender.getSelectedItem().toString());
         String heightStr = etHeight.getText().toString().trim();
         String weightStr = etWeight.getText().toString().trim();
 
@@ -54,21 +57,19 @@ public class StatsActivity extends AppCompatActivity {
         String hUnit = spinHeightUnit.getSelectedItem().toString();
         String wUnit = spinWeightUnit.getSelectedItem().toString();
 
-        if (hUnit.equals("m")) {
-            height *= 100f;
-        } else if (hUnit.equals("in")) {
-            height *= 2.54f;
+        if (hUnit.equals("in")) {
+            height = Conversion.INtoCM(height);
         } else if (hUnit.equals("feet")) {
-            height *= 30.48f;
+            height = Conversion.FTtoCM(height);
         }
 
         if (wUnit.equals("lb")) {
-            weight *= 0.453592f;
+            weight = Conversion.LBtoKG(weight);
         }
 
         Intent i = new Intent(this, ActivitylevelActivity.class);
-        Bundle b = getIntent().getExtras();
-        if (b != null) i.putExtras(b);
+        i.putExtras(Objects.requireNonNull(getIntent().getExtras()));
+//      i.putExtra("Gender", gender);
         i.putExtra("Height", height);
         i.putExtra("Weight", weight);
         startActivity(i);

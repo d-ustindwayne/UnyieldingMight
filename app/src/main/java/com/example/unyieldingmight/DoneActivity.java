@@ -41,7 +41,8 @@ public class DoneActivity extends AppCompatActivity {
             boolean success = Database.registerCustomer(
                 fName, lName, email, password,
                 street, suburb, city, country, postcode,
-                height, weight, multiplier, membershipId, Date.valueOf(dob), gender
+                height, weight, multiplier, membershipId,
+                Date.valueOf(dob), gender
             );
 
             runOnUiThread(() -> {

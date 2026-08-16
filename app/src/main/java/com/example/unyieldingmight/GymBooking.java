@@ -5,7 +5,7 @@ import java.util.Date;
 public class GymBooking {
     private final int historyId;
     private final GymClass gymClass;
-    private final String status;
+    private final ClassStatus status;
     private final Date bookingDate;
 
     public GymBooking(Builder builder) {
@@ -23,7 +23,7 @@ public class GymBooking {
         return gymClass;
     }
 
-    public String getStatus() {
+    public ClassStatus getStatus() {
         return status;
     }
 
@@ -31,7 +31,7 @@ public class GymBooking {
         return bookingDate;
     }
 
-    public static class Builder() {
+    public static class Builder {
         private int historyId;
         private GymClass gymClass;
         private ClassStatus status;

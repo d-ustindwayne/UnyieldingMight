@@ -71,12 +71,12 @@ public class Customer implements Observer {
     public void update() {
         // 1. Determine what happened from the Subject
         NewsletterType updateType = NewsletterSubscribers.getInstance().getLatestUpdateType();
-        
+
         if (updateType != null) {
             // 2. Automatically send an email notification using Jakarta Mail
             // Ensure SMTP settings in local.properties are correct.
-            String verifiedSenderEmail = "diaz59@gmail.com"; 
-            
+            String verifiedSenderEmail = "diaz59@gmail.com";
+
             // Personalize the email by passing the customer's name to the constructor
             EmailNewsletter emailNotification = new EmailNewsletter(updateType, profile.getFirstName());
 

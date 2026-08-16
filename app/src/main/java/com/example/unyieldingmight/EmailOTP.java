@@ -26,7 +26,8 @@ public class EmailOTP extends EmailFunction {
 
     public void send(String toEmail) {
         setSender("Verify from Unyielding Might", BuildConfig.SMTP_USER);
-        setReceiver(toEmail.split("@")[0], toEmail);
+        String name = toEmail.split("@")[0];
+        setReceiver(name, toEmail);
         createEmail("Your Verification Code", "Your OTP code is: <b>" + OTP + "</b>");
         sendEmail();
     }
