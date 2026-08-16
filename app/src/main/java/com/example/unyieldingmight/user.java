@@ -1,47 +1,83 @@
 package com.example.unyieldingmight;
 
 public class user {
-    String customerId;
-    boolean isMember;
-    double height;
-    double weight;
+    private final int customerId;
+    private final boolean isMember;
+    private final double height;
+    private final double weight;
+    private final double activityMultiplier;
+    private final double TDEE;
 
-    public user(String customerId, boolean isMember, double height, double weight) {
-        this.customerId = customerId;
-        this.isMember = isMember;
-        this.height = height;
-        this.weight = weight;
+    user(Builder builder){
+        this.customerId = builder.customerId;
+        this.isMember = builder.isMember;
+        this.height = builder.height;
+        this.weight = builder.weight;
+        this.activityMultiplier = builder.activityMultiplier;
+        this.TDEE = builder.TDEE;
     }
 
-    public String getCustomerId() {
+    public int getCustomerId(){
         return customerId;
-    }
-
-    public void setCustomerId(String customerId) {
-        this.customerId = customerId;
     }
 
     public boolean isMember() {
         return isMember;
     }
 
-    public void setMember(boolean member) {
-        isMember = member;
-    }
-
     public double getHeight() {
         return height;
-    }
-
-    public void setHeight(double height) {
-        this.height = height;
     }
 
     public double getWeight() {
         return weight;
     }
 
-    public void setWeight(double weight) {
-        this.weight = weight;
+    public double getActivityMultiplier() {
+        return activityMultiplier;
+    }
+
+    public double getTDEE() {
+        return TDEE;
+    }
+
+    // Builder class
+    public static class Builder {
+        private int customerId;
+        private boolean isMember;
+        private double height;
+        private double weight;
+        private double activityMultiplier;
+        private double TDEE;
+
+        public Builder customerId(int customerId){
+            this.customerId = customerId;
+            return this;
+        }
+
+        public Builder isMember(boolean isMember){
+            this.isMember = isMember;
+            return this;
+        }
+
+        public Builder height(double height){
+            this.height = height;
+            return this;
+        }
+
+        public Builder weight(double weight){
+            this.weight = weight;
+            return this;
+        }
+
+        public Builder activityMultiplier(double activityMultiplier){
+            this.activityMultiplier = activityMultiplier;
+            return this;
+        }
+
+        public Builder TDEE(double TDEE){
+            this.TDEE = TDEE;
+            return this;
+        }
     }
 }
