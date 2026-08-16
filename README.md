@@ -25,7 +25,7 @@ Before running the application, ensure you have the following installed:
 
 Clone the repository and open it in **Android Studio**:
 ```bash
-   git clone [https://github.com/SaplingBeing/UnyieldingMight.git](https://github.com/SaplingBeing/UnyieldingMight.git)
+   git clone [https://github.com/d-ustindwayne/UnyieldingMight.git](https://github.com/d-ustindwayne/UnyieldingMight.git)
    cd UnyieldingMight
 ```
 
