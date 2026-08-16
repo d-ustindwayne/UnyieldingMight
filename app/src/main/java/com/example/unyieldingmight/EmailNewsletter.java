@@ -1,6 +1,6 @@
     package com.example.unyieldingmight;
 
-    public class EmailNewsletter extends EmailFunction {
+    public class EmailNewsletter extends EmailFunction implements Observer {
         private final NewsletterType emailType;
         private String introMessage;
 
@@ -42,5 +42,10 @@
         }
         public NewsletterType getEmailType() {
             return emailType;
+        }
+
+        @Override
+        public void update() {
+            this.sendEmail();
         }
     }

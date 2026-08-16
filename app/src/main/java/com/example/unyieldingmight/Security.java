@@ -22,6 +22,4 @@ public class Security {
         return data1.equals(data2);
     }
 
-
-
 }

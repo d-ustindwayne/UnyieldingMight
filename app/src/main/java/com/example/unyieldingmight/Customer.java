@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 
 import java.util.Date;
 
-public class Customer {
+public class Customer implements Observer {
     private final int customerId;
     private final Profile profile;
     private final boolean isMember;
@@ -61,6 +61,12 @@ public class Customer {
 
     public float calculateTDEE() {
         return this.calculateBMR() * activityMultiplier;
+    }
+
+    @Override
+    public void update() {
+        // Update class booked status by the customer and needed attributes
+        // to be updated (user's class history | add count and append the class and its detail [this separate class])
     }
 
     // Builder class
