@@ -6,14 +6,14 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class SecondActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.second_activity);
+        setContentView(R.layout.activity_login);
     }
     public void nA(View v){
-        Intent i = new Intent(this, ThirdActivity.class);
+        Intent i = new Intent(this, RegisterActivity.class);
         startActivity(i);
     }
 }

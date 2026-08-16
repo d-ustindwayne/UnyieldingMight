@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">UnyieldingMight</string>
+    <string name="login">Login</string>
+    <string name="et_email">Email</string>
+    <string name="btn_login">LOGIN</string>
+    <string name="et_password">Password</string>
+    <string name="forgot_your_password">Forgot your password?</string>
+    <string name="dont_have_an_account_register_now">Don\'t have an account? Register Now</string>
+    <string name="register">Register</string>
+    <string name="et_confirmPassword">Confirm Password</string>
+    <string name="btn_register">REGISTER</string>
+    <string name="already_have_an_account_login_now">Already have an account? Login Now</string>
+    <string name="unyielding_might">UNYIELDING MIGHT</string>
+    <string name="unyielding_might_logo">Unyielding Might logo</string>
 </resources>

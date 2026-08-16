@@ -23,8 +23,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
     public void nA(View v){
-        Intent i = new Intent(this, SecondActivity.class);
+        Intent i = new Intent(this, LoginActivity.class);
         startActivity(i);
     }
-
 }
