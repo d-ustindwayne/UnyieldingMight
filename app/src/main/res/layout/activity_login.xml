@@ -31,6 +31,7 @@
             android:layout_height="53dp"
             android:backgroundTint="#fff"
             android:fontFamily="@font/manrope_extrabold"
+            android:onClick="nextActivityHome"
             android:text="@string/btn_login"
             android:textColor="#0E0E0E"
             android:textSize="16sp"

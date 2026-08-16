@@ -2,4 +2,6 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="umBlack">#0E0E0E</color>
+    <color name="umGrey">#4E4E4E</color>
 </resources>

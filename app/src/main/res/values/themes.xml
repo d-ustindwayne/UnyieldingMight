@@ -4,6 +4,6 @@
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
-
+    <!-- Customize your theme here. -->
     <style name="Theme.UnyieldingMight" parent="Base.Theme.UnyieldingMight" />
 </resources>

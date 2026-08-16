@@ -1,6 +1,8 @@
 package com.example.unyieldingmight;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,5 +18,10 @@ public class DoneActivity extends AppCompatActivity {
             public void handleOnBackPressed() {
             }
         });
+
+    }
+    public void nextActivityHome(View v){
+        Intent i = new Intent(this, HomeActivity.class);
+        startActivity(i);
     }
 }

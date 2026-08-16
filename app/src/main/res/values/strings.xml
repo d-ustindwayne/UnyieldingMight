@@ -47,6 +47,7 @@
     <string name="physical_stats">Physical Stats</string>
     <string name="weight">Weight</string>
     <string name="height">Height</string>
+
     <string-array name="country_array">
         <item>New Zealand</item>
         <item>Australia</item>
@@ -61,5 +62,7 @@
         <item>kg</item>
         <item>lb</item>
     </string-array>
+    <string name="crossfit">The boys</string>
+    <string name="boxfit">Lorem Ipsum</string>
 </resources>
 
