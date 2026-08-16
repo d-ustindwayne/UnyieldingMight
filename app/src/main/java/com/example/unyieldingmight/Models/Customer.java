@@ -2,6 +2,7 @@ package com.example.unyieldingmight.Models;
 
 import com.example.unyieldingmight.BuildConfig;
 import com.example.unyieldingmight.Services.EmailNewsletter;
+import com.example.unyieldingmight.Services.Database;
 
 public class Customer implements Observer {
     private int customerId;
@@ -11,6 +12,7 @@ public class Customer implements Observer {
     private float weight;
     private float activityMultiplier;
     private float TDEE;
+
 
     Customer(Builder builder){
         this.customerId = builder.customerId;
@@ -72,8 +74,7 @@ public class Customer implements Observer {
     @Override
     public void update() {
         // 1. Determine what happened from the Subject
-        NewsletterSubscribers subscribers = com.example.
-                unyieldingmight.Services.Database.getNewsletterSubscribers();
+        NewsletterSubscribers subscribers = Database.getNewsletterSubscribers();
         NewsletterType updateType = subscribers.getLatestUpdateType();
 
         if (updateType != null) {
