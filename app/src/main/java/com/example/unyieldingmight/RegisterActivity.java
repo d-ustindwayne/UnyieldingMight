@@ -20,9 +20,7 @@ public class RegisterActivity extends AppCompatActivity {
         startActivity(i);
     }
 
-// Register function
     public void register(View v){
-//        Finds the input field from activity_register.xml and assigns them to a variable
         EditText email = findViewById(R.id.activity_register_et_email);
         String emailData = email.getText().toString().trim();
 
@@ -35,15 +33,28 @@ public class RegisterActivity extends AppCompatActivity {
         if(emailData.isEmpty() || passwordData.isEmpty() || confirmPasswordData.isEmpty()){
             Toast.makeText(this, "Input fields cannot be empty", Toast.LENGTH_SHORT).show();
         }
+        else if(!android.util.Patterns.EMAIL_ADDRESS.matcher(emailData).matches()){
+            Toast.makeText(this, "Invalid email format", Toast.LENGTH_SHORT).show();
+        }
         else if(!passwordData.equals(confirmPasswordData)){
             Toast.makeText(this, "Password is not the same", Toast.LENGTH_SHORT).show();
         }
         else{
-            Intent i = new Intent(this, VerifyActivity.class);
-            i.putExtra(emailData,"Email");
-            i.putExtra(passwordData, "Password");
-
-            startActivity(i);
+            new Thread(() -> {
+                Customer existingCustomer = Database.getCustomer(emailData);
+                
+                runOnUiThread(() -> {
+                    if (existingCustomer != null) {
+                        Toast.makeText(this, "Email is already registered", Toast.LENGTH_LONG).show();
+                    } else {
+                        // Pass data to VerifyActivity
+                        Intent i = new Intent(this, VerifyActivity.class);
+                        i.putExtra("Email", emailData);
+                        i.putExtra("Password", passwordData);
+                        startActivity(i);
+                    }
+                });
+            }).start();
         }
     }
 }

@@ -23,4 +23,15 @@ public class EmailOTP extends EmailFunction {
         int n = rand.nextInt(1000000);
         return String.format("%06d", n);
     }
+
+    public void send(String toEmail) {
+        setSender("Verify from Unyielding Might", BuildConfig.SMTP_USER);
+        setReceiver(toEmail.split("@")[0], toEmail);
+        createEmail("Your Verification Code", "Your OTP code is: <b>" + OTP + "</b>");
+        sendEmail();
+    }
+
+    public String getOTP() {
+        return OTP;
+    }
 }

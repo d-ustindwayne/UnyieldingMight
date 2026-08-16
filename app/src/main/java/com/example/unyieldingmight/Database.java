@@ -65,23 +65,29 @@ public class Database {
                             .postcode(rs.getString("PostCode"))
                             .build();
 
+                    String gdStr = rs.getString("Gender");
+                    Gender gd;
+                    if (gdStr.equalsIgnoreCase("M")) gd = Gender.MALE;
+                    else if (gdStr.equalsIgnoreCase("F")) gd = Gender.FEMALE;
+                    else gd = Gender.OTHER;
+
                     Profile profile = new Profile.Builder()
                             .email(rs.getString("Email"))
                             .firstName(rs.getString("FirstName"))
                             .lastName(rs.getString("LastName"))
                             .dateOfBirth(rs.getDate("DateOfBirth"))
-                            .gender(Gender.valueOf(rs.getString("Gender").equalsIgnoreCase("M") ? "MALE" : "FEMALE"))
+                            .gender(gd)
                             .age(rs.getInt("Age"))
                             .address(address)
                             .build();
 
                     float multiplierVal = rs.getFloat("ActivityMultiplier");
-                    ActivityMultiplier multiplier = ActivityMultiplier.MODERATE; // Default
-                    if (multiplierVal <= 1.2) multiplier = ActivityMultiplier.INACTIVE;
-                    else if (multiplierVal <= 1.375) multiplier = ActivityMultiplier.LIGHT;
-                    else if (multiplierVal <= 1.55) multiplier = ActivityMultiplier.MODERATE;
-                    else if (multiplierVal <= 1.725) multiplier = ActivityMultiplier.HEAVY;
-                    else multiplier = ActivityMultiplier.EXTREME;
+                    ActivityMultiplier multiplier;
+                    if (multiplierVal == 1.2) multiplier = ActivityMultiplier.INACTIVE;
+                    else if (multiplierVal == 1.375) multiplier = ActivityMultiplier.LIGHT;
+                    else if (multiplierVal == 1.725) multiplier = ActivityMultiplier.HEAVY;
+                    else if (multiplierVal == 1.9) multiplier = ActivityMultiplier.EXTREME;
+                    else multiplier = ActivityMultiplier.MODERATE; // Default Value
 
                     return new Customer.Builder()
                             .customerId(rs.getInt("CustomerId"))
@@ -143,7 +149,7 @@ public class Database {
 
     public static boolean registerCustomer(String firstName, String lastName, String email, String password,
                                           String street, String suburb, String city, String country, String postcode,
-                                          float height, float weight, Integer membershipId, Date dob, String gender) {
+                                          float height, float weight, float multiplier, Integer membershipId, Date dob, String gender) {
         
         EmailVerification ev = new EmailVerification().email(email).verify();
         EmailVerificationData evData = ev.getData();
@@ -171,11 +177,12 @@ public class Database {
 
             int customerId = -1;
             boolean isMember = (membershipId != null);
-            String custSql = "INSERT INTO Customer (IsMember, MembershipId, CustomerHeight, CustomerWeight, ActivityMultiplier, TDEE) VALUES (?, ?, ?, ?, 1.2, 0)";
+            String custSql = "INSERT INTO Customer (IsMember, MembershipId, CustomerHeight, CustomerWeight, ActivityMultiplier, TDEE) VALUES (?, ?, ?, ?, ?, 0)";
             try (PreparedStatement pstmt = conn.prepareStatement(custSql, Statement.RETURN_GENERATED_KEYS)) {
                 pstmt.setBoolean(1, isMember);
                 if (membershipId != null) pstmt.setInt(2, membershipId); else pstmt.setNull(2, Types.INTEGER);
                 pstmt.setFloat(3, height); pstmt.setFloat(4, weight);
+                pstmt.setFloat(5, multiplier);
                 pstmt.executeUpdate();
                 try (ResultSet rs = pstmt.getGeneratedKeys()) { if (rs.next()) customerId = rs.getInt(1); }
             }
@@ -229,9 +236,46 @@ public class Database {
     }
 
     /**
-     * Recommends classes based on user's TDEE.
-     * Logic: Recommends classes that burn at least 15% of the user's TDEE.
+     * Checks if a membership ID is valid and hasn't been linked to any account yet.
+     * Also verifies that the name in the membership record matches the registrant.
      */
+    public static Membership validateMembership(int membershipId, String firstName, String lastName) {
+        String sql = "SELECT m.* FROM Membership m " +
+                "LEFT JOIN Customer c ON m.MembershipId = c.MembershipId " +
+                "WHERE m.MembershipId = ? " +
+                "AND LOWER(m.MemberFirstName) = LOWER(?) " +
+                "AND LOWER(m.MemberLastName) = LOWER(?) " +
+                "AND c.CustomerId IS NULL"; // Ensures it's not linked to any Customer yet
+
+        Connection conn = getConnection();
+        if (conn == null) return null;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, membershipId);
+            pstmt.setString(2, firstName);
+            pstmt.setString(3, lastName);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    // Mapping to a Membership object (Assuming a Membership class exists)
+                    // For now, returning a basic validation flag or a partial object
+                    // You might need a Membership class with these fields:
+                    return new Membership(
+                            rs.getInt("MembershipId"),
+                            rs.getString("MemberFirstName"),
+                            rs.getString("MemberLastName"),
+                            rs.getFloat("MemberHeight"),
+                            rs.getFloat("MemberWeight"),
+                            rs.getFloat("ActivityMultiplier"),
+                            rs.getFloat("TDEE")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     public static ArrayList<GymClass> getRecommendedGymClasses(Customer customer) {
         ArrayList<GymClass> allOngoing = getGymClassesAvailable();
         ArrayList<GymClass> recommended = new ArrayList<>();
@@ -267,6 +311,38 @@ public class Database {
         return false;
     }
 
+    public static ArrayList<GymBooking> getBookingHistory() {
+        ArrayList<GymBooking> history = new ArrayList<>();
+        User user = getCurrentUser();
+        if (user == null) return history;
+
+        String sql = "SELECT b.*, c.* FROM GymBooking b " +
+                "JOIN GymClasses c ON b.ClassId = c.ClassId " +
+                "WHERE b.ProfileId = ? " +
+                "ORDER BY b.BookingDate DESC";
+
+        Connection conn = getConnection();
+        if (conn == null) return history;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, user.getId());
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    GymClass gc = mapResultSetToGymClass(rs);
+                    history.add(new GymBooking(
+                            rs.getInt("HistoryId"),
+                            gc,
+                            rs.getString("BookingStatus"),
+                            rs.getTimestamp("BookingDate")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return history;
+    }
+
     public static boolean bookClass(int classId) {
         User user = getCurrentUser();
         if (user == null) return false;
@@ -283,7 +359,7 @@ public class Database {
                         try (PreparedStatement upPstmt = conn.prepareStatement(upSql)) {
                             upPstmt.setInt(1, classId); upPstmt.executeUpdate();
                         }
-                        String histSql = "INSERT INTO GymClassHistory (ProfileId, ClassId, BookingStatus) VALUES (?, ?, 'BOOKED')";
+                        String histSql = "INSERT INTO GymBooking (ProfileId, ClassId, BookingStatus) VALUES (?, ?, 'BOOKED')";
                         try (PreparedStatement hPstmt = conn.prepareStatement(histSql)) {
                             hPstmt.setInt(1, user.getId()); hPstmt.setInt(2, classId); hPstmt.executeUpdate();
                         }

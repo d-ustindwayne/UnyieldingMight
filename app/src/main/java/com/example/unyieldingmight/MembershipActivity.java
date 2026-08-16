@@ -12,12 +12,15 @@ public class MembershipActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_membership);
     }
-    public void nextActivityProfile(View v){
+    public void nextActivityProfile(View v) {
         Intent i = new Intent(this, ProfileActivity.class);
+        i.putExtras(getIntent().getExtras());
         startActivity(i);
     }
-    public void nextActivityLinkMembership(View v){
+
+    public void nextActivityLinkMembership(View v) {
         Intent i = new Intent(this, LinkmembershipActivity.class);
+        i.putExtras(getIntent().getExtras());
         startActivity(i);
     }
 }

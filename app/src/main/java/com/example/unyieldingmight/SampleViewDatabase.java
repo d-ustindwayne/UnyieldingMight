@@ -70,7 +70,7 @@ public class SampleViewDatabase extends AppCompatActivity {
                     boolean success = Database.registerCustomer(
                             "Jasmine", "Taboy", testEmail, "jasmine15",
                             "1/35 Clendon Avenue", "Papatoetoe", "Auckland", "New Zealand", "2121", 
-                            160.0f, 46.7f, null, java.sql.Date.valueOf("2005-04-15"), "F"
+                            160.0f, 46.7f, 1.2f, null, java.sql.Date.valueOf("2005-04-15"), "F"
                     );
                     
                     debugLog.accept("Result: SQL Registration " + (success ? "SUCCESS" : "FAILED"));
@@ -106,7 +106,7 @@ public class SampleViewDatabase extends AppCompatActivity {
                     boolean success = Database.registerCustomer(
                             "Justin", "Grumal", testEmail, "password123",
                             "123 Mindanao St", "Surfer", "Manukau", "Philippines", "1234",
-                            175.0f, 70.0f, null, java.sql.Date.valueOf("2005-11-28"), "M"
+                            175.0f, 70.0f, 1.2f, null, java.sql.Date.valueOf("2005-11-28"), "M"
                     );
                     
                     debugLog.accept("Result: SQL Registration " + (success ? "SUCCESS" : "FAILED"));

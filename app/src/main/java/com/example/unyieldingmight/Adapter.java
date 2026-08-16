@@ -18,22 +18,27 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class Adapter extends RecyclerView.Adapter<ViewHolder> {
     private Context context;
-//    A list of type GymClass
     private ArrayList<GymClass> dataList;
+    private float userTdee;
+
     public void setSearchList(ArrayList<GymClass> dataSearchList){
         this.dataList = dataSearchList;
         notifyDataSetChanged();
     }
-    public Adapter(Context context, ArrayList<GymClass> dataList){
+
+    public Adapter(Context context, ArrayList<GymClass> dataList, float userTdee){
         this.context = context;
         this.dataList = dataList;
+        this.userTdee = userTdee;
     }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_class, parent, false);
         return new ViewHolder(view);
     }
+
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         GymClass gymClass = dataList.get(position);
@@ -43,7 +48,9 @@ public class Adapter extends RecyclerView.Adapter<ViewHolder> {
         holder.recImage.setImageResource(R.drawable.boxfit);
         holder.recTitle.setText(gymClass.getName());
         holder.recInstructor.setText(gymClass.getTrainer() != null ? gymClass.getTrainer().getName() : "Unknown");
-        holder.recIntensity.setText("Medium");
+        
+        GymClass.Intensity intensity = gymClass.getIntensity(userTdee);
+        holder.recIntensity.setText(intensity.name());
 
         holder.recDate.setText(gymClass.getStartDateTime() != null ? dateFormat.format(gymClass.getStartDateTime()) : "N/A");
         holder.recStartTime.setText(gymClass.getStartDateTime() != null ? timeFormat.format(gymClass.getStartDateTime()) : "N/A");
@@ -64,23 +71,25 @@ public class Adapter extends RecyclerView.Adapter<ViewHolder> {
                 intent.putExtra("Image", R.drawable.boxfit);
                 intent.putExtra("Title", current.getName());
                 intent.putExtra("Instructor", current.getTrainer() != null ? current.getTrainer().getName() : "Unknown");
-                intent.putExtra("Intensity", current);
+                intent.putExtra("Intensity", current.getIntensity(userTdee).name());
                 intent.putExtra("Date", current.getStartDateTime() != null ? dateFormat.format(current.getStartDateTime()) : "N/A");
                 intent.putExtra("StartTime", current.getStartDateTime() != null ? timeFormat.format(current.getStartDateTime()) : "N/A");
-                intent.putExtra("EndTime", current.getEndDateTime() != null ? timeFormat.format(current.getEndDateTime()) : "N");
+                intent.putExtra("EndTime", current.getEndDateTime() != null ? timeFormat.format(current.getEndDateTime()) : "N/A");
                 intent.putExtra("CurCap", String.valueOf(current.getCurrentCapacity()));
                 intent.putExtra("MaxCap", String.valueOf(current.getMaxCapacity()));
                 intent.putExtra("Desc", current.getDescription());
+                intent.putExtra("ClassId", current.getID());
                 context.startActivity(intent);
             }
         });
     }
+
     @Override
     public int getItemCount() {
         return dataList != null ? dataList.size() : 0;
     }
 }
-// Finds the components from recycler_class via their IDs
+
 class ViewHolder extends RecyclerView.ViewHolder{
     CardView recCard;
     ImageView recImage;

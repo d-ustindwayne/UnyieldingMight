@@ -66,16 +66,28 @@ public class HomeActivity extends AppCompatActivity {
 
         new Thread(() -> {
             try {
+                // Fetch user TDEE if available
+                float tdee = 2000f;
+                User current = Database.getCurrentUser();
+                if (current != null) {
+                    Customer customer = Database.getCustomer(current.getEmail());
+                    if (customer != null) {
+                        tdee = customer.getTDEE();
+                        if (tdee <= 0) tdee = customer.calculateTDEE();
+                    }
+                }
+                final float finalTdee = tdee;
+
                 // Fetch data in background thread
                 final ArrayList<GymClass> fetchedClasses = Database.getGymClassesAvailable();
-                
+
                 runOnUiThread(() -> {
                     isLoaded = true;
                     gymClasses = fetchedClasses;
                     loadingSpinner.setVisibility(View.GONE);
-                    
+
                     if (gymClasses != null && !gymClasses.isEmpty()) {
-                        adapter = new Adapter(HomeActivity.this, gymClasses);
+                        adapter = new Adapter(HomeActivity.this, gymClasses, finalTdee);
                         recyclerView.setAdapter(adapter);
                     } else {
                         Toast.makeText(HomeActivity.this, "No classes available at the moment.", Toast.LENGTH_SHORT).show();

@@ -49,12 +49,20 @@ public class GymClass {
     }
 
     public Intensity getIntensity() {
-        Intensity intense;
-//        Gym Class's avgCalorieBurnedPerDay is 5% or less of Customer's TDEE = BEGINNER
-//        Gym Class's avgCalorieBurnedPerDay is 12% or less of Customer's TDEE = Intermediate
-//        Gym Class's avgCalorieBurnedPerDay is 12% or higher = ATHLETE
-//        if (User.getTDEE() )
-        return intense;
+        return getIntensity(2000f);
+    }
+
+    public Intensity getIntensity(float userTdee) {
+        float effectiveTdee = userTdee <= 0 ? 2000f : userTdee;
+        float ratio = avgCaloriesBurnedPerDay / effectiveTdee;
+
+        if (ratio <= 0.15f) {
+            return Intensity.BEGINNER;
+        } else if (ratio <= 0.25f) {
+            return Intensity.INTERMEDIATE;
+        } else {
+            return Intensity.ATHLETE;
+        }
     }
 
     public ClassStatus getStatus() {

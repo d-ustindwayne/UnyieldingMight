@@ -9,50 +9,59 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class ActivitylevelActivity extends AppCompatActivity {
+    private SeekBar sbActivityLevel;
+    private TextView tvDescription;
+    private float multiplier = 1.2f;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_activitylevel);
 
-        SeekBar seekBar = findViewById(R.id.activity_activitylevel_sb_activityLevel);
-        TextView textView = findViewById(R.id.activity_activitylevel_tv_description);
+        sbActivityLevel = findViewById(R.id.activity_activitylevel_sb_activityLevel);
+        tvDescription = findViewById(R.id.activity_activitylevel_tv_description);
 
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        sbActivityLevel.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                // Update the TextView content with the current progress
-                if (progress==0) {
-                    textView.setText("Little to no exercise.");
-                }
-                else if (progress==1) {
-                    textView.setText("Exercise 1-3 days per week.");
-                }
-                else if (progress==2) {
-                    textView.setText("Exercise 3-5 days per week.");
-                }
-                else if (progress==3) {
-                    textView.setText("Exercise 6-7 days per week.");
-                }
-                else if (progress==4) {
-                    textView.setText("Vigorous training two times a day.");
+                switch (progress) {
+                    case 0:
+                        multiplier = 1.2f;
+                        tvDescription.setText("Little to no exercise.");
+                        break;
+                    case 1:
+                        multiplier = 1.375f;
+                        tvDescription.setText("Light exercise/sports 1-3 days/week.");
+                        break;
+                    case 2:
+                        multiplier = 1.55f;
+                        tvDescription.setText("Moderate exercise/sports 3-5 days/week.");
+                        break;
+                    case 3:
+                        multiplier = 1.725f;
+                        tvDescription.setText("Hard exercise/sports 6-7 days/week.");
+                        break;
+                    case 4:
+                        multiplier = 1.9f;
+                        tvDescription.setText("Very hard exercise, physical job or training 2x/day.");
+                        break;
                 }
             }
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-                // Optional: Action when user starts dragging
-            }
+            public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                // Optional: Action when user stops dragging
-            }
+            public void onStopTrackingTouch(SeekBar seekBar) {}
         });
     }
-    public void nextActivityDone(View v){
+
+    public void nextActivityDone(View v) {
         Intent i = new Intent(this, DoneActivity.class);
+        i.putExtras(getIntent().getExtras());
+        i.putExtra("ActivityMultiplier", multiplier);
         startActivity(i);
     }
-    public void previousActivityStats(View v){
-        Intent i = new Intent(this, StatsActivity.class);
-        startActivity(i);
+
+    public void previousActivityStats(View v) {
+        finish();
     }
 }

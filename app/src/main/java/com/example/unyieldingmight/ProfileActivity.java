@@ -1,61 +1,66 @@
 package com.example.unyieldingmight;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
-
-import androidx.appcompat.app.AppCompatActivity;
+import android.widget.EditText;
+import android.widget.Toast;
 
 public class ProfileActivity extends AppCompatActivity {
+    private String email, password;
+    private EditText etDay, etMonth, etYear, etStreet, etCity, etState, etPostcode;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        Spinner spinner = findViewById(R.id.activity_profile_spin_country);
+        email = getIntent().getStringExtra("Email");
+        password = getIntent().getStringExtra("Password");
 
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-                this,
-                R.array.country_array,
-                R.layout.my_selected_item
-        );
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
+        etDay = findViewById(R.id.activity_profile_et_day);
+        etMonth = findViewById(R.id.activity_profile_et_month);
+        etYear = findViewById(R.id.activity_profile_et_year);
+        etStreet = findViewById(R.id.activity_profile_et_street);
+        etCity = findViewById(R.id.activity_profile_et_city);
+        etState = findViewById(R.id.activity_profile_et_state);
+        etPostcode = findViewById(R.id.activity_profile_et_postcode);
     }
-    public void proceed(View v){
-        EditText day = findViewById(R.id.activity_profile_et_day);
-        String dayData = day.getText().toString().trim();
 
-        EditText month = findViewById(R.id.activity_profile_et_month);
-        String monthData = month.getText().toString().trim();
+    public void previousActivityMembership(View v) {
+        finish();
+    }
 
-        EditText year = findViewById(R.id.activity_profile_et_year);
-        String yearData = year.getText().toString().trim();
+    public void proceed(View v) {
+        String day = etDay.getText().toString().trim();
+        String month = etMonth.getText().toString().trim();
+        String year = etYear.getText().toString().trim();
+        String street = etStreet.getText().toString().trim();
+        String city = etCity.getText().toString().trim();
+        String state = etState.getText().toString().trim();
+        String postcode = etPostcode.getText().toString().trim();
 
-        EditText street = findViewById(R.id.activity_profile_et_street);
-        String streetData = street.getText().toString().trim();
+        if (day.isEmpty() || month.isEmpty() || year.isEmpty() || street.isEmpty() || 
+            city.isEmpty() || state.isEmpty() || postcode.isEmpty()) {
+            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        EditText city = findViewById(R.id.activity_profile_et_city);
-        String cityData = city.getText().toString().trim();
-
-        EditText state = findViewById(R.id.activity_profile_et_state);
-        String stateData = state.getText().toString().trim();
-
-        EditText postCode = findViewById(R.id.activity_profile_et_postcode);
-        String postCodeData = postCode.getText().toString().trim();
-
-//        Spinner for country
-        Spinner country = findViewById(R.id.activity_profile_spin_country);
-        String countryData = country.getSelectedItem().toString();
-
-        Log.d(countryData, "Spinner Value");
+        // Format DOB for SQL: YYYY-MM-DD
+        String dob = String.format("%s-%s-%s", year, month, day);
 
         Intent i = new Intent(this, StatsActivity.class);
-        startActivity(i);}
-    public void previousActivityMembership(View v){
-        Intent i = new Intent(this, MembershipActivity.class);
+        i.putExtra("Email", email);
+        i.putExtra("Password", password);
+        i.putExtra("DOB", dob);
+        i.putExtra("Street", street);
+        i.putExtra("City", city);
+        i.putExtra("Suburb", state); // Mapping "state/region" to "suburb" field for now
+        i.putExtra("Postcode", postcode);
+        i.putExtra("Country", "New Zealand"); // Hardcoded for now, or get from spinner if added
+        i.putExtra("Gender", "M"); // Defaulting for now as GUI lacks gender selection
         startActivity(i);
     }
 }
