@@ -5,13 +5,13 @@ import androidx.annotation.NonNull;
 import java.util.Date;
 
 public class Customer implements Observer {
-    private final int customerId;
-    private final Profile profile;
-    private final boolean isMember;
-    private final float height;
-    private final float weight;
-    private final float activityMultiplier;
-    private final float TDEE;
+    private int customerId;
+    private Profile profile;
+    private boolean isMember;
+    private float height;
+    private float weight;
+    private float activityMultiplier;
+    private float TDEE;
 
     Customer(Builder builder){
         this.customerId = builder.customerId;
@@ -48,14 +48,19 @@ public class Customer implements Observer {
     }
 
     public float calculateBMR() {
-        if (profile.getGender().equals(Gender.MALE)) {
-            return (float) ((10 * weight) + (6.25 * height) - (5 * profile.getAge()) + 5);
-        } else if (profile.getGender().equals(Gender.FEMALE)) {
-            return (float) ((10 * weight) + (6.25 * height) - (5 * profile.getAge()) - 161);
-        } else {
-            float TDEE1 = ((float) ((10 * weight) + (6.25 * height) - (5 * profile.getAge()) + 5));
-            float TDEE2 = (float) ((10 * weight) + (6.25 * height) - (5 * profile.getAge()) - 161);
-            return (float) ((TDEE1 + TDEE2) / 2);
+        float weightComponent = 10 * weight;
+        float heightComponent = 6.25f * height;
+        float ageComponent = 5 * profile.getAge();
+
+        switch (profile.getGender()) {
+            case MALE:
+                return weightComponent + heightComponent - ageComponent + 5;
+            case FEMALE:
+                return weightComponent + heightComponent - ageComponent - 161;
+            default:
+                float male = weightComponent + heightComponent - ageComponent + 5;
+                float female = weightComponent + heightComponent - ageComponent - 161;
+                return (male + female) / 2;
         }
     }
 
@@ -111,6 +116,7 @@ public class Customer implements Observer {
         }
 
         public Customer build(){
+            if (this.profile == null) { throw new IllegalStateException("Profile is needed");}
             return new Customer(this);
         }
     }
