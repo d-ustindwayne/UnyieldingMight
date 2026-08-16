@@ -91,7 +91,6 @@ dependencies {
     implementation(libs.jtds)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
-    implementation(libs.stripe.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
