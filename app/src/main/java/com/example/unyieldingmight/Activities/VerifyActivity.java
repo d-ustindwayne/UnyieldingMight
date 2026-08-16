@@ -55,17 +55,16 @@ public class VerifyActivity extends AppCompatActivity {
                 Log.d(TAG, "QEV Response: " + rawResponse);
 
                 runOnUiThread(() -> {
-                    if (data != null && data.success() != null && "true".equalsIgnoreCase(data.success())) {
-                        // Check if the email is "safe to send" and not disposable
-                        if ("true".equalsIgnoreCase(data.safe_to_send()) && !"true".equalsIgnoreCase(data.disposable())) {
+                    if (data != null && data.success() != null && "true".equalsIgnoreCase(data.success()) &&
+                    data.result() != null && "valid".equalsIgnoreCase(data.result())) {
+                        // Check if the email is not disposable
+                        if (!"true".equalsIgnoreCase(data.disposable())) {
                             Log.d(TAG, "Email is safe. Sending OTP.");
                             sendOTP();
                         } else {
                             String reason = data.reason() != null ? data.reason() : "Invalid or risky email";
                             Log.w(TAG, "Email risky. Reason: " + reason);
                             Toast.makeText(VerifyActivity.this, "Security Check Failed: " + reason, Toast.LENGTH_LONG).show();
-                            // If it's a test account, or you want to bypass this during dev,
-                            // you could call sendOTP() here anyway or just finish.
                             finish();
                         }
                     } else {
@@ -73,9 +72,8 @@ public class VerifyActivity extends AppCompatActivity {
                         // fallback to sending OTP anyway so we don't block the user.
                         Log.e(TAG, "Email verification API failed or returned error. Falling back to send OTP.");
                         if (rawResponse != null && rawResponse.contains("invalid_api_key")) {
-                            Toast.makeText(this, "Verification API error: Invalid API Key. Falling back...", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, "Verification API error: Invalid API Key.", Toast.LENGTH_SHORT).show();
                         }
-                        sendOTP(); 
                     }
                 });
             } catch (Exception e) {
