@@ -84,7 +84,7 @@
             android:layout_height="53dp"
             android:backgroundTint="#fff"
             android:fontFamily="@font/manrope_extrabold"
-            android:onClick="nextActivityVerify"
+            android:onClick="register"
             android:text="@string/btn_register"
             android:textColor="#0E0E0E"
             android:textSize="16sp"

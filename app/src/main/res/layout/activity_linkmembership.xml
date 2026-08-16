@@ -65,6 +65,7 @@
             android:fontFamily="@font/jura_bold"
             android:hint="@string/membership_id"
             android:inputType="text"
+            android:maxLength="8"
             android:textColor="#fff"
             android:textColorHint="#fff"
             app:layout_constraintBottom_toBottomOf="parent"
