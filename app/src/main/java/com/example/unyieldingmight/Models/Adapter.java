@@ -31,7 +31,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         this.userTdee = userTdee;
     }
 
-//    Wraps the view object inside of ViewHolder, which contains references to the
+//    Wraps the view object inside of ViewHolder
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

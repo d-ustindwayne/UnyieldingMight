@@ -73,7 +73,6 @@ public class EditClassActivity extends AppCompatActivity {
 //            }
 
             boolean isEmpty = Stream.of(updatedTitle, updatedDesc, dateString, startTimeString, endTimeString, maxCapString, avgCalString).anyMatch(String::isEmpty);
-
             if(isEmpty){
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 return;

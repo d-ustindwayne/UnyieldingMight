@@ -15,6 +15,8 @@ import com.example.unyieldingmight.Services.Database;
 import com.example.unyieldingmight.R;
 import com.example.unyieldingmight.Models.User;
 
+import java.util.stream.Stream;
+
 public class LoginActivity extends AppCompatActivity {
     private EditText emailEditText;
     private EditText passwordEditText;
@@ -46,7 +48,9 @@ public class LoginActivity extends AppCompatActivity {
         String emailData = emailEditText.getText().toString().trim();
         String passwordData = passwordEditText.getText().toString().trim();
 
-        if (emailData.isEmpty() || passwordData.isEmpty()) {
+        boolean isEmpty = Stream.of(emailData, passwordData).anyMatch(String::isEmpty);
+
+        if (isEmpty) {
             Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
             return;
         }
