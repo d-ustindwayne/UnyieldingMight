@@ -26,6 +26,7 @@ public class InfoActivity extends AppCompatActivity {
         infoDesc = findViewById(R.id.activity_class_tv_description);
 
         Bundle bundle = getIntent().getExtras();
+//        Ensures value is not empty
         if (bundle != null){
             infoImage.setImageResource(bundle.getInt("Image"));
             infoTitle.setText(bundle.getString("Title"));
