@@ -39,6 +39,7 @@ public class VerifyActivity extends AppCompatActivity {
             return;
         }
 
+        initOtpFields();
         emailOTP = new EmailOTP();
         
         // Show a "Loading" or "Verifying" message
@@ -55,11 +56,13 @@ public class VerifyActivity extends AppCompatActivity {
                 Log.d(TAG, "QEV Response: " + rawResponse);
 
                 runOnUiThread(() -> {
-                    if (data != null && data.success() != null && "true".equalsIgnoreCase(data.success()) &&
-                    data.result() != null && "valid".equalsIgnoreCase(data.result())) {
-                        // Check if the email is not disposable
-                        if (!"true".equalsIgnoreCase(data.disposable())) {
-                            Log.d(TAG, "Email is safe. Sending OTP.");
+                    if (data != null && data.success() != null && "true".equalsIgnoreCase(data.success())) {
+                        boolean isSafe = "true".equalsIgnoreCase(data.safe_to_send());
+                        boolean isValid = "valid".equalsIgnoreCase(data.result());
+                        boolean isDisposable = "true".equalsIgnoreCase(data.disposable());
+
+                        if ((isSafe || isValid) && !isDisposable) {
+                            Log.d(TAG, "Email is valid/safe. Sending OTP.");
                             sendOTP();
                         } else {
                             String reason = data.reason() != null ? data.reason() : "Invalid or risky email";
@@ -74,6 +77,7 @@ public class VerifyActivity extends AppCompatActivity {
                         if (rawResponse != null && rawResponse.contains("invalid_api_key")) {
                             Toast.makeText(this, "Verification API error: Invalid API Key.", Toast.LENGTH_SHORT).show();
                         }
+                        sendOTP();
                     }
                 });
             } catch (Exception e) {
@@ -81,6 +85,48 @@ public class VerifyActivity extends AppCompatActivity {
                 runOnUiThread(this::sendOTP);
             }
         }).start();
+    }
+
+    private void initOtpFields() {
+        EditText otp1 = findViewById(R.id.activity_verify_et_number1);
+        EditText otp2 = findViewById(R.id.activity_verify_et_number2);
+        EditText otp3 = findViewById(R.id.activity_verify_et_number3);
+        EditText otp4 = findViewById(R.id.activity_verify_et_number4);
+        EditText otp5 = findViewById(R.id.activity_verify_et_number5);
+        EditText otp6 = findViewById(R.id.activity_verify_et_number6);
+
+        setupAutoMove(otp1, otp2);
+        setupAutoMove(otp2, otp3);
+        setupAutoMove(otp3, otp4);
+        setupAutoMove(otp4, otp5);
+        setupAutoMove(otp5, otp6);
+
+        setupBackMove(otp2, otp1);
+        setupBackMove(otp3, otp2);
+        setupBackMove(otp4, otp3);
+        setupBackMove(otp5, otp4);
+        setupBackMove(otp6, otp5);
+    }
+
+    private void setupAutoMove(EditText current, EditText next) {
+        current.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() == 1) next.requestFocus();
+            }
+            @Override public void afterTextChanged(Editable s) {}
+        });
+    }
+
+    private void setupBackMove(EditText current, EditText previous) {
+        current.setOnKeyListener((view, keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_DEL && event.getAction() == KeyEvent.ACTION_DOWN) {
+                if (current.getText().toString().isEmpty()) {
+                    previous.requestFocus();
+                }
+            }
+            return false;
+        });
     }
 
     private void sendOTP() {
@@ -108,97 +154,23 @@ public class VerifyActivity extends AppCompatActivity {
 
     public void verify(View v){
         EditText otp1 = findViewById(R.id.activity_verify_et_number1);
-        String otp1Data = otp1.getText().toString().trim();
-
         EditText otp2 = findViewById(R.id.activity_verify_et_number2);
-        String otp2Data = otp2.getText().toString().trim();
-
         EditText otp3 = findViewById(R.id.activity_verify_et_number3);
-        String otp3Data = otp3.getText().toString().trim();
-
         EditText otp4 = findViewById(R.id.activity_verify_et_number4);
-        String otp4Data = otp4.getText().toString().trim();
-
         EditText otp5 = findViewById(R.id.activity_verify_et_number5);
-        String otp5Data = otp5.getText().toString().trim();
-
         EditText otp6 = findViewById(R.id.activity_verify_et_number6);
-        String otp6Data = otp6.getText().toString().trim();
 
-        // On input for each box
-        otp1.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() == 1) otp2.requestFocus();
-            }
-            @Override public void afterTextChanged(Editable s) {}
-        });
-        otp2.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() == 1) otp3.requestFocus();
-            }
-            @Override public void afterTextChanged(Editable s) {}
-        });
-        otp3.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() == 1) otp4.requestFocus();
-            }
-            @Override public void afterTextChanged(Editable s) {}
-        });
-        otp4.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() == 1) otp5.requestFocus();
-            }
-            @Override public void afterTextChanged(Editable s) {}
-        });
-        otp5.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() == 1) otp5.requestFocus();
-            }
-            @Override public void afterTextChanged(Editable s) {}
-        });
+        String inputOtp = otp1.getText().toString().trim() +
+                          otp2.getText().toString().trim() +
+                          otp3.getText().toString().trim() +
+                          otp4.getText().toString().trim() +
+                          otp5.getText().toString().trim() +
+                          otp6.getText().toString().trim();
 
-        // Backspace for each box
-        otp6.setOnKeyListener((view, keyCode, event) -> {
-            if (keyCode == KeyEvent.KEYCODE_DEL && otp6.getText().length() == 0) {
-                otp5.requestFocus();
-            }
-            return false;
-        });
-        otp5.setOnKeyListener((view, keyCode, event) -> {
-            if (keyCode == KeyEvent.KEYCODE_DEL && otp5.getText().length() == 0) {
-                otp4.requestFocus();
-            }
-            return false;
-        });
-        otp4.setOnKeyListener((view, keyCode, event) -> {
-            if (keyCode == KeyEvent.KEYCODE_DEL && otp4.getText().length() == 0) {
-                otp3.requestFocus();
-            }
-            return false;
-        });
-        otp3.setOnKeyListener((view, keyCode, event) -> {
-            if (keyCode == KeyEvent.KEYCODE_DEL && otp3.getText().length() == 0) {
-                otp2.requestFocus();
-            }
-            return false;
-        });
-        otp2.setOnKeyListener((view, keyCode, event) -> {
-            if (keyCode == KeyEvent.KEYCODE_DEL && otp2.getText().length() == 0) {
-                otp1.requestFocus();
-            }
-            return false;
-        });
-
-        if(otp1Data.isEmpty() || otp2Data.isEmpty() || otp3Data.isEmpty() || otp4Data.isEmpty() || otp5Data.isEmpty() || otp6Data.isEmpty()){
+        if(inputOtp.length() < 6){
             Toast.makeText(this, "Input fields cannot be empty", Toast.LENGTH_SHORT).show();
         }
         else{
-            String inputOtp = otp1Data + otp2Data + otp3Data + otp4Data + otp5Data + otp6Data;
             Log.d(TAG, "User input OTP: " + inputOtp + " | Expected: " + emailOTP.getOTP());
             
             if (emailOTP.validateOTP(inputOtp)) {

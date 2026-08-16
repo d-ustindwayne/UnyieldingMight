@@ -188,9 +188,15 @@ public class Database {
         
         EmailVerification ev = new EmailVerification().email(email).verify();
         EmailVerificationData evData = ev.getData();
-        if (evData != null && evData.result().equalsIgnoreCase("valid")) {
-        Log.w("DATABASE_ERROR", email + " is invalid.");
-            return false;
+        if (evData != null && evData.success() != null && "true".equalsIgnoreCase(evData.success())) {
+            boolean isSafe = "true".equalsIgnoreCase(evData.safe_to_send());
+            boolean isValid = "valid".equalsIgnoreCase(evData.result());
+            boolean isDisposable = "true".equalsIgnoreCase(evData.disposable());
+
+            if (!(isSafe || isValid) || isDisposable) {
+                Log.w("DATABASE_ERROR", "Registration blocked by QEV for: " + email + ". Reason: " + evData.reason());
+                return false;
+            }
         }
 
         Connection conn = getConnection();
