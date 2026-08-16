@@ -70,8 +70,8 @@ To run and deploy the application onto an Android Emulator or a physical testing
 Pull requests are welcome! For major changes, please open an issue first to discuss what you’d like to change.
 
 ## License
-MIT License  
-See `LICENSE` file for details.
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Credits
 https://github.com/SaplingBeing
