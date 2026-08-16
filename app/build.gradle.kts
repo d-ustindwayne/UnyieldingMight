@@ -51,6 +51,7 @@ android {
 
     buildFeatures {
         buildConfig = true
+        viewBinding = true
     }
 
     buildTypes {
@@ -75,6 +76,7 @@ java {
 }
 
 dependencies {
+    implementation(libs.activity.ktx)
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
@@ -82,6 +84,8 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.brevo)
     implementation(libs.jtds)
+    implementation(libs.navigation.fragment)
+    implementation(libs.navigation.ui)
     implementation(libs.stripe.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

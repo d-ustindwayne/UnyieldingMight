@@ -63,7 +63,6 @@ public class Customer implements Observer {
                 return (male + female) / 2;
         }
     }
-
     public float calculateTDEE() {
         return this.calculateBMR() * activityMultiplier;
     }
@@ -71,6 +70,7 @@ public class Customer implements Observer {
     @Override
     public void update() {
         // Update class booked status by the customer and needed attributes
+        // Or when a newsletter is uploaded by the admin
         // to be updated (user's class history | add count and append the class and its detail [this separate class])
     }
 
