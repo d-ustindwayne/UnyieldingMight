@@ -5,6 +5,17 @@ public class Trainer {
     private Profile profile;
     private String description;
 
+    public Profile getProfile() {
+        return profile;
+    }
+
+    public String getName() {
+        if (profile != null) {
+            return profile.getFirstName() + " " + profile.getLastName();
+        }
+        return "Unknown";
+    }
+
     Trainer(Builder builder) {
         this.trainerID = builder.trainerID;
         this.profile = builder.profile;
