@@ -7,20 +7,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class Adapter extends RecyclerView.Adapter<ViewHolder> {
+public class Adapter<T> extends RecyclerView.Adapter<ViewHolder> {
     private Context context;
 //    A list of type class
-    private List<Class1> dataList;
-    public void setSearchList(List<Class1> dataSearchList){
+    private ArrayList<T> dataList;
+    public void setSearchList(ArrayList<T> dataSearchList){
         this.dataList = dataSearchList;
         notifyDataSetChanged();
     }
-    public Adapter(Context context, List<Class1> dataList){
+    public Adapter(Context context, ArrayList<T> dataList){
         this.context = context;
         this.dataList = dataList;
     }

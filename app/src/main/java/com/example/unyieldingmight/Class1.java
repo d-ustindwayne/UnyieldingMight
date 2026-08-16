@@ -1,4 +1,7 @@
 package com.example.unyieldingmight;
+
+import java.util.Date;
+
 // Variables used to hold data which is going to be displayed in recycler_item.xml and activity_detail.xml
 public class Class1 {
     private String title;
@@ -6,7 +9,7 @@ public class Class1 {
     private String intensity;
 //  R.string are integers
     private int description;
-    private String date;
+    private Date date = new Date(2005, 4, 14);
     private String startTime;
     private String endTime;
     private String curCap;
