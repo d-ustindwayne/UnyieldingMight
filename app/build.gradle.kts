@@ -51,10 +51,6 @@ android {
         buildConfigField("String", "SMTP_USER", "\"$SMTP_USER\"")
         val SMTP_PASS = properties.getProperty("SMTP_PASS") ?: ""
         buildConfigField("String", "SMTP_PASS", "\"$SMTP_PASS\"")
-
-
-        // Optional: If you need it in AndroidManifest.xml
-        manifestPlaceholders["QEV_APIKEY"] = QEV_apiKey
     }
 
     buildFeatures {

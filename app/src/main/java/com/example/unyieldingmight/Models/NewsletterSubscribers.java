@@ -5,31 +5,10 @@ import java.util.List;
 
 public class NewsletterSubscribers implements Subject {
 
-    private static NewsletterSubscribers instance;
     private List<Observer> newsletterSubscribers = new ArrayList<>();
     private NewsletterType latestUpdateType;
-    private final List<String> executionLogs = new ArrayList<>();
 
-    private NewsletterSubscribers() {}
-
-    public static NewsletterSubscribers getInstance() {
-        if (instance == null) {
-            instance = new NewsletterSubscribers();
-        }
-        return instance;
-    }
-
-    public void log(String message) {
-        executionLogs.add(message);
-    }
-
-    public List<String> getExecutionLogs() {
-        return new ArrayList<>(executionLogs);
-    }
-
-    public void clearLogs() {
-        executionLogs.clear();
-    }
+    public NewsletterSubscribers() {}
 
     public NewsletterType getLatestUpdateType() {
         return latestUpdateType;

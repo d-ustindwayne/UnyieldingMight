@@ -55,7 +55,12 @@ public class HomeActivity extends AppCompatActivity {
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(HomeActivity.this, 1);
         recyclerView.setLayoutManager(gridLayoutManager);
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Load data dynamically
         loadGymClasses();
     }
 
@@ -63,7 +68,7 @@ public class HomeActivity extends AppCompatActivity {
         loadingSpinner.setVisibility(View.VISIBLE);
         isLoaded = false;
 
-        // Set 20 second timeout
+        // 20 second timeout
         timeoutHandler.postDelayed(() -> {
             if (!isLoaded) {
                 loadingSpinner.setVisibility(View.GONE);
@@ -73,7 +78,6 @@ public class HomeActivity extends AppCompatActivity {
 
         new Thread(() -> {
             try {
-                // Fetch user TDEE if available
                 float tdee = 2000f;
                 User current = Database.getCurrentUser();
                 if (current != null) {
@@ -85,7 +89,6 @@ public class HomeActivity extends AppCompatActivity {
                 }
                 final float finalTdee = tdee;
 
-                // Fetch data in background thread
                 final ArrayList<GymClass> fetchedClasses = Database.getGymClassesAvailable();
 
                 runOnUiThread(() -> {

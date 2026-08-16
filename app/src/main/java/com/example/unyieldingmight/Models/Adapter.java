@@ -81,6 +81,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
                 intent.putExtra("CurCap", String.valueOf(current.getCurrentCapacity()));
                 intent.putExtra("MaxCap", String.valueOf(current.getMaxCapacity()));
                 intent.putExtra("Desc", current.getDescription());
+                intent.putExtra("AvgCalorie", current.getAvgCaloriesBurnedPerDay());
                 intent.putExtra("ClassId", current.getID());
                 context.startActivity(intent);
             }

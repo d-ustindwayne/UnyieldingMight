@@ -34,7 +34,7 @@
         <activity android:name=".Activities.DoneActivity"></activity>
         <activity android:name=".Activities.HomeActivity"></activity>
         <activity android:name=".Activities.InfoActivity"></activity>
-        <activity android:name=".Activities.EditclassActivity"></activity>
+        <activity android:name=".Activities.EditClassActivity"></activity>
 
         <meta-data
             android:name="preloaded_fonts"

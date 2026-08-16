@@ -1,6 +1,8 @@
 package com.example.unyieldingmight.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -15,7 +17,7 @@ import com.example.unyieldingmight.R;
 public class InfoActivity extends AppCompatActivity {
     ImageView infoImage;
     TextView infoTitle, infoInstructor, infoIntensity, infoDate, infoStartTime, infoEndTime, infoCurCap, infoMaxCap, infoDesc;
-    Button bookButton;
+    Button clickButton;
     int classId = -1;
 
     @Override
@@ -33,7 +35,7 @@ public class InfoActivity extends AppCompatActivity {
         infoCurCap = findViewById(R.id.activity_class_tv_currentCapacity);
         infoMaxCap = findViewById(R.id.activity_class_tv_maxCapacity);
         infoDesc = findViewById(R.id.activity_class_tv_description);
-        bookButton = findViewById(R.id.activity_class_btn_book);
+        clickButton = findViewById(R.id.activity_class_btn_book);
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null){
@@ -50,35 +52,81 @@ public class InfoActivity extends AppCompatActivity {
             infoDesc.setText(bundle.getString("Desc"));
         }
 
-        bookButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (classId == -1) {
-                    Toast.makeText(InfoActivity.this, "Error: Invalid Class ID", Toast.LENGTH_SHORT).show();
-                    return;
+        String user = Database.getCurrentUser().getUserClass().toString();
+        if (user.equals("ADMIN")) {
+            clickButton.setText("Edit Class");
+            clickButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    new Thread(() -> {
+                        Intent intent = getIntent();
+                        int classID = intent.getIntExtra("ClassId", 0);
+                        String title = intent.getStringExtra("Title");
+                        String date = intent.getStringExtra("Date");
+                        String startTime = intent.getStringExtra("StartTime");
+                        String endTime = intent.getStringExtra("EndTime");
+                        String maxCap = intent.getStringExtra("MaxCap");
+                        String intensity = intent.getStringExtra("Intensity");
+                        String desc = intent.getStringExtra("Desc");
+                        float avgCalorie = intent.getFloatExtra("AvgCalorie", 200);
+
+                        Intent i = new Intent(InfoActivity.this, EditClassActivity.class);
+                        i.putExtra("ClassId", classID);
+                        i.putExtra("Title", title);
+                        i.putExtra("Date", date);
+                        i.putExtra("StartTime", startTime);
+                        i.putExtra("EndTime", endTime);
+                        i.putExtra("MaxCap", maxCap);
+                        i.putExtra("Intensity", intensity);
+                        i.putExtra("Desc", desc);
+                        i.putExtra("AvgCalorie", avgCalorie);
+                        startActivity(i);
+                    }).start();
                 }
+            });
+        } else {
+            clickButton.setText("Book Now!");
+            clickButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (classId == -1) {
+                        Toast.makeText(InfoActivity.this, "Error: Invalid Class ID", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
 
-                bookButton.setEnabled(false);
-                bookButton.setText("Booking...");
+                    clickButton.setEnabled(false);
+                    clickButton.setText("Booking...");
 
-                new Thread(() -> {
-                    boolean success = Database.bookClass(classId);
-                    runOnUiThread(() -> {
-                        bookButton.setEnabled(true);
-                        bookButton.setText("Book Now!");
-                        if (success) {
-                            Toast.makeText(InfoActivity.this, "Class booked successfully!", Toast.LENGTH_SHORT).show();
-                            // Update UI capacity locally if needed
-                            try {
-                                int current = Integer.parseInt(infoCurCap.getText().toString());
-                                infoCurCap.setText(String.valueOf(current + 1));
-                            } catch (Exception e) {}
-                        } else {
-                            Toast.makeText(InfoActivity.this, "Booking failed. Class might be full or already booked.", Toast.LENGTH_LONG).show();
+                    new Thread(() -> {
+                        boolean alreadyBooked = Database.isAlreadyBooked(classId);
+                        if (alreadyBooked) {
+                            runOnUiThread(() -> {
+                                clickButton.setEnabled(true);
+                                clickButton.setText("Book Now!");
+                                Toast.makeText(InfoActivity.this, "You have already booked this class.", Toast.LENGTH_LONG).show();
+                            });
+                            return;
                         }
-                    });
-                }).start();
-            }
-        });
+
+                        boolean success = Database.bookClass(classId);
+                        runOnUiThread(() -> {
+                            clickButton.setEnabled(true);
+                            clickButton.setText("Book Now!");
+                            if (success) {
+                                Toast.makeText(InfoActivity.this, "Class booked successfully!", Toast.LENGTH_SHORT).show();
+                                try {
+                                    int current = Integer.parseInt(infoCurCap.getText().toString());
+                                    infoCurCap.setText(String.valueOf(current + 1));
+                                    finish();
+                                } catch (Exception e) {}
+                            } else {
+                                Toast.makeText(InfoActivity.this, "Booking failed. Class might be full.", Toast.LENGTH_LONG).show();
+                                finish();
+                            }
+                        });
+                    }).start();
+                }
+            });
+        }
     }
 }

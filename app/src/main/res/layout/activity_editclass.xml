@@ -140,12 +140,14 @@
             app:hintTextColor="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.192"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.497">
 
             <EditText
                 android:id="@+id/activity_editclass_et_maxcapacity"
-                android:layout_width="314dp"
+                android:layout_width="157dp"
                 android:layout_height="72dp"
                 android:ems="10"
                 android:fontFamily="@font/jura"
@@ -153,6 +155,31 @@
                 android:textColor="@color/white"
                 android:textColorHint="@color/white"
                 android:textColorLink="@color/white" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/activity_editclass_til_avgcalorie"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Avg. Calorie"
+            android:textColorHint="@color/white"
+            app:hintTextColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.811"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.497">
+
+            <EditText
+                android:id="@+id/activity_editclass_et_avgcalorie"
+                android:layout_width="157dp"
+                android:layout_height="72dp"
+                android:ems="10"
+                android:fontFamily="@font/jura"
+                android:inputType="numberDecimal"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button

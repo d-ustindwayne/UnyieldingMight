@@ -16,6 +16,7 @@ import com.example.unyieldingmight.Models.EmailVerificationData;
 import com.example.unyieldingmight.Models.NewsletterType;
 import com.example.unyieldingmight.Models.NewsletterSubscribers;
 import com.example.unyieldingmight.Models.Profile;
+import com.example.unyieldingmight.Models.Trainer;
 import com.example.unyieldingmight.Utils.Security;
 import com.example.unyieldingmight.Models.User;
 import com.example.unyieldingmight.Utils.Conversion;
@@ -27,6 +28,7 @@ public class Database {
     private static Database instance;
     private Connection connection;
     private User currentUser;
+    private final NewsletterSubscribers newsletterSubscribers = new NewsletterSubscribers();
     private final String DB_HOST = BuildConfig.DB_HOST;
     private final String DB_PORT = BuildConfig.DB_PORT;
     private final String DB_USER = BuildConfig.DB_USER;
@@ -38,41 +40,53 @@ public class Database {
         reconnect();
     }
 
+    /**PreparedStatement is a precompiled query and those ? will be replaced
+     * with values to be set | to prevent sql injection
+     */
+
+    // Only one instantiation
     public static Database getInstance() {
         if (instance == null) instance = new Database();
         return instance;
     }
 
+    // Connection to database
     public static Connection getConnection() {
         try {
             if (getInstance().connection == null || getInstance().connection.isClosed()) {
                 getInstance().reconnect();
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        } catch (SQLException e) { Log.e(e.toString(), "Connection Error"); }
         return getInstance().connection;
     }
 
     private void reconnect() {
         try {
+            // Connect the driver to the class
             Class.forName("net.sourceforge.jtds.jdbc.Driver");
-            String url = DB_URL + ";ssl=request;loginTimeout=30";
+            // URL for database connection + parameter
+            String url = DB_URL + ";ssl=request;loginTimeout=30"; // Establish secure connection + timeout
             this.connection = DriverManager.getConnection(url, DB_USER, DB_PASSWORD);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) { Log.e(e.toString(), "Reconnection Error"); }
     }
 
     public static User getCurrentUser() { return getInstance().currentUser; }
 
+    // To apply observer pattern
+    public static NewsletterSubscribers getNewsletterSubscribers() {
+        return getInstance().newsletterSubscribers;
+    }
+
     public static Customer getCustomer(String email) {
+        // Combine UserProfile, ProfileAddress, and Customer
         String sql = "SELECT up.*, c.*, pa.* FROM UserProfile up " +
-                "LEFT JOIN Customer c ON up.CustomerId = c.CustomerId " +
-                "LEFT JOIN ProfileAddress pa ON up.AddressId = pa.AddressId " +
-                "WHERE up.Email = ?";
+            "LEFT JOIN Customer c ON up.CustomerId = c.CustomerId " +
+            "LEFT JOIN ProfileAddress pa ON up.AddressId = pa.AddressId " +
+            "WHERE up.Email = ?";
+        // Check for valid connection
         Connection conn = getConnection();
         if (conn == null) return null;
+
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, email);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -92,15 +106,15 @@ public class Database {
                     else gd = Gender.OTHER;
 
                     Profile profile = new Profile.Builder()
-                            .email(rs.getString("Email"))
-                            .firstName(rs.getString("FirstName"))
-                            .lastName(rs.getString("LastName"))
-                            .dateOfBirth(rs.getDate("DateOfBirth"))
-                            .gender(gd)
-                            .age(rs.getInt("Age"))
-                            .address(address)
-                            .userClass(rs.getString("UserClass"))
-                            .build();
+                        .email(rs.getString("Email"))
+                        .firstName(rs.getString("FirstName"))
+                        .lastName(rs.getString("LastName"))
+                        .dateOfBirth(rs.getDate("DateOfBirth"))
+                        .gender(gd)
+                        .age(rs.getInt("Age"))
+                        .address(address)
+                        .userClass(rs.getString("UserClass"))
+                        .build();
 
                     float multiplierVal = rs.getFloat("ActivityMultiplier");
                     ActivityMultiplier multiplier;
@@ -111,17 +125,17 @@ public class Database {
                     else multiplier = ActivityMultiplier.EXTREME;
 
                     return new Customer.Builder()
-                            .customerId(rs.getInt("CustomerId"))
-                            .profile(profile)
-                            .isMember(rs.getObject("MembershipId") != null)
-                            .height(rs.getFloat("Height"))
-                            .weight(rs.getFloat("Weight"))
-                            .activityMultiplier(multiplier)
-                            .tdee(rs.getFloat("TDEE"))
-                            .build();
+                        .customerId(rs.getInt("CustomerId"))
+                        .profile(profile)
+                        .isMember(rs.getObject("MembershipId") != null)
+                        .height(rs.getFloat("Height"))
+                        .weight(rs.getFloat("Weight"))
+                        .activityMultiplier(multiplier)
+                        .tdee(rs.getFloat("TDEE"))
+                        .build();
                 }
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { Log.e(e.toString(), "Customer Data Fetching Failed"); }
         return null;
     }
 
@@ -156,16 +170,16 @@ public class Database {
                                 ? User.Role.ADMIN : User.Role.CUSTOMER;
 
                         return new User(
-                                rs.getInt("ProfileId"),
-                                rs.getString("FirstName") + " " + rs.getString("LastName"),
-                                storedHash,
-                                rs.getString("Email"),
-                                role
+                            rs.getInt("ProfileId"),
+                            rs.getString("FirstName") + " " + rs.getString("LastName"),
+                            storedHash,
+                            rs.getString("Email"),
+                            role
                         );
                     }
                 }
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) { Log.e(e.toString(), "SQL ERROR"); }
         return null;
     }
 
@@ -267,7 +281,10 @@ public class Database {
 
     public static ArrayList<GymClass> getGymClassesAvailable() {
         ArrayList<GymClass> classes = new ArrayList<>();
-        String sql = "SELECT * FROM GymClass WHERE ClassStatus = 'ONGOING'";
+        String sql = "SELECT gc.*, t.FirstName as T_FirstName, t.LastName as T_LastName, t.ProfileDescription as T_Desc " +
+                "FROM GymClass gc " +
+                "LEFT JOIN Trainer t ON gc.TrainerId = t.TrainerId " +
+                "WHERE gc.ClassStatus = 'ONGOING'";
         Connection conn = getConnection();
         if (conn == null) return classes;
         try (PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -382,8 +399,9 @@ public class Database {
             int rows = pstmt.executeUpdate();
             if (rows > 0) {
                 NewsletterType type = (status == ClassStatus.COMPLETE) ? NewsletterType.CLASS_FINISHED : NewsletterType.CLASS_CANCELLED;
-                NewsletterSubscribers.getInstance().setLatestUpdateType(type);
-                NewsletterSubscribers.getInstance().notifyObserver();
+                NewsletterSubscribers subscribers = getNewsletterSubscribers();
+                subscribers.setLatestUpdateType(type);
+                subscribers.notifyObserver();
                 return true;
             }
         } catch (SQLException e) { e.printStackTrace(); }
@@ -395,8 +413,10 @@ public class Database {
         User user = getCurrentUser();
         if (user == null) return history;
 
-        String sql = "SELECT b.*, c.* FROM GymClassBooking b " +
+        String sql = "SELECT b.*, c.*, t.FirstName as T_FirstName, t.LastName as T_LastName, t.ProfileDescription as T_Desc " +
+                "FROM GymClassBooking b " +
                 "JOIN GymClass c ON b.ClassId = c.ClassId " +
+                "LEFT JOIN Trainer t ON c.TrainerId = t.TrainerId " +
                 "WHERE b.ProfileId = ? " +
                 "ORDER BY b.BookingDate DESC";
 
@@ -423,6 +443,25 @@ public class Database {
         return history;
     }
 
+    public static boolean editClass(int classId, String name, String description, Timestamp startDateTime, Timestamp endDateTime, int maxCapacity, float avgCalorieBurnedPerDay) {
+        Connection conn = getConnection();
+        if (conn == null) return false;
+        String sql = "UPDATE GymClass SET ClassName = ?, ClassDescription = ?, StartDateTime = ?, EndDateTime = ?, MaxCapacity = ?, AvgCaloriesBurnedPerDay = ? WHERE ClassId = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, name);
+            pstmt.setString(2, description);
+            pstmt.setTimestamp(3, startDateTime);
+            pstmt.setTimestamp(4, endDateTime);
+            pstmt.setInt(5, maxCapacity);
+            pstmt.setFloat(6, avgCalorieBurnedPerDay);
+            pstmt.setInt(7, classId);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            Log.e("DATABASE_ERROR", "Error updating class: " + e.getMessage(), e);
+            return false;
+        }
+    }
+
     public static boolean bookClass(int classId) {
         User user = getCurrentUser();
         if (user == null) return false;
@@ -430,6 +469,20 @@ public class Database {
         if (conn == null) return false;
         try {
             conn.setAutoCommit(false);
+            
+            // Check if already booked
+            String checkBookedSql = "SELECT 1 FROM GymClassBooking WHERE ProfileId = ? AND ClassId = ? AND BookingStatus = 'BOOKED'";
+            try (PreparedStatement checkPstmt = conn.prepareStatement(checkBookedSql)) {
+                checkPstmt.setInt(1, user.getId());
+                checkPstmt.setInt(2, classId);
+                try (ResultSet rs = checkPstmt.executeQuery()) {
+                    if (rs.next()) {
+                        conn.rollback();
+                        return false; // Already booked
+                    }
+                }
+            }
+
             String checkSql = "SELECT CurrentCapacity, MaxCapacity FROM GymClass WITH (UPDLOCK) WHERE ClassId = ?";
             try (PreparedStatement pstmt = conn.prepareStatement(checkSql)) {
                 pstmt.setInt(1, classId);
@@ -448,7 +501,7 @@ public class Database {
 
                         Customer customer = getCustomer(user.getEmail());
                         if (customer != null) {
-                            NewsletterSubscribers.getInstance().notifySpecificObserver(customer, NewsletterType.BOOK_CONFIRMED);
+                            getNewsletterSubscribers().notifySpecificObserver(customer, NewsletterType.BOOK_CONFIRMED);
                         }
 
                         return true;
@@ -465,10 +518,43 @@ public class Database {
         return false;
     }
 
+    public static boolean isAlreadyBooked(int classId) {
+        User user = getCurrentUser();
+        if (user == null) return false;
+        String sql = "SELECT 1 FROM GymClassBooking WHERE ProfileId = ? AND ClassId = ? AND BookingStatus = 'BOOKED'";
+        Connection conn = getConnection();
+        if (conn == null) return false;
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, user.getId());
+            pstmt.setInt(2, classId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     private static GymClass mapResultSetToGymClass(ResultSet rs) throws SQLException {
+        Trainer trainer = null;
+        try {
+            String tFirst = rs.getString("T_FirstName");
+            if (tFirst != null) {
+                trainer = new Trainer.Builder()
+                        .firstName(tFirst)
+                        .lastName(rs.getString("T_LastName"))
+                        .profileDescription(rs.getString("T_Desc"))
+                        .build();
+            }
+        } catch (SQLException e) {
+            // Trainer info might not be in the ResultSet if the join wasn't used
+        }
+
         return new GymClass.Builder()
                 .ID(rs.getInt("ClassId")).name(rs.getString("ClassName"))
                 .description(rs.getString("ClassDescription"))
+                .trainer(trainer)
                 .startDateTime(rs.getTimestamp("StartDateTime"))
                 .endDateTime(rs.getTimestamp("EndDateTime"))
                 .currentCapacity(rs.getInt("CurrentCapacity"))

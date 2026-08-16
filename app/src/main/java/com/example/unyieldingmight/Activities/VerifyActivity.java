@@ -2,6 +2,9 @@ package com.example.unyieldingmight.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -83,7 +86,6 @@ public class VerifyActivity extends AppCompatActivity {
     }
 
     private void sendOTP() {
-        Log.d(TAG, "sendOTP() called");
         Toast.makeText(this, "Sending verification code...", Toast.LENGTH_SHORT).show();
         new Thread(() -> {
             try {
@@ -124,6 +126,77 @@ public class VerifyActivity extends AppCompatActivity {
 
         EditText otp6 = findViewById(R.id.activity_verify_et_number6);
         String otp6Data = otp6.getText().toString().trim();
+
+        // On input for each box
+        otp1.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() == 1) otp2.requestFocus();
+            }
+            @Override public void afterTextChanged(Editable s) {}
+        });
+        otp2.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() == 1) otp3.requestFocus();
+            }
+            @Override public void afterTextChanged(Editable s) {}
+        });
+        otp3.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() == 1) otp4.requestFocus();
+            }
+            @Override public void afterTextChanged(Editable s) {}
+        });
+        otp4.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() == 1) otp5.requestFocus();
+            }
+            @Override public void afterTextChanged(Editable s) {}
+        });
+        otp5.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() == 1) otp5.requestFocus();
+            }
+            @Override public void afterTextChanged(Editable s) {}
+        });
+
+        // Backspace for each box
+        otp6.setOnKeyListener((view, keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_DEL && otp6.getText().length() == 0) {
+                otp5.requestFocus();
+            }
+            return false;
+        });
+        otp5.setOnKeyListener((view, keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_DEL && otp5.getText().length() == 0) {
+                otp4.requestFocus();
+            }
+            return false;
+        });
+        otp4.setOnKeyListener((view, keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_DEL && otp4.getText().length() == 0) {
+                otp3.requestFocus();
+            }
+            return false;
+        });
+        otp3.setOnKeyListener((view, keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_DEL && otp3.getText().length() == 0) {
+                otp2.requestFocus();
+            }
+            return false;
+        });
+        otp2.setOnKeyListener((view, keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_DEL && otp2.getText().length() == 0) {
+                otp1.requestFocus();
+            }
+            return false;
+        });
+
+// Repeat this for et2 (to et3), et3 (to et4), etc.
 
         if(otp1Data.isEmpty() || otp2Data.isEmpty() || otp3Data.isEmpty() || otp4Data.isEmpty() || otp5Data.isEmpty() || otp6Data.isEmpty()){
             Toast.makeText(this, "Input fields cannot be empty", Toast.LENGTH_SHORT).show();

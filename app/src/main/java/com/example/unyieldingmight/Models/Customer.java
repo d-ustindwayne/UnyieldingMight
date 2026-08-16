@@ -72,7 +72,8 @@ public class Customer implements Observer {
     @Override
     public void update() {
         // 1. Determine what happened from the Subject
-        NewsletterType updateType = NewsletterSubscribers.getInstance().getLatestUpdateType();
+        NewsletterSubscribers subscribers = com.example.unyieldingmight.Services.Database.getNewsletterSubscribers();
+        NewsletterType updateType = subscribers.getLatestUpdateType();
 
         if (updateType != null) {
             // 2. Automatically send an email notification using Jakarta Mail
@@ -89,7 +90,6 @@ public class Customer implements Observer {
             
             String result = "Mail Result for " + profile.getEmail() + ": " + emailNotification.getResponseString();
             System.out.println(result);
-            NewsletterSubscribers.getInstance().log(result);
         }
     }
 
