@@ -1,6 +1,8 @@
 package com.example.unyieldingmight.Utils;
 
 public class Conversion {
+    // Conversion class converts the height or weight into its default unit that it is going to be stored in for the database
+
     // Rounds the number to the 2nd decimal place
     public static float rounded(float f) {
         return Math.round(f * 100.0f) / 100.0f;

@@ -20,6 +20,8 @@ import com.example.unyieldingmight.Activities.InfoActivity;
 import com.example.unyieldingmight.R;
 
 public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
+
+//    Adapter for reusable card components for loading all gym classes
     private Context context;
 //    ArrayList of class GymClass is defined as object dataList
     private ArrayList<GymClass> dataList;

@@ -1,5 +1,5 @@
 package com.example.unyieldingmight.Models;
 
-public interface Observer {
+public interface    Observer {
     void update();
 }

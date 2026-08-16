@@ -100,8 +100,6 @@ public abstract class EmailFunction {
             return;
         }
 
-        // Removed internal thread because the calling context (Observer) should handle
-        // the background execution. This allows for immediate response string retrieval.
         try {
             Transport.send(emailMessage);
             this.responseString = "Success: Email sent successfully!";

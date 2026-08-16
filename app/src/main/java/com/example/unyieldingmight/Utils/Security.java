@@ -5,7 +5,7 @@ import java.security.MessageDigest;
 
 public class Security {
     public static String hashData(String text) throws Exception {
-        // Encrypting data using SHA256
+        // Implement SHA-256 one-way cryptographic hashing to securely store user credentials and ensure password integrity.
         MessageDigest md = MessageDigest.getInstance("SHA-256");
 
         byte[] hashBytes = md.digest(text.getBytes(StandardCharsets.UTF_8));
