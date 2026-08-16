@@ -83,7 +83,7 @@ public class CustomerTest {
 
     @Test
     public void BMRSuccess(){
-//        Assert.assertEquals(1780f,customer.calculateBMR(), 1780);
+        Assert.assertEquals(1780f,customer.calculateBMR(customer.getWeight(), customer.getHeight(), customer.getProfile().getAge(), customer.getProfile().getGender()), 1780);
     }
 
     @Test

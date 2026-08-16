@@ -39,12 +39,14 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         return new ViewHolder(view);
     }
 
+//    Binds the data from <GymClass> to the views within RecyclerView
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+//        Gets the position of class within dataList and uses the position to retrieve an object of GymClass
         GymClass gymClass = dataList.get(position);
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-
+//        Sets the image,texts, and values to the corresponding views within the holder
         holder.recImage.setImageResource(R.drawable.boxfit);
         holder.recTitle.setText(gymClass.getName());
         holder.recInstructor.setText(gymClass.getTrainer().getName());
@@ -59,15 +61,17 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         holder.recDesc.setText(gymClass.getDescription());
         holder.recCurCap.setText(String.valueOf(gymClass.getCurrentCapacity()));
         holder.recMaxCap.setText(String.valueOf(gymClass.getMaxCapacity()));
-
+//        Listens if a card gets clicked
         holder.recCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+//                Gets the current position of the card
                 int pos = holder.getAbsoluteAdapterPosition();
                 if (pos == RecyclerView.NO_POSITION) return;
                 GymClass current = dataList.get(pos);
-
+//                New intent to start the activity InfoActivity
                 Intent intent = new Intent(context, InfoActivity.class);
+//                Transfers the class data to InfoActivity so it can be displayed
                 intent.putExtra("Image", R.drawable.boxfit);
                 intent.putExtra("Title", current.getName());
                 intent.putExtra("Instructor", current.getTrainer().getName());
