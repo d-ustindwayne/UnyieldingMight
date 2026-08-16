@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.unyieldingmight.Models.Gender;
 import com.example.unyieldingmight.Services.Database;
 import com.example.unyieldingmight.R;
 
@@ -23,7 +24,7 @@ public class DoneActivity extends AppCompatActivity {
     public void nextActivityHome(View v) {
         // Disable double-submits
         v.setEnabled(false);
-        
+
         Bundle b = getIntent().getExtras();
         if (b == null) {
             v.setEnabled(true);
@@ -48,10 +49,10 @@ public class DoneActivity extends AppCompatActivity {
 
         new Thread(() -> {
             boolean success = Database.registerCustomer(
-                fName, lName, email, password,
-                street, region, city, country, postcode,
-                height, weight, multiplier, membershipId,
-                Date.valueOf(dob), gender
+                    fName, lName, email, password,
+                    street, region, city, country, postcode,
+                    height, weight, multiplier, membershipId,
+                    Date.valueOf(dob), Gender.valueOf(gender)
             );
 
             runOnUiThread(() -> {

@@ -51,7 +51,7 @@ public class EmailVerification {
                 reader.close();
             }
         } catch (Exception e) {
-            Log.e(e.getMessage(), "VERIFICATION ERROR");
+            Log.e("VERIFICATION ERROR", e.getMessage());
         } finally {
             // Close the connection
             if (urlConnection != null) {

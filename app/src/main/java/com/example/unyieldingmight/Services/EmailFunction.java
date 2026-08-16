@@ -67,12 +67,12 @@ public abstract class EmailFunction {
             emailMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(toEmail, toName));
             emailMessage.setSubject(subjectText);
             emailMessage.setContent(String.format(
-                "<html><body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>%s</body></html>", bodyText), 
-                "text/html; charset=utf-8"
+                            "<html><body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>%s</body></html>", bodyText),
+                    "text/html; charset=utf-8"
             );
 
         } catch (Exception e) {
-            Log.e(e.getMessage(), "EMAIL FUNCTION ERROR");
+            Log.e("EMAIL FUNCTION ERROR", e.getMessage());
             this.responseString = "Creation Error: " + e.getMessage();
         }
         return this;
@@ -100,13 +100,13 @@ public abstract class EmailFunction {
             return;
         }
 
-        // Removed internal thread because the calling context (Observer) should handle 
+        // Removed internal thread because the calling context (Observer) should handle
         // the background execution. This allows for immediate response string retrieval.
         try {
             Transport.send(emailMessage);
             this.responseString = "Success: Email sent successfully!";
         } catch (Exception e) {
-            Log.e(e.getMessage(), "EMAIL SENDING ERROR");
+            Log.e("EMAIL SENDING ERROR", e.getMessage());
             this.responseString = "Send Error: " + e.getMessage();
         }
     }

@@ -11,6 +11,14 @@ public enum ActivityMultiplier {
     ActivityMultiplier(float multiplier) {
         this.multiplier = multiplier;
     }
+    public static ActivityMultiplier valueOf(float f) {
+        for (ActivityMultiplier m : values()) {
+            if (m.multiplier == f) {
+                return m;
+            }
+        }
+        return LIGHT; // DEFAULT VALUE
+    }
 
     public float getActivityMultiplier() {
         return multiplier;

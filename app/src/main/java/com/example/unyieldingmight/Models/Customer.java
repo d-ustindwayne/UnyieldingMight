@@ -49,24 +49,23 @@ public class Customer implements Observer {
         return TDEE;
     }
 
-    public float calculateBMR() {
-        float weightComponent = 10 * weight;
-        float heightComponent = 6.25f * height;
-        float ageComponent = 5 * profile.getAge();
-
-        switch (profile.getGender()) {
+    public static float calculateBMR(float w, float h, int age, Gender gd) {
+        switch (gd) {
             case MALE:
-                return weightComponent + heightComponent - ageComponent + 5;
+                return w + h - age + 5;
             case FEMALE:
-                return weightComponent + heightComponent - ageComponent - 161;
+                return w + h - age - 161;
             default:
-                float male = weightComponent + heightComponent - ageComponent + 5;
-                float female = weightComponent + heightComponent - ageComponent - 161;
+                float male = w + h - age + 5;
+                float female = w + h - age - 161;
                 return (male + female) / 2;
         }
     }
     public float calculateTDEE() {
-        return this.calculateBMR() * activityMultiplier;
+        float weightVal = 10 * weight;
+        float heightVal = 6.25f * height;
+        return calculateBMR(weightVal, heightVal,
+                profile.getAge(), profile.getGender()) * activityMultiplier;
     }
 
     @Override
@@ -84,10 +83,10 @@ public class Customer implements Observer {
             EmailNewsletter emailNotification = new EmailNewsletter(updateType, profile.getFirstName());
 
             emailNotification.setSender("Dustin @ UnyieldingMight", verifiedSenderEmail)
-                             .setReceiver(profile.getFirstName(), profile.getEmail())
-                             .createEmail()
-                             .sendEmail();
-            
+                    .setReceiver(profile.getFirstName(), profile.getEmail())
+                    .createEmail()
+                    .sendEmail();
+
             String result = "Mail Result for " + profile.getEmail() + ": " + emailNotification.getResponseString();
             System.out.println(result);
         }
