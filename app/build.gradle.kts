@@ -43,6 +43,14 @@ android {
         buildConfigField("String", "DB_PASSWORD", "\"$DB_PASSWORD\"")
         val DB_NAME = properties.getProperty("DB_NAME") ?: ""
         buildConfigField("String", "DB_NAME", "\"$DB_NAME\"")
+        val SMTP_HOST = properties.getProperty("SMTP_HOST") ?: ""
+        buildConfigField("String", "SMTP_HOST", "\"$SMTP_HOST\"")
+        val SMTP_PORT = properties.getProperty("SMTP_PORT") ?: ""
+        buildConfigField("String", "SMTP_PORT", "\"$SMTP_PORT\"")
+        val SMTP_USER = properties.getProperty("SMTP_USER") ?: ""
+        buildConfigField("String", "SMTP_USER", "\"$SMTP_USER\"")
+        val SMTP_PASS = properties.getProperty("SMTP_PASS") ?: ""
+        buildConfigField("String", "SMTP_PASS", "\"$SMTP_PASS\"")
 
 
         // Optional: If you need it in AndroidManifest.xml
@@ -52,6 +60,14 @@ android {
     buildFeatures {
         buildConfig = true
         viewBinding = true
+    }
+
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/NOTICE.md"
+            excludes += "/META-INF/LICENSE.md"
+        }
     }
 
     buildTypes {
@@ -82,7 +98,8 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.gson)
     implementation(libs.constraintlayout)
-    implementation(libs.brevo)
+    implementation(libs.mail.android)
+    implementation(libs.activation.android)
     implementation(libs.jtds)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)

@@ -69,9 +69,26 @@ public class Customer implements Observer {
 
     @Override
     public void update() {
-        // Update class booked status by the customer and needed attributes
-        // Or when a newsletter is uploaded by the admin
-        // to be updated (user's class history | add count and append the class and its detail [this separate class])
+        // 1. Determine what happened from the Subject
+        NewsletterType updateType = NewsletterSubscribers.getInstance().getLatestUpdateType();
+        
+        if (updateType != null) {
+            // 2. Automatically send an email notification using Jakarta Mail
+            // Ensure SMTP settings in local.properties are correct.
+            String verifiedSenderEmail = "diaz59@gmail.com"; 
+            
+            // Personalize the email by passing the customer's name to the constructor
+            EmailNewsletter emailNotification = new EmailNewsletter(updateType, profile.getFirstName());
+
+            emailNotification.setSender("Dustin @ UnyieldingMight", verifiedSenderEmail)
+                             .setReceiver(profile.getFirstName(), profile.getEmail())
+                             .createEmail()
+                             .sendEmail();
+            
+            String result = "Mail Result for " + profile.getEmail() + ": " + emailNotification.getResponseString();
+            System.out.println(result);
+            NewsletterSubscribers.getInstance().log(result);
+        }
     }
 
     // Builder class

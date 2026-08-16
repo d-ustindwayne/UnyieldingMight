@@ -6,12 +6,13 @@ public class GymClass {
     private int ID;
     private String name;
     private Trainer trainer;
-    private Date DateAndTime;
+    private Date startDateTime;
+    private Date endDateTime;
     private String description;
     private int currentCapacity;
     private int maxCapacity;
     private ClassStatus status;
-    private float avgCaloriesBurnedADay;
+    private float avgCaloriesBurnedPerDay;
 
     public int getID() {
         return ID;
@@ -25,8 +26,12 @@ public class GymClass {
         return trainer;
     }
 
-    public Date getDateAndTime() {
-        return DateAndTime;
+    public Date getStartDateTime() {
+        return startDateTime;
+    }
+
+    public Date getEndDateTime() {
+        return endDateTime;
     }
 
     public String getDescription() {
@@ -45,32 +50,34 @@ public class GymClass {
         return status;
     }
 
-    public float getAvgCaloriesBurnedADay() {
-        return avgCaloriesBurnedADay;
+    public float getAvgCaloriesBurnedPerDay() {
+        return avgCaloriesBurnedPerDay;
     }
 
     GymClass(Builder builder) {
         this.ID = builder.ID;
         this.name = builder.name;
         this.trainer = builder.trainer;
-        this.DateAndTime = builder.DateAndTime;
+        this.startDateTime = builder.startDateTime;
+        this.endDateTime = builder.endDateTime;
         this.description = builder.description;
         this.currentCapacity = builder.currentCapacity;
         this.maxCapacity = builder.maxCapacity;
         this.status = builder.status;
-        this.avgCaloriesBurnedADay = builder.avgCaloriesBurnedADay;
+        this.avgCaloriesBurnedPerDay = builder.avgCaloriesBurnedPerDay;
     }
 
     public static class Builder {
         private int ID;
         private String name;
         private Trainer trainer;
-        private Date DateAndTime;
+        private Date startDateTime;
+        private Date endDateTime;
         private String description;
         private int currentCapacity;
         private int maxCapacity;
         private ClassStatus status;
-        private float avgCaloriesBurnedADay;
+        private float avgCaloriesBurnedPerDay;
 
         public Builder ID(int ID) {
             this.ID = ID;
@@ -84,8 +91,12 @@ public class GymClass {
             this.trainer = trainer;
             return this;
         }
-        public Builder DateAndTime(Date DateAndTime) {
-            this.DateAndTime = DateAndTime;
+        public Builder startDateTime(Date startDateTime) {
+            this.startDateTime = startDateTime;
+            return this;
+        }
+        public Builder endDateTime(Date endDateTime) {
+            this.endDateTime = endDateTime;
             return this;
         }
         public Builder description(String description) {
@@ -104,8 +115,8 @@ public class GymClass {
             this.status = status;
             return this;
         }
-        public Builder avgCaloriesBurnedADay(float calories) {
-            this.avgCaloriesBurnedADay = calories;
+        public Builder avgCaloriesBurnedPerDay(float calories) {
+            this.avgCaloriesBurnedPerDay = calories;
             return this;
         }
 

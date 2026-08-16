@@ -15,10 +15,7 @@ public class Database {
     private final String DB_URL = String.format("jdbc:jtds:sqlserver://%s:%s/%s", DB_HOST, DB_PORT, DB_NAME);
 
     private Database() {
-        try {
-            Class.forName("net.sourceforge.jtds.jdbc.Driver");
-            this.connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-        } catch (Exception e) { e.printStackTrace(); }
+        reconnect();
     }
 
     public static Database getInstance() {
@@ -40,8 +37,6 @@ public class Database {
     private void reconnect() {
         try {
             Class.forName("net.sourceforge.jtds.jdbc.Driver");
-            // Added ssl=request to handle school servers that might require basic encryption
-            // Added loginTimeout to prevent the app from hanging too long
             String url = DB_URL + ";ssl=request;loginTimeout=30";
             this.connection = DriverManager.getConnection(url, DB_USER, DB_PASSWORD);
         } catch (Exception e) {
@@ -51,46 +46,120 @@ public class Database {
 
     public static User getCurrentUser() { return getInstance().currentUser; }
 
-    /**
-     * Authenticates a user against the UserProfile table.
-     */
-    public static User getUser(String email, String password) {
-        String sql = "SELECT * FROM UserProfile WHERE Email = ? AND ProfilePassword = ?";
-        try (PreparedStatement pstmt = getConnection().prepareStatement(sql)) {
+    public static Customer getCustomer(String email) {
+        String sql = "SELECT up.*, c.*, pa.* FROM UserProfile up " +
+                "LEFT JOIN Customer c ON up.CustomerId = c.CustomerId " +
+                "LEFT JOIN ProfileAddress pa ON up.AddressId = pa.AddressId " +
+                "WHERE up.Email = ?";
+        Connection conn = getConnection();
+        if (conn == null) return null;
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, email);
-            pstmt.setString(2, password);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    String roleStr = rs.getString("UserClass");
-                    User.Role role = (roleStr != null && roleStr.equalsIgnoreCase("ADMIN"))
-                            ? User.Role.ADMIN : User.Role.CUSTOMER;
+                    Address address = new Address.Builder()
+                            .street(rs.getString("Street"))
+                            .city(rs.getString("City"))
+                            .region(rs.getString("Suburb"))
+                            .country(rs.getString("Country"))
+                            .postcode(rs.getString("PostCode"))
+                            .build();
 
-                    User loggedInUser = new User(
-                            rs.getInt("ProfileId"),
-                            rs.getString("FirstName") + " " + rs.getString("LastName"),
-                            rs.getString("ProfilePassword"),
-                            rs.getString("Email"),
-                            role
-                    );
-                    getInstance().currentUser = loggedInUser;
-                    return loggedInUser;
+                    Profile profile = new Profile.Builder()
+                            .email(rs.getString("Email"))
+                            .firstName(rs.getString("FirstName"))
+                            .lastName(rs.getString("LastName"))
+                            .dateOfBirth(rs.getDate("DateOfBirth"))
+                            .gender(Gender.valueOf(rs.getString("Gender").equalsIgnoreCase("M") ? "MALE" : "FEMALE"))
+                            .age(rs.getInt("Age"))
+                            .address(address)
+                            .build();
+
+                    float multiplierVal = rs.getFloat("ActivityMultiplier");
+                    ActivityMultiplier multiplier = ActivityMultiplier.MODERATE; // Default
+                    if (multiplierVal <= 1.2) multiplier = ActivityMultiplier.INACTIVE;
+                    else if (multiplierVal <= 1.375) multiplier = ActivityMultiplier.LIGHT;
+                    else if (multiplierVal <= 1.55) multiplier = ActivityMultiplier.MODERATE;
+                    else if (multiplierVal <= 1.725) multiplier = ActivityMultiplier.HEAVY;
+                    else multiplier = ActivityMultiplier.EXTREME;
+
+                    return new Customer.Builder()
+                            .customerId(rs.getInt("CustomerId"))
+                            .profile(profile)
+                            .isMember(rs.getBoolean("IsMember"))
+                            .height(rs.getFloat("CustomerHeight"))
+                            .weight(rs.getFloat("CustomerWeight"))
+                            .activityMultiplier(multiplier)
+                            .build();
+                }
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return null;
+    }
+
+    public static User loginUser(String email, String password) {
+        User user = getUser(email, password);
+        if (user != null) {
+            getInstance().currentUser = user;
+        }
+        return user;
+    }
+
+    public static User getUser(String email, String password) {
+        String sql = "SELECT * FROM UserProfile WHERE Email = ?";
+        Connection conn = getConnection();
+        if (conn == null) return null;
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, email);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    String storedHash = rs.getString("ProfilePassword");
+                    String inputHash;
+                    try {
+                        inputHash = Security.hashData(password);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+
+                    if (Security.validated(storedHash, inputHash)) {
+                        String roleStr = rs.getString("UserClass");
+                        User.Role role = (roleStr != null && roleStr.equalsIgnoreCase("ADMIN"))
+                                ? User.Role.ADMIN : User.Role.CUSTOMER;
+
+                        return new User(
+                                rs.getInt("ProfileId"),
+                                rs.getString("FirstName") + " " + rs.getString("LastName"),
+                                storedHash,
+                                rs.getString("Email"),
+                                role
+                        );
+                    }
                 }
             }
         } catch (SQLException e) { e.printStackTrace(); }
         return null;
     }
 
-    /**
-     * Registers a new customer across ProfileAddress, Customer, and UserProfile tables.
-     */
     public static boolean registerCustomer(String firstName, String lastName, String email, String password,
-        String street, String suburb, String city, String country, String postcode,
-        float height, float weight) {
-        Connection conn = getConnection();
-        try {
-            conn.setAutoCommit(false); // Start transaction
+                                          String street, String suburb, String city, String country, String postcode,
+                                          float height, float weight, Integer membershipId, Date dob, String gender) {
+        
+        EmailVerification ev = new EmailVerification().email(email).verify();
+        EmailVerificationData evData = ev.getData();
+        if (evData != null && evData.safe_to_send() != null && evData.safe_to_send().equalsIgnoreCase("false")) {
+            android.util.Log.w("DATABASE_ERROR", "Registration blocked by QEV for: " + email + ". Factor safe_to_send is false.");
+            return false;
+        }
 
-            // 1. Insert Address
+        Connection conn = getConnection();
+        if (conn == null) {
+            android.util.Log.e("DATABASE_ERROR", "Registration failed: No connection to database.");
+            return false;
+        }
+        try {
+            conn.setAutoCommit(false);
+
             int addressId = -1;
             String addrSql = "INSERT INTO ProfileAddress (Street, Suburb, City, Country, PostCode) VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement pstmt = conn.prepareStatement(addrSql, Statement.RETURN_GENERATED_KEYS)) {
@@ -100,28 +169,43 @@ public class Database {
                 try (ResultSet rs = pstmt.getGeneratedKeys()) { if (rs.next()) addressId = rs.getInt(1); }
             }
 
-            // 2. Insert Customer (Set default activity multiplier)
             int customerId = -1;
-            String custSql = "INSERT INTO Customer (IsMember, CustomerHeight, CustomerWeight, ActivityMultiplier, TDEE) VALUES (0, ?, ?, 1.2, 0)";
+            boolean isMember = (membershipId != null);
+            String custSql = "INSERT INTO Customer (IsMember, MembershipId, CustomerHeight, CustomerWeight, ActivityMultiplier, TDEE) VALUES (?, ?, ?, ?, 1.2, 0)";
             try (PreparedStatement pstmt = conn.prepareStatement(custSql, Statement.RETURN_GENERATED_KEYS)) {
-                pstmt.setFloat(1, height); pstmt.setFloat(2, weight);
+                pstmt.setBoolean(1, isMember);
+                if (membershipId != null) pstmt.setInt(2, membershipId); else pstmt.setNull(2, Types.INTEGER);
+                pstmt.setFloat(3, height); pstmt.setFloat(4, weight);
                 pstmt.executeUpdate();
                 try (ResultSet rs = pstmt.getGeneratedKeys()) { if (rs.next()) customerId = rs.getInt(1); }
             }
 
-            // 3. Insert UserProfile
-            String profSql = "INSERT INTO UserProfile (Email, ProfilePassword, FirstName, LastName, Age, DateOfBirth, Gender, AddressId, CustomerId, UserClass) " +
-                    "VALUES (?, ?, ?, ?, 20, '2000-01-01', 'M', ?, ?, 'CUSTOMER')";
+            String profSql = "INSERT INTO UserProfile (Email, ProfilePassword, FirstName, LastName, DateOfBirth, Gender, AddressId, CustomerId, UserClass) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'CUSTOMER')";
             try (PreparedStatement pstmt = conn.prepareStatement(profSql)) {
-                pstmt.setString(1, email); pstmt.setString(2, password);
-                pstmt.setString(3, firstName); pstmt.setString(4, lastName);
-                pstmt.setInt(5, addressId); pstmt.setInt(6, customerId);
+                String hashedPassword;
+                try {
+                    hashedPassword = Security.hashData(password);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    conn.rollback();
+                    return false;
+                }
+                pstmt.setString(1, email);
+                pstmt.setString(2, hashedPassword);
+                pstmt.setString(3, firstName);
+                pstmt.setString(4, lastName);
+                pstmt.setDate(5, dob);
+                pstmt.setString(6, gender);
+                pstmt.setInt(7, addressId);
+                pstmt.setInt(8, customerId);
                 pstmt.executeUpdate();
             }
 
             conn.commit();
             return true;
         } catch (SQLException e) {
+            android.util.Log.e("DATABASE_ERROR", "Registration failed: " + e.getMessage());
             try { conn.rollback(); } catch (SQLException ex) { }
             e.printStackTrace();
             return false;
@@ -144,29 +228,75 @@ public class Database {
         return classes;
     }
 
+    /**
+     * Recommends classes based on user's TDEE.
+     * Logic: Recommends classes that burn at least 15% of the user's TDEE.
+     */
+    public static ArrayList<GymClass> getRecommendedGymClasses(Customer customer) {
+        ArrayList<GymClass> allOngoing = getGymClassesAvailable();
+        ArrayList<GymClass> recommended = new ArrayList<>();
+
+        float userTdee = customer.getTDEE();
+
+        for (GymClass gc : allOngoing) {
+            float classBurn = gc.getAvgCaloriesBurnedPerDay();
+
+            // Example threshold: Class must burn at least 15% of their daily maintenance calories
+            if (classBurn >= (userTdee * 0.15f)) {
+                recommended.add(gc);
+            }
+        }
+        return recommended;
+    }
+
+    public static boolean updateClassStatus(int classId, ClassStatus status) {
+        String sql = "UPDATE GymClasses SET ClassStatus = ? WHERE ClassId = ?";
+        Connection conn = getConnection();
+        if (conn == null) return false;
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, status.name());
+            pstmt.setInt(2, classId);
+            int rows = pstmt.executeUpdate();
+            if (rows > 0) {
+                NewsletterType type = (status == ClassStatus.COMPLETE) ? NewsletterType.CLASS_FINISHED : NewsletterType.CLASS_CANCELLED;
+                NewsletterSubscribers.getInstance().setLatestUpdateType(type);
+                NewsletterSubscribers.getInstance().notifyObserver();
+                return true;
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return false;
+    }
+
     public static boolean bookClass(int classId) {
         User user = getCurrentUser();
         if (user == null) return false;
         Connection conn = getConnection();
+        if (conn == null) return false;
         try {
             conn.setAutoCommit(false);
-            // SQL Server Row Locking
             String checkSql = "SELECT CurrentCapacity, MaxCapacity FROM GymClasses WITH (UPDLOCK) WHERE ClassId = ?";
             try (PreparedStatement pstmt = conn.prepareStatement(checkSql)) {
                 pstmt.setInt(1, classId);
                 try (ResultSet rs = pstmt.executeQuery()) {
                     if (rs.next() && rs.getInt("CurrentCapacity") < rs.getInt("MaxCapacity")) {
-                        // Update capacity
                         String upSql = "UPDATE GymClasses SET CurrentCapacity = CurrentCapacity + 1 WHERE ClassId = ?";
                         try (PreparedStatement upPstmt = conn.prepareStatement(upSql)) {
                             upPstmt.setInt(1, classId); upPstmt.executeUpdate();
                         }
-                        // Record history
-                        String histSql = "INSERT INTO ClassHistory (ProfileId, ClassId, BookingStatus) VALUES (?, ?, 'BOOKED')";
+                        String histSql = "INSERT INTO GymClassHistory (ProfileId, ClassId, BookingStatus) VALUES (?, ?, 'BOOKED')";
                         try (PreparedStatement hPstmt = conn.prepareStatement(histSql)) {
                             hPstmt.setInt(1, user.getId()); hPstmt.setInt(2, classId); hPstmt.executeUpdate();
                         }
+                        
+                        // Commit the transaction
                         conn.commit();
+
+                        // Notify ONLY the current customer about their successful booking
+                        Customer customer = getCustomer(user.getEmail());
+                        if (customer != null) {
+                            NewsletterSubscribers.getInstance().notifySpecificObserver(customer, NewsletterType.BOOK_CONFIRMED);
+                        }
+
                         return true;
                     }
                 }
@@ -185,10 +315,12 @@ public class Database {
         return new GymClass.Builder()
                 .ID(rs.getInt("ClassId")).name(rs.getString("ClassName"))
                 .description(rs.getString("ClassDescription"))
+                .startDateTime(rs.getTimestamp("StartDateTime"))
+                .endDateTime(rs.getTimestamp("EndDateTime"))
                 .currentCapacity(rs.getInt("CurrentCapacity"))
                 .maxCapacity(rs.getInt("MaxCapacity"))
                 .status(ClassStatus.valueOf(rs.getString("ClassStatus")))
-                .avgCaloriesBurnedADay(rs.getFloat("CaloriesBurned"))
+                .avgCaloriesBurnedPerDay(rs.getFloat("AvgCaloriesBurnedPerDay"))
                 .build();
     }
 }

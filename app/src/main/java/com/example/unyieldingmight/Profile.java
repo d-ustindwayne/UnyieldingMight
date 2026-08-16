@@ -45,11 +45,11 @@ public class Profile {
         return gender;
     }
 
-    public String fetFirstName() {
+    public String getFirstName() {
         return firstName;
     }
 
-    public String letLastName() {
+    public String getLastName() {
         return lastName;
     }
 
