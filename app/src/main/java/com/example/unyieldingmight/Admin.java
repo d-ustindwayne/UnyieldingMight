@@ -11,6 +11,7 @@ public class Admin {
         return adminId;
     }
 
+    //Builder Class
     public static class Builder{
         private int adminId;
 
@@ -20,11 +21,11 @@ public class Admin {
         }
     }
 
-    public manageCustomer(){
+    /** public manageCustomer(){
 
     }
 
     public manageClass(){
 
-    }
+    } **/
 }
