@@ -12,7 +12,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
     }
-    public void nA(View v){
+    public void nextActivityRegister(View v){
         Intent i = new Intent(this, RegisterActivity.class);
         startActivity(i);
     }

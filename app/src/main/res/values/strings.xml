@@ -12,4 +12,26 @@
     <string name="already_have_an_account_login_now">Already have an account? Login Now</string>
     <string name="unyielding_might">UNYIELDING MIGHT</string>
     <string name="unyielding_might_logo">Unyielding Might logo</string>
+    <string name="complete_your_profile">Complete Your Profile</string>
+    <string name="date_of_birth">Date of Birth</string>
+    <string name="dd">DD</string>
+    <string name="mm">MM</string>
+    <string name="yyyy">YYYY</string>
+    <string name="address">Address</string>
+    <string name="city_town">City/Town</string>
+    <string name="state_region">State/Region</string>
+    <string name="street">Street</string>
+    <string name="postcode">Postcode</string>
+    <string name="btn_proceed">PROCEED</string>
+    <string name="btn_back">back</string>
+    <string name="btn_confirm">CONFIRM</string>
+    <string name="verify_your_email">Verify your email</string>
+    <string name="we_sent_you_a_verification_code_to_your_email_address">We sent you a verification code to your email address</string>
+    <string name="btn_no_i_m_not_a_member">NO, I\'M NOT A MEMBER</string>
+    <string name="btn_link_my_membership">LINK MY MEMBERSHIP</string>
+    <string name="are_you_a_member">Are you a member?</string>
+    <string name="link_your_membership">Link your membership</string>
+    <string name="membership_id">Membership ID</string>
+    <string name="to_see_your_membership_id_check_the_back_of_your_membership_card_below_your_picture">To see your Membership ID, check the back of your Membership Card, below your picture</string>
+    <string name="btn_link">LINK</string>
 </resources>

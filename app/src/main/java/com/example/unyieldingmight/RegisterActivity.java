@@ -13,8 +13,13 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
     }
 
-    public void nA(View v){
+    public void nextActivityLogin(View v){
         Intent i = new Intent(this, LoginActivity.class);
+        startActivity(i);
+    }
+
+    public void nextActivityVerify(View v){
+        Intent i = new Intent(this, VerifyActivity.class);
         startActivity(i);
     }
 }

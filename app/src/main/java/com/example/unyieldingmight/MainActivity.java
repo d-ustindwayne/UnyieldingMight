@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
     }
-    public void nA(View v){
+    public void nextActivityLogin(View v){
         Intent i = new Intent(this, LoginActivity.class);
         startActivity(i);
     }

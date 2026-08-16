@@ -95,7 +95,7 @@
             android:layout_width="272dp"
             android:layout_height="48dp"
             android:fontFamily="@font/manrope_bold"
-            android:onClick="nA"
+            android:onClick="nextActivityRegister"
             android:text="@string/dont_have_an_account_register_now"
             android:textAlignment="center"
             android:textColor="#fff"

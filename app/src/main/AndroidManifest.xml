@@ -22,6 +22,10 @@
         </activity>
         <activity android:name=".LoginActivity"></activity>
         <activity android:name=".RegisterActivity"></activity>
+        <activity android:name="VerifyActivity"></activity>
+        <activity android:name=".MembershipActivity"></activity>
+        <activity android:name=".ProfileActivity"></activity>
+        <activity android:name=".LinkmembershipActivity"></activity>
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
