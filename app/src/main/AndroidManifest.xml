@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UnyieldingMight">
         <activity
-            android:name=".MainActivity"
+            android:name=".Activities.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.UnyieldingMight">
             <intent-filter>
@@ -23,18 +23,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginActivity"></activity>
-        <activity android:name=".RegisterActivity"></activity>
-        <activity android:name="VerifyActivity"></activity>
-        <activity android:name=".MembershipActivity"></activity>
-        <activity android:name=".ProfileActivity"></activity>
-        <activity android:name=".LinkmembershipActivity"></activity>
-        <activity android:name=".ActivitylevelActivity"></activity>
-        <activity android:name=".StatsActivity"></activity>
-        <activity android:name=".DoneActivity"></activity>
-        <activity android:name=".HomeActivity"></activity>
-        <activity android:name=".InfoActivity"></activity>
-        <activity android:name=".EditclassActivity"></activity>
+        <activity android:name=".Activities.LoginActivity"></activity>
+        <activity android:name=".Activities.RegisterActivity"></activity>
+        <activity android:name=".Activities.VerifyActivity"></activity>
+        <activity android:name=".Activities.MembershipActivity"></activity>
+        <activity android:name=".Activities.ProfileActivity"></activity>
+        <activity android:name=".Activities.LinkmembershipActivity"></activity>
+        <activity android:name=".Activities.ActivitylevelActivity"></activity>
+        <activity android:name=".Activities.StatsActivity"></activity>
+        <activity android:name=".Activities.DoneActivity"></activity>
+        <activity android:name=".Activities.HomeActivity"></activity>
+        <activity android:name=".Activities.InfoActivity"></activity>
+        <activity android:name=".Activities.EditclassActivity"></activity>
 
         <meta-data
             android:name="preloaded_fonts"

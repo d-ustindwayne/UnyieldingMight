@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="#0E0E0E"
     android:onClick="nA"
-    tools:context=".MainActivity">
+    tools:context=".Activities.MainActivity">
 
     <TextView
         android:id="@+id/activity_main_tv_unyieldingMight"

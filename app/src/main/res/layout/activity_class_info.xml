@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="#0e0e0e"
     android:orientation="vertical"
-    tools:context=".InfoActivity">
+    tools:context=".Activities.InfoActivity">
 
     <ImageView
         android:id="@+id/activity_class_iv_class"
