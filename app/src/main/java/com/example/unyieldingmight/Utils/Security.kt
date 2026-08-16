@@ -1,21 +1,22 @@
-package com.example.unyieldingmight.Utils;
+package com.example.unyieldingmight.Utils
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
+import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
 
-public class Security {
-    public static String hashData(String text) throws Exception {
+object Security {
+    @Throws(Exception::class)
+    fun hashData(text: String): String {
         // Implement SHA-256 one-way cryptographic hashing to securely store user credentials and ensure password integrity.
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        val md = MessageDigest.getInstance("SHA-256")
 
-        byte[] hashBytes = md.digest(text.getBytes(StandardCharsets.UTF_8));
+        val hashBytes = md.digest(text.toByteArray(StandardCharsets.UTF_8))
 
-        StringBuilder hexString = new StringBuilder();
-        for (byte b : hashBytes) {
-            String hex = Integer.toHexString(0xff & b);
-            if (hex.length() == 1) hexString.append('0');
-            hexString.append(hex);
+        val hexString = StringBuilder()
+        for (b in hashBytes) {
+            val hex = Integer.toHexString(0xff and b.toInt())
+            if (hex.length == 1) hexString.append('0')
+            hexString.append(hex)
         }
-        return hexString.toString();
+        return hexString.toString()
     }
 }

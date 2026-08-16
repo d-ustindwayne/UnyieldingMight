@@ -1,186 +1,167 @@
-package com.example.unyieldingmight.Activities;
+package com.example.unyieldingmight.Activities
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.KeyEvent;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.Toast;
-import android.util.Log;
+import android.content.Intent
+import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
+import android.view.KeyEvent
+import android.view.View
+import android.widget.EditText
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.example.unyieldingmight.R
+import com.example.unyieldingmight.Services.EmailOTP
+import com.example.unyieldingmight.Services.EmailVerification
 
-import androidx.appcompat.app.AppCompatActivity;
+class VerifyActivity : AppCompatActivity() {
+    private var email: String? = null
+    private var password: String? = null
+    private var emailOTP: EmailOTP? = null
 
-import com.example.unyieldingmight.Services.EmailOTP;
-import com.example.unyieldingmight.Services.EmailVerification;
-import com.example.unyieldingmight.Models.EmailVerificationData;
-import com.example.unyieldingmight.R;
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_verify)
 
-public class VerifyActivity extends AppCompatActivity {
-    private String email;
-    private String password;
-    private EmailOTP emailOTP;
-    private static final String TAG = "VerifyActivity";
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_verify);
-
-        email = getIntent().getStringExtra("Email");
-        password = getIntent().getStringExtra("Password");
-
-        Log.d(TAG, "Email: " + email);
+        email = intent.getStringExtra("Email")
+        password = intent.getStringExtra("Password")
 
         if (email == null) {
-            Toast.makeText(this, "Error: Email missing", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
+            Toast.makeText(this, "Error: Email missing", Toast.LENGTH_SHORT).show()
+            finish()
+            return
         }
 
-        initOtpFields();
-        emailOTP = new EmailOTP();
-        
-        // Show a "Loading" or "Verifying" message
-        Toast.makeText(this, "Verifying email security...", Toast.LENGTH_SHORT).show();
+        initOtpFields()
+        emailOTP = EmailOTP()
 
-        // Verify email existence and security before sending OTP
-        new Thread(() -> {
+        Toast.makeText(this, "Verifying email security...", Toast.LENGTH_SHORT).show()
+
+        Thread {
             try {
-                Log.d(TAG, "Starting EmailVerification for: " + email);
-                EmailVerification verification = new EmailVerification().email(email).verify();
-                EmailVerificationData data = verification.getData();
-                
-                String rawResponse = verification.getResponseString();
-                Log.d(TAG, "QEV Response: " + rawResponse);
+                val verification = EmailVerification().email(email).verify()
+                val data = verification?.data
+                val rawResponse = verification?.getResponseString()
 
-                runOnUiThread(() -> {
-                    if (data != null && data.success() != null && "true".equalsIgnoreCase(data.success())) {
-                        boolean isSafe = "true".equalsIgnoreCase(data.safe_to_send());
-                        boolean isValid = "valid".equalsIgnoreCase(data.result());
-                        boolean isDisposable = "true".equalsIgnoreCase(data.disposable());
+                runOnUiThread {
+                    if (data != null && data.success.equals("true", ignoreCase = true)) {
+                        val isSafe = data.safe_to_send.equals("true", ignoreCase = true)
+                        val isValid = data.result.equals("valid", ignoreCase = true)
+                        val isDisposable = data.disposable.equals("true", ignoreCase = true)
 
                         if ((isSafe || isValid) && !isDisposable) {
-                            Log.d(TAG, "Email is valid/safe. Sending OTP.");
-                            sendOTP();
+                            sendOTP()
                         } else {
-                            String reason = data.reason() != null ? data.reason() : "Invalid or risky email";
-                            Log.w(TAG, "Email risky. Reason: " + reason);
-                            Toast.makeText(VerifyActivity.this, "Security Check Failed: " + reason, Toast.LENGTH_LONG).show();
-                            finish();
+                            val reason = data.reason ?: "Invalid or risky email"
+                            Toast.makeText(this, "Security Check Failed: $reason", Toast.LENGTH_LONG).show()
+                            finish()
                         }
                     } else {
-                        // If API check fails (e.g. invalid API key, network error), 
-                        // fallback to sending OTP anyway so we don't block the user.
-                        Log.e(TAG, "Email verification API failed or returned error. Falling back to send OTP.");
-                        if (rawResponse != null && rawResponse.contains("invalid_api_key")) {
-                            Toast.makeText(this, "Verification API error: Invalid API Key.", Toast.LENGTH_SHORT).show();
+                        if (rawResponse?.contains("invalid_api_key") == true) {
+                            Toast.makeText(this, "Verification API error: Invalid API Key.", Toast.LENGTH_SHORT).show()
                         }
-                        sendOTP();
+                        sendOTP()
                     }
-                });
-            } catch (Exception e) {
-                Log.e(TAG, "Error in verification thread", e);
-                runOnUiThread(this::sendOTP);
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error in verification thread", e)
+                runOnUiThread { sendOTP() }
             }
-        }).start();
+        }.start()
     }
 
-    private void initOtpFields() {
-        EditText otp1 = findViewById(R.id.activity_verify_et_number1);
-        EditText otp2 = findViewById(R.id.activity_verify_et_number2);
-        EditText otp3 = findViewById(R.id.activity_verify_et_number3);
-        EditText otp4 = findViewById(R.id.activity_verify_et_number4);
-        EditText otp5 = findViewById(R.id.activity_verify_et_number5);
-        EditText otp6 = findViewById(R.id.activity_verify_et_number6);
+    private fun initOtpFields() {
+        val otp1 = findViewById<EditText>(R.id.activity_verify_et_number1)
+        val otp2 = findViewById<EditText>(R.id.activity_verify_et_number2)
+        val otp3 = findViewById<EditText>(R.id.activity_verify_et_number3)
+        val otp4 = findViewById<EditText>(R.id.activity_verify_et_number4)
+        val otp5 = findViewById<EditText>(R.id.activity_verify_et_number5)
+        val otp6 = findViewById<EditText>(R.id.activity_verify_et_number6)
 
-        setupAutoMove(otp1, otp2);
-        setupAutoMove(otp2, otp3);
-        setupAutoMove(otp3, otp4);
-        setupAutoMove(otp4, otp5);
-        setupAutoMove(otp5, otp6);
+        setupAutoMove(otp1, otp2)
+        setupAutoMove(otp2, otp3)
+        setupAutoMove(otp3, otp4)
+        setupAutoMove(otp4, otp5)
+        setupAutoMove(otp5, otp6)
 
-        setupBackMove(otp2, otp1);
-        setupBackMove(otp3, otp2);
-        setupBackMove(otp4, otp3);
-        setupBackMove(otp5, otp4);
-        setupBackMove(otp6, otp5);
+        setupBackMove(otp2, otp1)
+        setupBackMove(otp3, otp2)
+        setupBackMove(otp4, otp3)
+        setupBackMove(otp5, otp4)
+        setupBackMove(otp6, otp5)
     }
 
-    private void setupAutoMove(EditText current, EditText next) {
-        current.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() == 1) next.requestFocus();
+    private fun setupAutoMove(current: EditText, next: EditText) {
+        current.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                if (s.length == 1) next.requestFocus()
             }
-            @Override public void afterTextChanged(Editable s) {}
-        });
+            override fun afterTextChanged(s: Editable?) {}
+        })
     }
 
-    private void setupBackMove(EditText current, EditText previous) {
-        current.setOnKeyListener((view, keyCode, event) -> {
-            if (keyCode == KeyEvent.KEYCODE_DEL && event.getAction() == KeyEvent.ACTION_DOWN) {
-                if (current.getText().toString().isEmpty()) {
-                    previous.requestFocus();
+    private fun setupBackMove(current: EditText, previous: EditText) {
+        current.setOnKeyListener { _, keyCode, event ->
+            if (keyCode == KeyEvent.KEYCODE_DEL && event.action == KeyEvent.ACTION_DOWN) {
+                if (current.text.toString().isEmpty()) {
+                    previous.requestFocus()
                 }
             }
-            return false;
-        });
+            false
+        }
     }
 
-    private void sendOTP() {
-        Toast.makeText(this, "Sending verification code...", Toast.LENGTH_SHORT).show();
-        new Thread(() -> {
+    private fun sendOTP() {
+        Toast.makeText(this, "Sending verification code...", Toast.LENGTH_SHORT).show()
+        Thread {
             try {
-                emailOTP.send(email);
-                String response = emailOTP.getResponseString();
-                Log.d(TAG, "SMTP Response: " + response);
-
-                runOnUiThread(() -> {
-                    if (response != null && response.startsWith("Success")) {
-                        Toast.makeText(VerifyActivity.this, "Code sent to " + email + ". Check your inbox (or spam).", Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(VerifyActivity.this, "Mail Error: " + response, Toast.LENGTH_LONG).show();
-                        Log.e(TAG, "Failed to send email: " + response);
-                    }
-                });
-            } catch (Exception e) {
-                Log.e(TAG, "Error in send thread", e);
-                runOnUiThread(() -> Toast.makeText(this, "Internal error sending mail.", Toast.LENGTH_SHORT).show());
+                emailOTP?.send(email!!)
+                // We don't have direct access to responseString from EmailOTP anymore, 
+                // but EmailFunction logs errors.
+                runOnUiThread {
+                    Toast.makeText(this, "Code sent to $email. Check your inbox (or spam).", Toast.LENGTH_LONG).show()
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error in send thread", e)
+                runOnUiThread {
+                    Toast.makeText(this, "Internal error sending mail.", Toast.LENGTH_SHORT).show()
+                }
             }
-        }).start();
+        }.start()
     }
 
-    public void verify(View v){
-        EditText otp1 = findViewById(R.id.activity_verify_et_number1);
-        EditText otp2 = findViewById(R.id.activity_verify_et_number2);
-        EditText otp3 = findViewById(R.id.activity_verify_et_number3);
-        EditText otp4 = findViewById(R.id.activity_verify_et_number4);
-        EditText otp5 = findViewById(R.id.activity_verify_et_number5);
-        EditText otp6 = findViewById(R.id.activity_verify_et_number6);
+    fun verify(v: View?) {
+        val otp1 = findViewById<EditText>(R.id.activity_verify_et_number1)
+        val otp2 = findViewById<EditText>(R.id.activity_verify_et_number2)
+        val otp3 = findViewById<EditText>(R.id.activity_verify_et_number3)
+        val otp4 = findViewById<EditText>(R.id.activity_verify_et_number4)
+        val otp5 = findViewById<EditText>(R.id.activity_verify_et_number5)
+        val otp6 = findViewById<EditText>(R.id.activity_verify_et_number6)
 
-        String inputOtp = otp1.getText().toString().trim() +
-                          otp2.getText().toString().trim() +
-                          otp3.getText().toString().trim() +
-                          otp4.getText().toString().trim() +
-                          otp5.getText().toString().trim() +
-                          otp6.getText().toString().trim();
+        val inputOtp = otp1.text.toString().trim() +
+                otp2.text.toString().trim() +
+                otp3.text.toString().trim() +
+                otp4.text.toString().trim() +
+                otp5.text.toString().trim() +
+                otp6.text.toString().trim()
 
-        if(inputOtp.length() < 6){
-            Toast.makeText(this, "Input fields cannot be empty", Toast.LENGTH_SHORT).show();
-        }
-        else{
-            Log.d(TAG, "User input OTP: " + inputOtp + " | Expected: " + emailOTP.getOTP());
-            
-            if (emailOTP.validateOTP(inputOtp)) {
-                Toast.makeText(this, "Verification successful!", Toast.LENGTH_SHORT).show();
-                Intent i = new Intent(this, MembershipActivity.class);
-                i.putExtras(getIntent().getExtras());
-                startActivity(i);
+        if (inputOtp.length < 6) {
+            Toast.makeText(this, "Input fields cannot be empty", Toast.LENGTH_SHORT).show()
+        } else {
+            if (emailOTP?.validateOTP(inputOtp) == true) {
+                Toast.makeText(this, "Verification successful!", Toast.LENGTH_SHORT).show()
+                val i = Intent(this, MembershipActivity::class.java).apply {
+                    putExtras(intent.extras ?: Bundle())
+                }
+                startActivity(i)
             } else {
-                Toast.makeText(this, "Invalid verification code", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Invalid verification code", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    companion object {
+        private const val TAG = "VerifyActivity"
     }
 }

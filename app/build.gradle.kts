@@ -94,4 +94,5 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    implementation("com.google.android.material:material:1.3.0-alpha03")}
+    implementation(libs.material.v130alpha03)
+}

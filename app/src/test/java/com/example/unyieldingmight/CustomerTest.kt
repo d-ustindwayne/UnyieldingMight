@@ -1,93 +1,71 @@
-package com.example.unyieldingmight;
+package com.example.unyieldingmight
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import com.example.unyieldingmight.Models.*
+import org.junit.Assert
+import org.junit.Before
+import org.junit.Test
 
-import android.util.Log;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
-
-import com.example.unyieldingmight.Models.ActivityMultiplier;
-import com.example.unyieldingmight.Models.Address;
-import com.example.unyieldingmight.Models.Customer;
-import com.example.unyieldingmight.Models.Gender;
-import com.example.unyieldingmight.Models.Profile;
-
-import java.util.Date;
-
-public class CustomerTest {
-
-    private Profile profile;
-    private Address address;
-    private Customer customer;
-    private Customer customer2;
-    private Date date = new Date();
+class CustomerTest {
+    private lateinit var profile: Profile
+    private lateinit var address: Address
+    private lateinit var customer: Customer
 
     @Before
-    public void setUp(){
-        address = new Address.Builder()
-                .street("19H Street")
-                .city("Manukau")
-                .region("Auckland")
-                .postcode("123A")
-                .country("New Zealand")
-                .build();
+    fun setUp() {
+        address = Address(
+            street = "19H Street",
+            city = "Manukau",
+            region = "Auckland",
+            postcode = "123A",
+            country = "New Zealand"
+        )
 
-        profile = new Profile.Builder()
-                .email("example@email.com")
-                .password("password123")
-                .age(20)
-                .address(address)
-                .dateOfBirth(date)
-                .gender(Gender.MALE)
-                .firstName("John")
-                .lastName("Smith")
-                .userClass("ADMIN")
-                .build();
+        profile = Profile(
+            email = "example@email.com",
+            password = "password123",
+            age = 20,
+            address = address,
+            gender = Gender.MALE,
+            firstName = "John",
+            lastName = "Smith",
+            userClass = "ADMIN"
+        )
 
-        customer = new Customer.Builder()
-                .customerId(1)
-                .profile(profile)
-                .isMember(true)
-                .height(180f)
-                .weight(75f)
-                .activityMultiplier(ActivityMultiplier.EXTREME)
-                .build();
-    }
-
-
-    @Test
-    public void CustomerBuilderSuccess(){
-        Assert.assertEquals(1, customer.getCustomerId());
-        Assert.assertEquals(profile, customer.getProfile());
-        Assert.assertTrue(customer.isMember());
-        Assert.assertEquals(180f, customer.getHeight(), 180);
-        Assert.assertEquals(75f, customer.getWeight(), 75);
-        Assert.assertEquals(ActivityMultiplier.EXTREME.getActivityMultiplier(), customer.getActivityMultiplier(), 1.9);
-        Assert.assertEquals(3382f, customer.getTDEE(), 3382);
+        customer = Customer(
+            customerId = 1,
+            profile = profile,
+            isMember = true,
+            height = 180f,
+            weight = 75f,
+            activityMultiplier = ActivityMultiplier.EXTREME.multiplier
+        )
     }
 
     @Test
-    public void CustomerBuilderFail(){
-        try{
-            customer2 = new Customer.Builder()
-                    .build();
-        }
-        catch (Exception e){
-            assertEquals("Profile is needed", e.getMessage());
-        }
+    fun testCustomerProperties() {
+        Assert.assertEquals(1, customer.customerId)
+        Assert.assertEquals(profile, customer.profile)
+        Assert.assertTrue(customer.isMember)
+        Assert.assertEquals(180f, customer.height)
+        Assert.assertEquals(75f, customer.weight)
+        Assert.assertEquals(ActivityMultiplier.EXTREME.multiplier, customer.activityMultiplier)
     }
 
     @Test
-    public void BMRSuccess(){
-        Assert.assertEquals(1780f,customer.calculateBMR(customer.getWeight(), customer.getHeight(), customer.getProfile().getAge(), customer.getProfile().getGender()), 1780);
+    fun testBMRCalculation() {
+        val bmr = Customer.calculateBMR(
+            customer.weight,
+            customer.height,
+            customer.profile.age,
+            customer.profile.gender ?: Gender.OTHER
+        )
+        // BMR = (10 * 75) + (6.25 * 180) - (5 * 20) + 5 = 750 + 1125 - 100 + 5 = 1780
+        Assert.assertEquals(1780f, bmr, 0.1f)
     }
 
     @Test
-    public void TDEESuccess(){
-        Assert.assertEquals(3382f,customer.calculateTDEE(),3382);
+    fun testTDEECalculation() {
+        // TDEE = BMR * multiplier = 1780 * 1.9 = 3382
+        Assert.assertEquals(3382f, customer.calculateTDEE(), 0.1f)
     }
 }

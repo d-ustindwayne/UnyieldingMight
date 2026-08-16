@@ -1,7 +1,7 @@
-package com.example.unyieldingmight.Models;
+package com.example.unyieldingmight.Models
 
-public interface Subject {
-    void add(Observer obs);
-    void remove(Observer obs);
-    void notifyObserver();
+interface Subject {
+    fun add(obs: Observer?)
+    fun remove(obs: Observer?)
+    fun notifyObserver()
 }

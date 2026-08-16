@@ -1,138 +1,124 @@
-package com.example.unyieldingmight.Activities;
+package com.example.unyieldingmight.Activities
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
+import android.content.Intent
+import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.example.unyieldingmight.R
+import com.example.unyieldingmight.Services.Database
+import java.sql.Timestamp
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
-import com.example.unyieldingmight.R;
-import com.example.unyieldingmight.Services.Database;
+class EditClassActivity : AppCompatActivity() {
+    private lateinit var edit: Button
+    private lateinit var classname: EditText
+    private lateinit var date: EditText
+    private lateinit var starttime: EditText
+    private lateinit var endtime: EditText
+    private lateinit var maxcapacity: EditText
+    private lateinit var avgcalorie: EditText
+    private lateinit var description: EditText
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.stream.Stream;
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_editclass)
 
-public class EditClassActivity extends AppCompatActivity {
+        edit = findViewById(R.id.activity_editclass_btn_done)
+        classname = findViewById(R.id.activity_editclass_et_classname)
+        date = findViewById(R.id.activity_editclass_et_date)
+        starttime = findViewById(R.id.activity_editclass_et_starttime)
+        endtime = findViewById(R.id.activity_editclass_et_endtime)
+        maxcapacity = findViewById(R.id.activity_editclass_et_maxcapacity)
+        avgcalorie = findViewById(R.id.activity_editclass_et_avgcalorie)
+        description = findViewById(R.id.activity_editclass_et_description)
 
-    Button edit;
-    EditText classname, date, starttime, endtime, maxcapacity, avgcalorie, description;
+        val classID = intent.getIntExtra("ClassId", 0)
+        classname.setText(intent.getStringExtra("Title"))
+        date.setText(intent.getStringExtra("Date"))
+        starttime.setText(intent.getStringExtra("StartTime"))
+        endtime.setText(intent.getStringExtra("EndTime"))
+        maxcapacity.setText(intent.getStringExtra("MaxCap"))
+        avgcalorie.setText(intent.getFloatExtra("AvgCalorie", 0f).toString())
+        description.setText(intent.getStringExtra("Desc"))
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_editclass);
+        edit.setOnClickListener {
+            val updatedTitle = classname.text.toString().trim()
+            val updatedDesc = description.text.toString().trim()
+            val dateString = date.text.toString().trim()
+            val startTimeString = starttime.text.toString().trim()
+            val endTimeString = endtime.text.toString().trim()
+            val maxCapString = maxcapacity.text.toString().trim()
+            val avgCalString = avgcalorie.text.toString().trim()
 
-        edit = findViewById(R.id.activity_editclass_btn_done);
-
-        classname = findViewById(R.id.activity_editclass_et_classname);
-        date = findViewById(R.id.activity_editclass_et_date);
-        starttime = findViewById(R.id.activity_editclass_et_starttime);
-        endtime = findViewById(R.id.activity_editclass_et_endtime);
-        maxcapacity = findViewById(R.id.activity_editclass_et_maxcapacity);
-        avgcalorie = findViewById(R.id.activity_editclass_et_avgcalorie);
-        description = findViewById(R.id.activity_editclass_et_description);
-
-        Intent intent = getIntent();
-        int classID = intent.getIntExtra("ClassId", 0);
-        String title = intent.getStringExtra("Title");
-        String classDate = intent.getStringExtra("Date");
-        String classStartTime = intent.getStringExtra("StartTime");
-        String classEndTime = intent.getStringExtra("EndTime");
-        String classMxCapacity = intent.getStringExtra("MaxCap");
-        String classDescription = intent.getStringExtra("Desc");
-        float classAvgCalorie = intent.getFloatExtra("AvgCalorie", 0);
-
-        classname.setText(title);
-        date.setText(classDate);
-        starttime.setText(classStartTime);
-        endtime.setText(classEndTime);
-        maxcapacity.setText(classMxCapacity);
-        avgcalorie.setText(String.valueOf(classAvgCalorie));
-        description.setText(classDescription);
-
-        // Done button
-        edit.setOnClickListener(v -> {
-            String updatedTitle = classname.getText().toString().trim();
-            String updatedDesc = description.getText().toString().trim();
-            String dateString = date.getText().toString().trim();
-            String startTimeString = starttime.getText().toString().trim();
-            String endTimeString = endtime.getText().toString().trim();
-            String maxCapString = maxcapacity.getText().toString().trim();
-            String avgCalString = avgcalorie.getText().toString().trim();
-
-//            if (updatedTitle.isEmpty() || dateString.isEmpty() || startTimeString.isEmpty() ||
-//                endTimeString.isEmpty() || maxCapString.isEmpty() || avgCalString.isEmpty()) {
-//                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
-//                return;
-//            }
-
-            boolean isEmpty = Stream.of(updatedTitle, updatedDesc, dateString, startTimeString, endTimeString, maxCapString, avgCalString).anyMatch(String::isEmpty);
-            if(isEmpty){
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
-                return;
+            val fields = listOf(updatedTitle, updatedDesc, dateString, startTimeString, endTimeString, maxCapString, avgCalString)
+            if (fields.any { it.isEmpty() }) {
+                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
 
-            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+            try {
+                val dayMonthYear = dateString.split("/")
+                val day = dayMonthYear[0].toInt()
+                val month = dayMonthYear[1].toInt() - 1
+                val year = dayMonthYear[2].toInt()
 
-            try{
-                String[] dayMonthYear = dateString.split("/");
-                int day = Integer.parseInt(dayMonthYear[0]);
-                int month = Integer.parseInt(dayMonthYear[1]) - 1;
-                int year = Integer.parseInt(dayMonthYear[2]);
+                val startTimeData = timeFormat.parse(startTimeString) ?: throw Exception("Invalid start time")
+                val startDateTimeCalendar = Calendar.getInstance().apply {
+                    set(year, month, day)
+                    val time = Calendar.getInstance().apply { time = startTimeData }
+                    set(Calendar.HOUR_OF_DAY, time.get(Calendar.HOUR_OF_DAY))
+                    set(Calendar.MINUTE, time.get(Calendar.MINUTE))
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }
 
-                Date startTimeData = timeFormat.parse(startTimeString);
-                Calendar startDateTimeCalendar = Calendar.getInstance();
-                startDateTimeCalendar.set(year, month, day);
+                val startTimestamp = Timestamp(startDateTimeCalendar.timeInMillis)
 
-                Calendar startTime = Calendar.getInstance();
-                startTime.setTime(startTimeData);
-                startDateTimeCalendar.set(Calendar.HOUR_OF_DAY, startTime.get(Calendar.HOUR_OF_DAY));
-                startDateTimeCalendar.set(Calendar.MINUTE, startTime.get(Calendar.MINUTE));
-                startDateTimeCalendar.set(Calendar.SECOND, 0);
-                startDateTimeCalendar.set(Calendar.MILLISECOND, 0);
+                val endTimeData = timeFormat.parse(endTimeString) ?: throw Exception("Invalid end time")
+                val endDateTimeCalendar = Calendar.getInstance().apply {
+                    set(year, month, day)
+                    val time = Calendar.getInstance().apply { time = endTimeData }
+                    set(Calendar.HOUR_OF_DAY, time.get(Calendar.HOUR_OF_DAY))
+                    set(Calendar.MINUTE, time.get(Calendar.MINUTE))
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }
 
-                java.sql.Timestamp startTimestamp = new java.sql.Timestamp(startDateTimeCalendar.getTimeInMillis());
+                val endTimestamp = Timestamp(endDateTimeCalendar.timeInMillis)
 
-                Date endTimeData = timeFormat.parse(endTimeString);
-                Calendar endDateTimeCalendar = Calendar.getInstance();
-                endDateTimeCalendar.set(year, month, day);
+                val maxCap = maxCapString.toInt()
+                val avgCal = avgCalString.toFloat()
 
-                Calendar endTime = Calendar.getInstance();
-                endTime.setTime(endTimeData);
-                endDateTimeCalendar.set(Calendar.HOUR_OF_DAY, endTime.get(Calendar.HOUR_OF_DAY));
-                endDateTimeCalendar.set(Calendar.MINUTE, endTime.get(Calendar.MINUTE));
-                endDateTimeCalendar.set(Calendar.SECOND, 0);
-                endDateTimeCalendar.set(Calendar.MILLISECOND, 0);
-
-                java.sql.Timestamp endTimestamp = new java.sql.Timestamp(endDateTimeCalendar.getTimeInMillis());
-
-                int maxCap = Integer.parseInt(maxCapString);
-                float avgCal = Float.parseFloat(avgCalString);
-
-                new Thread(() -> {
-                    boolean success = Database.editClass(classID, updatedTitle, updatedDesc, startTimestamp, endTimestamp, maxCap, avgCal);
-                    runOnUiThread(() -> {
+                Thread {
+                    val success = Database.editClass(
+                        classID,
+                        updatedTitle,
+                        updatedDesc,
+                        startTimestamp,
+                        endTimestamp,
+                        maxCap,
+                        avgCal
+                    )
+                    runOnUiThread {
                         if (success) {
-                            Toast.makeText(this, "Class updated successfully!", Toast.LENGTH_SHORT).show();
-                            Intent intentHome = new Intent(this, HomeActivity.class);
-                            intentHome.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                            startActivity(intentHome);
+                            Toast.makeText(this, "Class updated successfully!", Toast.LENGTH_SHORT).show()
+                            val intentHome = Intent(this, HomeActivity::class.java).apply {
+                                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                            }
+                            startActivity(intentHome)
                         } else {
-                            Toast.makeText(this, "Failed to update class", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, "Failed to update class", Toast.LENGTH_SHORT).show()
                         }
-                    });
-                }).start();
-
-            } catch (Exception e){
-                Toast.makeText(this, "Please follow the format dd/MM/yyyy and HH:mm", Toast.LENGTH_SHORT).show();
+                    }
+                }.start()
+            } catch (e: Exception) {
+                Toast.makeText(this, "Please follow the format dd/MM/yyyy and HH:mm", Toast.LENGTH_SHORT).show()
             }
-
-        });
+        }
     }
 }

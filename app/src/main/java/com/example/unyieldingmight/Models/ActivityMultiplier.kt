@@ -1,26 +1,15 @@
-package com.example.unyieldingmight.Models;
+package com.example.unyieldingmight.Models
 
-public enum ActivityMultiplier {
+enum class ActivityMultiplier(val multiplier: Float) {
     INACTIVE(1.2f),
-    LIGHT(1.275f),
+    LIGHT(1.375f),
     MODERATE(1.55f),
     HEAVY(1.725f),
     EXTREME(1.9f);
 
-    private final float multiplier;
-    ActivityMultiplier(float multiplier) {
-        this.multiplier = multiplier;
-    }
-    public static ActivityMultiplier valueOf(float f) {
-        for (ActivityMultiplier m : values()) {
-            if (m.multiplier == f) {
-                return m;
-            }
+    companion object {
+        fun valueOf(value: Float): ActivityMultiplier {
+            return entries.find { it.multiplier == value } ?: MODERATE
         }
-        return LIGHT; // DEFAULT VALUE
-    }
-
-    public float getActivityMultiplier() {
-        return multiplier;
     }
 }

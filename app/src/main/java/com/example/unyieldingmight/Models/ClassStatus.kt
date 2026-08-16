@@ -1,3 +1,5 @@
-package com.example.unyieldingmight.Models;
+package com.example.unyieldingmight.Models
 
-public enum ClassStatus {ONGOING, CANCELLED, COMPLETE}
+enum class ClassStatus {
+    ONGOING, CANCELLED, COMPLETE
+}

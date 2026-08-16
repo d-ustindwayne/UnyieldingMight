@@ -1,3 +1,5 @@
-package com.example.unyieldingmight.Models;
+package com.example.unyieldingmight.Models
 
-public enum Gender { MALE, FEMALE, OTHER }
+enum class Gender {
+    MALE, FEMALE, OTHER
+}

@@ -1,26 +1,27 @@
-package com.example.unyieldingmight;
-import com.example.unyieldingmight.Models.Trainer;
+package com.example.unyieldingmight
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-public class TrainerTest {
-    private Trainer trainer;
+import com.example.unyieldingmight.Models.Trainer
+import org.junit.Assert
+import org.junit.Before
+import org.junit.Test
+
+class TrainerTest {
+    private lateinit var trainer: Trainer
 
     @Before
-    public void setUp() {
-        trainer = new Trainer.Builder()
-                .trainerID(1)
-                .firstName("Dara")
-                .lastName("Sanglap")
-                .profileDescription("Testing trainer")
-                .build();
+    fun setUp() {
+        trainer = Trainer(
+            trainerID = 1,
+            firstName = "Dara",
+            lastName = "Sanglap",
+            profileDescription = "Testing trainer"
+        )
     }
 
     @Test
-    public void TrainerBuilderSuccess() {
-        Assert.assertEquals(1, trainer.getTrainerID());
-        Assert.assertEquals("Dara Sanglap", trainer.getName());
-        Assert.assertEquals("Testing trainer", trainer.getProfileDescription());
+    fun testTrainerProperties() {
+        Assert.assertEquals(1, trainer.trainerID)
+        Assert.assertEquals("Dara Sanglap", trainer.name)
+        Assert.assertEquals("Testing trainer", trainer.profileDescription)
     }
 }

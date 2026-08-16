@@ -1,6 +1,6 @@
-package com.example.unyieldingmight.Models;
+package com.example.unyieldingmight.Models
 
-public enum NewsletterType {
+enum class NewsletterType {
     INFORMATIONAL,
     PROMOTIONAL,
     UPDATES,

@@ -1,111 +1,100 @@
-package com.example.unyieldingmight.Services;
+package com.example.unyieldingmight.Services
 
-import android.util.Log;
+import android.util.Log
+import com.example.unyieldingmight.BuildConfig
+import java.util.Properties
+import javax.mail.*
+import javax.mail.internet.InternetAddress
+import javax.mail.internet.MimeMessage
 
-import androidx.annotation.NonNull;
+open class EmailFunction {
+    var responseString: String? = null
+        private set
+    private var fromEmail: String? = BuildConfig.SMTP_USER
+    private var fromName: String? = "Unyielding Might"
+    private var toEmail: String? = null
+    private var toName: String? = null
+    private var emailMessage: MimeMessage? = null
+    protected var subjectText: String? = null
+    protected var bodyText: String? = null
 
-import com.example.unyieldingmight.BuildConfig;
-
-import java.util.Properties;
-import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-
-public abstract class EmailFunction {
-    private String responseString;
-    private String fromEmail;
-    private String fromName;
-    private String toEmail;
-    private String toName;
-    private MimeMessage emailMessage;
-    protected String subjectText;
-    protected String bodyText;
-
-    public String getResponseString() {
-        return responseString;
+    fun setSender(senderName: String?, senderEmail: String?): EmailFunction {
+        this.fromName = senderName
+        this.fromEmail = senderEmail
+        return this
     }
 
-    public EmailFunction() {
+    fun setReceiver(receiverEmail: String?, receiverName: String?): EmailFunction {
+        this.toName = receiverName
+        this.toEmail = receiverEmail
+        return this
     }
 
-    public EmailFunction setSender(String senderName, String senderEmail) {
-        this.fromName = senderName;
-        this.fromEmail = senderEmail;
-        return this;
+    fun createEmail(subject: String?, body: String): EmailFunction {
+        this.subjectText = subject
+        this.bodyText = body
+        return createEmail()
     }
 
-    public EmailFunction setReceiver(String receiverName, String receiverEmail) {
-        this.toName = receiverName;
-        this.toEmail = receiverEmail;
-        return this;
-    }
-
-    public void createEmail(String subject, String body) {
-        this.subjectText = subject;
-        this.bodyText = body;
-        createEmail();
-    }
-
-    public EmailFunction createEmail() {
+    fun createEmail(): EmailFunction {
         try {
-            Properties props = getProperties();
+            val props: Properties = properties
 
-            Session session = Session.getInstance(props, new Authenticator() {
-                @Override
-                public PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(BuildConfig.SMTP_USER, BuildConfig.SMTP_PASS);
+            val session = Session.getInstance(props, object : Authenticator() {
+                public override fun getPasswordAuthentication(): PasswordAuthentication {
+                    return PasswordAuthentication(BuildConfig.SMTP_USER, BuildConfig.SMTP_PASS)
                 }
-            });
+            })
 
-            // Email content configuration
-            emailMessage = new MimeMessage(session); // Multipurpose Internet Mail Extensions Message Class
-            emailMessage.setFrom(new InternetAddress(fromEmail, fromName));
-            emailMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(toEmail, toName));
-            emailMessage.setSubject(subjectText);
-            emailMessage.setContent(String.format(
-                            "<html><body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>%s</body></html>", bodyText),
-                    "text/html; charset=utf-8"
-            );
-
-        } catch (Exception e) {
-            Log.e("EMAIL FUNCTION ERROR", e.getMessage());
-            this.responseString = "Creation Error: " + e.getMessage();
+            emailMessage = MimeMessage(session)
+            emailMessage?.setFrom(InternetAddress(fromEmail, fromName))
+            emailMessage?.setRecipient(Message.RecipientType.TO, InternetAddress(toEmail, toName))
+            emailMessage?.setSubject(subjectText)
+            emailMessage?.setContent(
+                String.format(
+                    "<html><body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>%s</body></html>",
+                    bodyText
+                ),
+                "text/html; charset=utf-8"
+            )
+        } catch (e: Exception) {
+            Log.e("EMAIL FUNCTION ERROR", e.message ?: "Unknown error")
+            this.responseString = "Creation Error: " + e.message
         }
-        return this;
+        return this
     }
 
-    @NonNull
-    private static Properties getProperties() {
-        // SMTP Configuration
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.host", BuildConfig.SMTP_HOST);
-        props.put("mail.smtp.port", BuildConfig.SMTP_PORT);
-        props.put("mail.smtp.socketFactory.port", BuildConfig.SMTP_PORT);
-        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-        props.put("mail.smtp.socketFactory.fallback", "false");
-        props.put("mail.smtp.ssl.enable", "true");
-        props.put("mail.smtp.ssl.protocols", "TLSv1.2");
-        props.put("mail.debug", "true");
-        return props;
+    fun sendEmail() {
+        val message = emailMessage ?: run {
+            this.responseString = "Error: Email message not created."
+            return
+        }
+
+        Thread {
+            try {
+                Transport.send(message)
+                this.responseString = "Success: Email sent successfully!"
+            } catch (e: Exception) {
+                Log.e("EMAIL SENDING ERROR", e.message ?: "Unknown error")
+                this.responseString = "Send Error: " + e.message
+            }
+        }.start()
     }
 
-    public void sendEmail() {
-        if (emailMessage == null) {
-            this.responseString = "Error: Email message not created.";
-            return;
-        }
-
-        try {
-            Transport.send(emailMessage);
-            this.responseString = "Success: Email sent successfully!";
-        } catch (Exception e) {
-            Log.e("EMAIL SENDING ERROR", e.getMessage());
-            this.responseString = "Send Error: " + e.getMessage();
-        }
+    companion object {
+        private val properties: Properties
+            get() {
+                val props = Properties()
+                props["mail.smtp.auth"] = "true"
+                props["mail.smtp.host"] = BuildConfig.SMTP_HOST
+                props["mail.smtp.port"] = BuildConfig.SMTP_PORT
+                props["mail.smtp.socketFactory.port"] = BuildConfig.SMTP_PORT
+                props["mail.smtp.socketFactory.class"] = "javax.net.ssl.SSLSocketFactory"
+                props["mail.smtp.socketFactory.fallback"] = "false"
+                props["mail.smtp.ssl.enable"] = "true"
+                props["mail.smtp.ssl.protocols"] = "TLSv1.2"
+                props["mail.debug"] = "true"
+                return props
+            }
     }
 }

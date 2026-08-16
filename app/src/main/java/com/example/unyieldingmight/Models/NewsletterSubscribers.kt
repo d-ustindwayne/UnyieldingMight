@@ -1,46 +1,25 @@
-package com.example.unyieldingmight.Models;
+package com.example.unyieldingmight.Models
 
-import java.util.ArrayList;
-import java.util.List;
+class NewsletterSubscribers : Subject {
+    val newsletterSubscribers: MutableList<Observer> = mutableListOf()
+    var latestUpdateType: NewsletterType? = null
 
-public class NewsletterSubscribers implements Subject {
-
-    private List<Observer> newsletterSubscribers = new ArrayList<>();
-    private NewsletterType latestUpdateType;
-
-    public NewsletterSubscribers() {}
-
-    public NewsletterType getLatestUpdateType() {
-        return latestUpdateType;
+    override fun add(observer: Observer?) {
+        observer?.let { newsletterSubscribers.add(it) }
     }
 
-    public void setLatestUpdateType(NewsletterType latestUpdateType) {
-        this.latestUpdateType = latestUpdateType;
+    override fun remove(observer: Observer?) {
+        newsletterSubscribers.remove(observer)
     }
 
-    @Override
-    public void add(Observer obs) {
-        newsletterSubscribers.add(obs);
-    }
-
-    @Override
-    public void remove(Observer obs) {
-        newsletterSubscribers.remove(obs);
-    }
-
-    @Override
-    public void notifyObserver() {
-        for (Observer o: newsletterSubscribers) {
-            o.update();
+    override fun notifyObserver() {
+        for (observer in newsletterSubscribers) {
+            observer.update()
         }
     }
 
-    /**
-     * Notifies a specific observer with a specific update type.
-     * Useful for private actions like booking confirmations.
-     */
-    public void notifySpecificObserver(Observer obs, NewsletterType type) {
-        this.setLatestUpdateType(type);
-        obs.update();
+    fun notifySpecificObserver(observer: Observer, updateType: NewsletterType?) {
+        this.latestUpdateType = updateType
+        observer.update()
     }
 }

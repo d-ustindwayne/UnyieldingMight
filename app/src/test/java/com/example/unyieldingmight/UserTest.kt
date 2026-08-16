@@ -1,39 +1,44 @@
-package com.example.unyieldingmight;
+package com.example.unyieldingmight
 
-import com.example.unyieldingmight.Models.User;
+import com.example.unyieldingmight.Models.User
+import org.junit.Assert
+import org.junit.Before
+import org.junit.Test
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
-public class UserTest {
-    public User user;
+class UserTest {
+    private lateinit var user: User
 
     @Before
-    public void setup(){
-        user = new User(1, "Dara", "123", "example@unyiedingmight.com", User.Role.ADMIN);
-    }
-
-    //Constructor testing
-    @Test
-    public void UserTestSuccess(){
-        Assert.assertEquals(1, user.getId());
-        Assert.assertEquals("Dara", user.getUsername());
-        Assert.assertEquals("123", user.getPassword());
-        Assert.assertEquals("example@unyiedingmight.com", user.getEmail());
-        Assert.assertEquals(User.Role.ADMIN, user.getUserClass());
+    fun setup() {
+        user = User(
+            id = 1,
+            username = "Dara",
+            password = "123",
+            email = "example@unyiedingmight.com",
+            userClass = User.Role.ADMIN
+        )
     }
 
     @Test
-    public void getAdminUserTest(){
-        User admin = new User(2, "Admin2", "admin123", "admin@unyieldingmight.com", User.Role.ADMIN);
-        Assert.assertTrue(admin.isAdmin());
+    fun testUserProperties() {
+        Assert.assertEquals(1, user.id)
+        Assert.assertEquals("Dara", user.username)
+        Assert.assertEquals("123", user.password)
+        Assert.assertEquals("example@unyiedingmight.com", user.email)
+        Assert.assertEquals(User.Role.ADMIN, user.userClass)
     }
 
     @Test
-    public void getCustomerUserTest(){
-        User customer = new User(3, "Customer", "customer123", "customer@unyieldingmight.com", User.Role.CUSTOMER);
-        Assert.assertTrue(customer.isCustomer());
+    fun testAdminRole() {
+        val admin = User(userClass = User.Role.ADMIN)
+        Assert.assertTrue(admin.isAdmin)
+        Assert.assertFalse(admin.isCustomer)
     }
 
+    @Test
+    fun testCustomerRole() {
+        val customer = User(userClass = User.Role.CUSTOMER)
+        Assert.assertTrue(customer.isCustomer)
+        Assert.assertFalse(customer.isAdmin)
+    }
 }

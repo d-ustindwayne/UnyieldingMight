@@ -1,79 +1,70 @@
-package com.example.unyieldingmight.Services;
+package com.example.unyieldingmight.Services
 
-import android.util.Log;
+import android.util.Log
+import com.example.unyieldingmight.BuildConfig
+import com.example.unyieldingmight.Models.EmailVerificationData
+import com.google.gson.Gson
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
 
-import com.example.unyieldingmight.BuildConfig;
-import com.example.unyieldingmight.Models.EmailVerificationData;
-import com.google.gson.Gson;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+class EmailVerification {
+    private val apiKey: String? = BuildConfig.QEV_APIKEY
+    private val apiURI = "https://api.quickemailverification.com/v1/verify?"
+    private var email: String? = null
+    private var responseString: StringBuilder? = null
+    var responseCode: Int = 0
+        private set
 
-public class EmailVerification {
-
-    private String apiKey = BuildConfig.QEV_APIKEY;
-    private String apiURI = "https://api.quickemailverification.com/v1/verify?";
-    private String email;
-    private StringBuilder responseString;
-    private int responseCode;
-
-    // Set the email to the object
-    public EmailVerification email(String email) {
-        this.email = email;
-        return this;
+    fun email(email: String?): EmailVerification {
+        this.email = email
+        return this
     }
 
-    public EmailVerification verify() {
-        if (email == null) { return null; }
+    fun verify(): EmailVerification? {
+        val currentEmail = email ?: return null
 
-        // Creating the whole URL
-        responseString = new StringBuilder();
-        String urlString = String.format("%semail=%s&apikey=%s", apiURI, email, apiKey);
-        HttpURLConnection urlConnection = null;
+        responseString = StringBuilder()
+        val urlString = "${apiURI}email=$currentEmail&apikey=$apiKey"
+        var urlConnection: HttpURLConnection? = null
 
         try {
-            URL url = new URL(urlString);
-            // Creates a connection to the URL and gets its response
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.setRequestProperty("Accept", "application/json");
-            responseCode = urlConnection.getResponseCode();
+            val url = URL(urlString)
+            urlConnection = url.openConnection() as HttpURLConnection
+            urlConnection.requestMethod = "GET"
+            urlConnection.setRequestProperty("Accept", "application/json")
+            responseCode = urlConnection.responseCode
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                // Get the response and be stored as a string
-                BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    responseString.append(line);
+                BufferedReader(InputStreamReader(urlConnection.inputStream)).use { reader ->
+                    var line: String?
+                    while (reader.readLine().also { line = it } != null) {
+                        responseString?.append(line)
+                    }
                 }
-                // Prevent memory leak
-                reader.close();
             }
-        } catch (Exception e) {
-            Log.e("VERIFICATION ERROR", e.getMessage());
+        } catch (e: Exception) {
+            Log.e("VERIFICATION ERROR", e.message ?: "Unknown error")
         } finally {
-            // Close the connection
-            if (urlConnection != null) {
-                urlConnection.disconnect();
+            urlConnection?.disconnect()
+        }
+
+        return this
+    }
+
+    val data: EmailVerificationData?
+        get() {
+            val json = responseString?.toString() ?: return null
+            return try {
+                Gson().fromJson(json, EmailVerificationData::class.java)
+            } catch (e: Exception) {
+                Log.e("GSON ERROR", e.message ?: "Unknown error")
+                null
             }
         }
 
-        return this;
+    fun getResponseString(): String {
+        return responseString?.toString() ?: ""
     }
-
-    public EmailVerificationData getData() {
-        // Map the response from JSON to EmailVerificationData class
-        try {
-            Gson gson = new Gson();
-            return gson.fromJson(responseString.toString(), EmailVerificationData.class);
-        } catch (Exception e) {
-            this.responseString.append(e.getMessage());
-            return null;
-        }
-    }
-
-    public String getResponseString() { return responseString.toString(); }
-
-    public int getResponseCode() { return responseCode; }
 }
