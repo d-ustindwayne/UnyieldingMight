@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="HardcodedText">
+
+    <item
+        android:id="@+id/menu_sidebar_home"
+        android:fontFamily="@font/manrope_extrabold"
+        android:textColor="#fff"
+        android:textSize="48sp"
+        android:title="Home" />
+    <item
+        android:id="@+id/menu_sidebar_account"
+        android:fontFamily="@font/manrope_extrabold"
+        android:textColor="#fff"
+        android:textSize="48sp"
+        android:title="Account" />
+    <item
+        android:id="@+id/menu_sidebar_termsandcondition"
+        android:fontFamily="@font/manrope_extrabold"
+        android:textColor="#fff"
+        android:textSize="48sp"
+        android:title="Terms and Condition" />
+
+    <item
+        android:id="@+id/menu_sidebar_logout"
+        android:fontFamily="@font/manrope_extrabold"
+        android:textColor="#fff"
+        android:textSize="48sp"
+        android:title="Logout" />
+</menu>
