@@ -250,12 +250,12 @@
             app:layout_constraintVertical_bias="0.618" />
 
         <Button
-            android:id="@+id/activity_editclass_btn_post"
+            android:id="@+id/activity_editclass_btn_done"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="#FFF"
             android:fontFamily="@font/manrope_bold"
-            android:text="POST"
+            android:text="DONE"
             android:textAlignment="center"
             android:textColor="#000"
             android:textSize="16sp"
