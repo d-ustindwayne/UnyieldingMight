@@ -61,10 +61,11 @@ public class Adapter extends RecyclerView.Adapter<ViewHolder> {
                 GymClass current = dataList.get(pos);
 
                 Intent intent = new Intent(context, InfoActivity.class);
+                intent.putExtra("ClassId", current.getID());
                 intent.putExtra("Image", R.drawable.boxfit);
                 intent.putExtra("Title", current.getName());
                 intent.putExtra("Instructor", current.getTrainer() != null ? current.getTrainer().getName() : "Unknown");
-                intent.putExtra("Intensity", current);
+//                intent.putExtra("Intensity", current);
                 intent.putExtra("Date", current.getStartDateTime() != null ? dateFormat.format(current.getStartDateTime()) : "N/A");
                 intent.putExtra("StartTime", current.getStartDateTime() != null ? timeFormat.format(current.getStartDateTime()) : "N/A");
                 intent.putExtra("EndTime", current.getEndDateTime() != null ? timeFormat.format(current.getEndDateTime()) : "N");
