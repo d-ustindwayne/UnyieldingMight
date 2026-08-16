@@ -21,13 +21,9 @@ import com.example.unyieldingmight.R;
 
 public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     private Context context;
+//    ArrayList of class GymClass is defined as object dataList
     private ArrayList<GymClass> dataList;
     private float userTdee;
-
-    public void setSearchList(ArrayList<GymClass> dataSearchList) {
-        this.dataList = dataSearchList;
-        notifyDataSetChanged();
-    }
 
     public Adapter(Context context, ArrayList<GymClass> dataList, float userTdee) {
         this.context = context;
@@ -35,6 +31,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         this.userTdee = userTdee;
     }
 
+//    Wraps the view object inside of ViewHolder, which contains references to the
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -92,7 +89,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     public int getItemCount() {
         return dataList != null ? dataList.size() : 0;
     }
-
+//    Holds the view for each item in the recycler view
     public static class ViewHolder extends RecyclerView.ViewHolder{
         CardView recCard;
         ImageView recImage;

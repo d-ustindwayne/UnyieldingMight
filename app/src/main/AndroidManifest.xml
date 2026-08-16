@@ -23,18 +23,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activities.LoginActivity"></activity>
-        <activity android:name=".Activities.RegisterActivity"></activity>
-        <activity android:name=".Activities.VerifyActivity"></activity>
-        <activity android:name=".Activities.MembershipActivity"></activity>
-        <activity android:name=".Activities.ProfileActivity"></activity>
-        <activity android:name=".Activities.LinkmembershipActivity"></activity>
-        <activity android:name=".Activities.ActivitylevelActivity"></activity>
-        <activity android:name=".Activities.StatsActivity"></activity>
-        <activity android:name=".Activities.DoneActivity"></activity>
-        <activity android:name=".Activities.HomeActivity"></activity>
-        <activity android:name=".Activities.InfoActivity"></activity>
-        <activity android:name=".Activities.EditClassActivity"></activity>
+        <activity android:name=".Activities.LoginActivity"/>
+        <activity android:name=".Activities.RegisterActivity"/>
+        <activity android:name=".Activities.VerifyActivity"/>
+        <activity android:name=".Activities.MembershipActivity"/>
+        <activity android:name=".Activities.ProfileActivity"/>
+        <activity android:name=".Activities.LinkmembershipActivity"/>
+        <activity android:name=".Activities.ActivitylevelActivity"/>
+        <activity android:name=".Activities.StatsActivity"/>
+        <activity android:name=".Activities.DoneActivity"/>
+        <activity android:name=".Activities.HomeActivity"/>
+        <activity android:name=".Activities.InfoActivity"/>
+        <activity android:name=".Activities.EditClassActivity"/>
 
         <meta-data
             android:name="preloaded_fonts"

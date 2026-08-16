@@ -8,7 +8,6 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,7 +25,6 @@ public class HomeActivity extends AppCompatActivity {
     ArrayList<GymClass> gymClasses;
     RecyclerView recyclerView;
     Adapter adapter;
-    SearchView searchView;
     ProgressBar loadingSpinner;
     
     private final Handler timeoutHandler = new Handler(Looper.getMainLooper());
@@ -38,20 +36,7 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         
         recyclerView = findViewById(R.id.activity_home_recyclerView);
-        searchView = findViewById(R.id.searchBar);
         loadingSpinner = findViewById(R.id.home_loading_spinner);
-        
-        searchView.clearFocus();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return true;
-            }
-        });
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(HomeActivity.this, 1);
         recyclerView.setLayoutManager(gridLayoutManager);
