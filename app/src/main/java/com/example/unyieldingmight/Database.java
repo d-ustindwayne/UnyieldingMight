@@ -60,15 +60,18 @@ public class Database {
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     Address address = new Address.Builder()
-                            .street(rs.getString("Street"))
-                            .city(rs.getString("City"))
-                            .region(rs.getString("Region"))
-                            .country(rs.getString("Country"))
-                            .postcode(rs.getString("Postcode"))
-                            .build();
+                        .street(rs.getString("Street"))
+                        .city(rs.getString("City"))
+                        .region(rs.getString("Region"))
+                        .country(rs.getString("Country"))
+                        .postcode(rs.getString("Postcode"))
+                        .build();
 
                     String gdStr = rs.getString("Gender");
-                    Gender gd = gdStr.equalsIgnoreCase("M") ? Gender.MALE : Gender.FEMALE;
+                    Gender gd;
+                    if ("MALE".equalsIgnoreCase(gdStr) || "M".equalsIgnoreCase(gdStr)) gd = Gender.MALE;
+                    else if ("FEMALE".equalsIgnoreCase(gdStr) || "F".equalsIgnoreCase(gdStr)) gd = Gender.FEMALE;
+                    else gd = Gender.OTHER;
 
                     Profile profile = new Profile.Builder()
                             .email(rs.getString("Email"))
@@ -78,22 +81,23 @@ public class Database {
                             .gender(gd)
                             .age(rs.getInt("Age"))
                             .address(address)
+                            .userClass(rs.getString("UserClass"))
                             .build();
 
                     float multiplierVal = rs.getFloat("ActivityMultiplier");
                     ActivityMultiplier multiplier;
                     if (multiplierVal == 1.2f) multiplier = ActivityMultiplier.INACTIVE;
                     else if (multiplierVal == 1.375f) multiplier = ActivityMultiplier.LIGHT;
+                    else if (multiplierVal == 1.55f) multiplier = ActivityMultiplier.MODERATE;
                     else if (multiplierVal == 1.725f) multiplier = ActivityMultiplier.HEAVY;
-                    else if (multiplierVal == 1.9f) multiplier = ActivityMultiplier.EXTREME;
-                    else multiplier = ActivityMultiplier.MODERATE;
+                    else multiplier = ActivityMultiplier.EXTREME;
 
                     return new Customer.Builder()
                             .customerId(rs.getInt("CustomerId"))
                             .profile(profile)
-                            .isMember(rs.getBoolean("IsMember"))
-                            .height(rs.getFloat("CustomerHeight"))
-                            .weight(rs.getFloat("CustomerWeight"))
+                            .isMember(rs.getObject("MembershipId") != null)
+                            .height(rs.getFloat("Height"))
+                            .weight(rs.getFloat("Weight"))
                             .activityMultiplier(multiplier)
                             .tdee(rs.getFloat("TDEE"))
                             .build();
@@ -153,13 +157,13 @@ public class Database {
         EmailVerification ev = new EmailVerification().email(email).verify();
         EmailVerificationData evData = ev.getData();
         if (evData != null && evData.safe_to_send() != null && evData.safe_to_send().equalsIgnoreCase("false")) {
-        android.util.Log.w("DATABASE_ERROR", "Registration blocked by QEV for: " + email + ". Factor safe_to_send is false.");
+        Log.w("DATABASE_ERROR", "Registration blocked by QEV for: " + email + ". Factor safe_to_send is false.");
             return false;
         }
 
         Connection conn = getConnection();
         if (conn == null) {
-            android.util.Log.e("DATABASE_ERROR", "Registration failed: No connection to database.");
+            Log.e("DATABASE_ERROR", "Registration failed: No connection to database.");
             return false;
         }
         try {
@@ -181,8 +185,8 @@ public class Database {
             
             // Calculate TDEE using the logic requested
             int age = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR) - (dob.getYear() + 1900);
-            float weightComponent = 10 * weight;
-            float heightComponent = 6.25f * height;
+            float weightComponent = Conversion.rounded(10 * weight);
+            float heightComponent = Conversion.rounded(6.25f * height);
             float ageComponent = 5 * age;
             float bmr;
 
@@ -196,7 +200,7 @@ public class Database {
                 float female = weightComponent + heightComponent - ageComponent - 161;
                 bmr = (male + female) / 2;
             }
-            float tdee = bmr * multiplier;
+            float tdee = Conversion.rounded(bmr * multiplier);
 
             String custSql = "INSERT INTO Customer (MembershipId, Email, Height, Weight, ActivityMultiplier, TDEE) VALUES (?, ?, ?, ?, ?, ?)";
             try (PreparedStatement pstmt = conn.prepareStatement(custSql, Statement.RETURN_GENERATED_KEYS)) {
@@ -234,7 +238,7 @@ public class Database {
             conn.commit();
             return true;
         } catch (SQLException e) {
-            android.util.Log.e("DATABASE_ERROR", "Registration failed: " + e.getMessage());
+            Log.e("DATABASE_ERROR", "Registration failed: " + e.getMessage());
             try { conn.rollback(); } catch (SQLException ex) { }
             e.printStackTrace();
             return false;
@@ -258,8 +262,10 @@ public class Database {
     }
 
     public static MembershipResult validateMembership(int membershipId, String email) {
-        String sql = "SELECT m.*, c.CustomerId FROM Membership m " +
+        String sql = "SELECT m.*, c.CustomerId, pa.Street, pa.City, pa.Region, pa.Postcode, pa.Country " +
+                "FROM Membership m " +
                 "LEFT JOIN Customer c ON m.MembershipId = c.MembershipId " +
+                "LEFT JOIN ProfileAddress pa ON m.AddressId = pa.AddressId " +
                 "WHERE m.MembershipId = ?";
 
         Connection conn = getConnection();
@@ -280,22 +286,56 @@ public class Database {
                         return new MembershipResult(MembershipResult.Status.EMAIL_MISMATCH, null);
                     }
 
+                    Date dob = null;
+                    try {
+                        dob = rs.getDate("DOB");
+                    } catch (SQLException e) {
+                        try {
+                            dob = rs.getDate("DateOfBirth");
+                        } catch (SQLException e2) {
+                            Log.w("DATABASE", "Neither 'DOB' nor 'DateOfBirth' found in Membership table.");
+                        }
+                    }
+
+                    String gender = "MALE";
+                    try {
+                        gender = rs.getString("Gender");
+                    } catch (SQLException e) {
+                        Log.w("DATABASE", "'Gender' column not found in Membership table.");
+                    }
+
                     Membership membership = new Membership(
                             rs.getInt("MembershipId"),
                             dbEmail,
                             rs.getFloat("Height"),
                             rs.getFloat("Weight"),
                             rs.getFloat("ActivityMultiplier"),
-                            rs.getFloat("TDEE")
+                            rs.getFloat("TDEE"),
+                            dob,
+                            gender
                     );
-                    Log.d(membership.toString(), "Membership Created");
+
+                    // Add address info if available
+                    Object addrIdObj = rs.getObject("AddressId");
+                    if (addrIdObj != null) {
+                        membership.setAddress(
+                                (Integer) addrIdObj,
+                                rs.getString("Street"),
+                                rs.getString("City"),
+                                rs.getString("Region"),
+                                rs.getString("Postcode"),
+                                rs.getString("Country")
+                        );
+                    }
+
+                    Log.d("DATABASE", "Membership Created: " + membership.toString());
                     return new MembershipResult(MembershipResult.Status.SUCCESS, membership);
                 } else {
                     return new MembershipResult(MembershipResult.Status.NOT_FOUND, null);
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            Log.e("DATABASE_ERROR", "Error in validateMembership: " + e.getMessage(), e);
         }
         return null;
     }
@@ -338,7 +378,7 @@ public class Database {
         if (user == null) return history;
 
         String sql = "SELECT b.*, c.* FROM GymClassBooking b " +
-                "JOIN GymClasses c ON b.ClassId = c.ClassId " +
+                "JOIN GymClass c ON b.ClassId = c.ClassId " +
                 "WHERE b.ProfileId = ? " +
                 "ORDER BY b.BookingDate DESC";
 

@@ -47,7 +47,13 @@
     <string name="physical_stats">Physical Stats</string>
     <string name="weight">Weight</string>
     <string name="height">Height</string>
+    <string name="gender">Gender</string>
 
+    <string-array name="gender_array">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Other</item>
+    </string-array>
     <string-array name="country_array">
         <item>New Zealand</item>
         <item>Australia</item>

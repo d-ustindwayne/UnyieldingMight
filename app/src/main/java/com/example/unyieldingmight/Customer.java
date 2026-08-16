@@ -27,6 +27,10 @@ public class Customer implements Observer {
         return customerId;
     }
 
+    public Profile getProfile() {
+        return profile;
+    }
+
     public boolean isMember() {
         return isMember;
     }
@@ -129,6 +133,11 @@ public class Customer implements Observer {
 
         public Builder activityMultiplier(ActivityMultiplier multiplier) {
             this.activityMultiplier = multiplier.getActivityMultiplier();
+            return this;
+        }
+
+        public Builder tdee(float tdee) {
+            this.TDEE = tdee;
             return this;
         }
 

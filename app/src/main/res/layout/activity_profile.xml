@@ -132,7 +132,7 @@
             app:layout_constraintVertical_bias="0.571" />
 
         <EditText
-            android:id="@+id/activity_profile_et_state"
+            android:id="@+id/activity_profile_et_region"
             android:layout_width="282dp"
             android:layout_height="48dp"
             android:ems="10"

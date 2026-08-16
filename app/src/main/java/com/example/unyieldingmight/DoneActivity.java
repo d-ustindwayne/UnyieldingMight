@@ -18,8 +18,14 @@ public class DoneActivity extends AppCompatActivity {
     }
 
     public void nextActivityHome(View v) {
+        // Disable double-submits
+        v.setEnabled(false);
+        
         Bundle b = getIntent().getExtras();
-        if (b == null) return;
+        if (b == null) {
+            v.setEnabled(true);
+            return;
+        }
 
         String fName = b.getString("FirstName");
         String lName = b.getString("LastName");
@@ -27,20 +33,20 @@ public class DoneActivity extends AppCompatActivity {
         String password = b.getString("Password");
         String dob = b.getString("DOB");
         String street = b.getString("Street");
-        String suburb = b.getString("Suburb");
+        String region = b.getString("Region");
         String city = b.getString("City");
         String country = b.getString("Country");
         String postcode = b.getString("Postcode");
         String gender = b.getString("Gender");
+        Integer membershipId = b.containsKey("MembershipId") ? b.getInt("MembershipId") : null;
         float height = b.getFloat("Height");
         float weight = b.getFloat("Weight");
         float multiplier = b.getFloat("ActivityMultiplier");
-        Integer membershipId = b.containsKey("MembershipId") ? b.getInt("MembershipId") : null;
 
         new Thread(() -> {
             boolean success = Database.registerCustomer(
                 fName, lName, email, password,
-                street, suburb, city, country, postcode,
+                street, region, city, country, postcode,
                 height, weight, multiplier, membershipId,
                 Date.valueOf(dob), gender
             );

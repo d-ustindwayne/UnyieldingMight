@@ -7,8 +7,6 @@ public class Conversion {
     public static float INtoCM(float val) {
         return rounded(val / 2.54f);
     }
-    public static float FTtoCM(float val) {
-        return rounded(val * 30.48f);
-    }
+    public static float FTtoCM(float val) { return rounded(val * 30.48f);}
     public static float LBtoKG(float val) { return rounded(val / 2.205f); }
 }

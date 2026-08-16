@@ -14,7 +14,7 @@ import java.util.Objects;
 
 public class StatsActivity extends AppCompatActivity {
     private EditText etHeight, etWeight;
-    private Spinner spinHeightUnit, spinWeightUnit;
+    private Spinner spinHeightUnit, spinWeightUnit, spinGender;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +25,7 @@ public class StatsActivity extends AppCompatActivity {
         etWeight = findViewById(R.id.activity_stats_et_weight);
         spinHeightUnit = findViewById(R.id.activity_stats_spin_height);
         spinWeightUnit = findViewById(R.id.activity_stats_spin_weight);
+        spinGender = findViewById(R.id.activity_stats_spin_gender);
 
         ArrayAdapter<CharSequence> adapterHeight = ArrayAdapter.createFromResource(this,
                 R.array.height_array, android.R.layout.simple_spinner_item);
@@ -35,6 +36,11 @@ public class StatsActivity extends AppCompatActivity {
                 R.array.weight_array, android.R.layout.simple_spinner_item);
         adapterWeight.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinWeightUnit.setAdapter(adapterWeight);
+
+        ArrayAdapter<CharSequence> adapterGender = ArrayAdapter.createFromResource(this,
+                R.array.gender_array, android.R.layout.simple_spinner_item);
+        adapterGender.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinGender.setAdapter(adapterGender);
     }
 
     public void previousActivityProfile(View v) {
@@ -42,7 +48,7 @@ public class StatsActivity extends AppCompatActivity {
     }
 
     public void proceedToActivityLevel(View v) {
-//        Gender genderStr = Gender.valueOf(spGender.getSelectedItem().toString());
+        String genderStr = spinGender.getSelectedItem().toString().toUpperCase();
         String heightStr = etHeight.getText().toString().trim();
         String weightStr = etWeight.getText().toString().trim();
 
@@ -69,7 +75,7 @@ public class StatsActivity extends AppCompatActivity {
 
         Intent i = new Intent(this, ActivitylevelActivity.class);
         i.putExtras(Objects.requireNonNull(getIntent().getExtras()));
-//      i.putExtra("Gender", gender);
+        i.putExtra("Gender", genderStr);
         i.putExtra("Height", height);
         i.putExtra("Weight", weight);
         startActivity(i);

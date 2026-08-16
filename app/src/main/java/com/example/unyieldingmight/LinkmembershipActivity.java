@@ -43,10 +43,10 @@ public class LinkmembershipActivity extends AppCompatActivity {
 
             runOnUiThread(() -> {
                 if (result == null) {
-                    Toast.makeText(this, "Invalid membership ID.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "A connection error occurred.", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
+                
                 switch (result.getStatus()) {
                     case SUCCESS:
                         Membership membership = result.getMembership();
@@ -54,10 +54,30 @@ public class LinkmembershipActivity extends AppCompatActivity {
                         Intent i = new Intent(this, DoneActivity.class);
                         i.putExtras(Objects.requireNonNull(getIntent().getExtras()));
                         i.putExtra("MembershipId", membershipId);
+
+                        // Safe date formatting
+                        String dobStr = "2000-01-01";
+                        if (membership.getDOB() != null) {
+                            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US);
+                            dobStr = sdf.format(membership.getDOB());
+                        }
+
+                        i.putExtra("DOB", dobStr);
+                        i.putExtra("Gender", membership.getGender() != null ? membership.getGender() : "MALE");
                         i.putExtra("Height", membership.getHeight());
                         i.putExtra("Weight", membership.getWeight());
                         i.putExtra("ActivityMultiplier", membership.getActivityMultiplier());
                         i.putExtra("TDEE", membership.getTdee());
+
+                        // Pass address if membership has it
+                        if (membership.getAddressId() != null) {
+                            i.putExtra("Street", membership.getStreet());
+                            i.putExtra("City", membership.getCity());
+                            i.putExtra("Region", membership.getRegion());
+                            i.putExtra("Postcode", membership.getPostcode());
+                            i.putExtra("Country", membership.getCountry());
+                        }
+
                         startActivity(i);
                         break;
                     case NOT_FOUND:

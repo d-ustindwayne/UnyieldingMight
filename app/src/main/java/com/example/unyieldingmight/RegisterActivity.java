@@ -21,6 +21,12 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     public void register(View v){
+        EditText etFirstName = findViewById(R.id.activity_register_et_firstName);
+        String firstName = etFirstName.getText().toString().trim();
+
+        EditText etLastName = findViewById(R.id.activity_register_et_lastName);
+        String lastName = etLastName.getText().toString().trim();
+
         EditText email = findViewById(R.id.activity_register_et_email);
         String emailData = email.getText().toString().trim();
 
@@ -30,7 +36,7 @@ public class RegisterActivity extends AppCompatActivity {
         EditText confirmPassword = findViewById(R.id.activity_register_et_confirmPassword);
         String confirmPasswordData = confirmPassword.getText().toString().trim();
 
-        if(emailData.isEmpty() || passwordData.isEmpty() || confirmPasswordData.isEmpty()){
+        if(firstName.isEmpty() || lastName.isEmpty() || emailData.isEmpty() || passwordData.isEmpty() || confirmPasswordData.isEmpty()){
             Toast.makeText(this, "Input fields cannot be empty", Toast.LENGTH_SHORT).show();
         }
         else if(!android.util.Patterns.EMAIL_ADDRESS.matcher(emailData).matches()){
@@ -45,10 +51,17 @@ public class RegisterActivity extends AppCompatActivity {
                 
                 runOnUiThread(() -> {
                     if (existingCustomer != null) {
-                        Toast.makeText(this, "Email is already registered", Toast.LENGTH_LONG).show();
+                        String userClass = existingCustomer.getProfile().getUserClass();
+                        if ("ADMIN".equalsIgnoreCase(userClass)) {
+                            Toast.makeText(this, "Email is used by an admin", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(this, "Email is already registered", Toast.LENGTH_LONG).show();
+                        }
                     } else {
                         // Pass data to VerifyActivity
                         Intent i = new Intent(this, VerifyActivity.class);
+                        i.putExtra("FirstName", firstName);
+                        i.putExtra("LastName", lastName);
                         i.putExtra("Email", emailData);
                         i.putExtra("Password", passwordData);
                         startActivity(i);

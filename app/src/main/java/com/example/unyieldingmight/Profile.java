@@ -11,6 +11,7 @@ public class Profile {
     private final Gender gender;
     private final String firstName;
     private final String lastName;
+    private final String userClass;
 
     private Profile(Builder builder) {
         this.email = builder.email;
@@ -21,6 +22,7 @@ public class Profile {
         this.gender = builder.gender;
         this.firstName = builder.firstName;
         this.lastName = builder.lastName;
+        this.userClass = builder.userClass;
     }
 
     public String getEmail() {
@@ -53,6 +55,8 @@ public class Profile {
         return lastName;
     }
 
+    public String getUserClass() { return userClass; }
+
     public static class Builder {
         private String email;
         private String password;
@@ -62,6 +66,7 @@ public class Profile {
         private Gender gender;
         private String firstName;
         private String lastName;
+        private String userClass;
 
         public Builder email(String email) {
             this.email = email;
@@ -88,8 +93,8 @@ public class Profile {
             return this;
         }
 
-        public Builder gender(Gender male) {
-            this.gender = male;
+        public Builder gender(Gender gender) {
+            this.gender = gender;
             return this;
         }
 
@@ -100,6 +105,11 @@ public class Profile {
 
         public Builder lastName(String lastName) {
             this.lastName = lastName;
+            return this;
+        }
+
+        public Builder userClass(String userClass) {
+            this.userClass = userClass;
             return this;
         }
 
