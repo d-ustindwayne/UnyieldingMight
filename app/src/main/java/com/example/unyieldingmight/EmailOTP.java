@@ -11,9 +11,6 @@ public class EmailOTP extends EmailFunction {
         this.OTP = generateOTP();
     }
 
-    public String getOTP() {
-        return OTP;
-    }
     public boolean isAuthenticated() { return authenticated; }
 
     public boolean validateOTP(String inputOTP) {

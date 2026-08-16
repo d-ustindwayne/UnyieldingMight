@@ -14,6 +14,8 @@ public abstract class EmailFunction {
     private SendSmtpEmailSender from;
     private SendSmtpEmailTo to;
     private SendSmtpEmail email;
+    protected String subjectText;
+    protected String bodyText;
 
     public String getResponseString() {
         return responseString;
@@ -42,11 +44,28 @@ public abstract class EmailFunction {
     }
 
     protected EmailFunction createEmail(String subject, String body) {
+        if (email != null) { return null; }
         SendSmtpEmail sendSmtpEmail = new SendSmtpEmail();
         sendSmtpEmail.setSender(from);
         sendSmtpEmail.addToItem(to);
         sendSmtpEmail.setSubject(subject);
         sendSmtpEmail.setHtmlContent(body);
+        this.email = sendSmtpEmail;
+        return this;
+    }
+
+    protected EmailFunction createEmail() {
+        if (email != null) { return null; }
+        SendSmtpEmail sendSmtpEmail = new SendSmtpEmail();
+        sendSmtpEmail.setSender(from);
+        sendSmtpEmail.addToItem(to);
+        sendSmtpEmail.setSubject(subjectText);
+        sendSmtpEmail.setHtmlContent(String.format(
+            "<html>" +
+                "<body>%s</body>" +
+            "</html>"
+        , bodyText)
+        );
         this.email = sendSmtpEmail;
         return this;
     }
@@ -57,7 +76,7 @@ public abstract class EmailFunction {
             CreateSmtpEmail result = apiInstance.sendTransacEmail(email);
             this.responseString = result.getMessageId();
         } catch (Exception e) {
-            this.responseString = e.getMessage();
+            e.printStackTrace();
         }
     }
 }

@@ -42,7 +42,7 @@ public class EmailVerification {
                 reader.close();
             }
         } catch (Exception e) {
-            responseString.append(e.getMessage());
+            e.printStackTrace();
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
