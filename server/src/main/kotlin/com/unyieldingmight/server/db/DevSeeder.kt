@@ -1,5 +1,6 @@
 package com.unyieldingmight.server.db
 
+import com.unyieldingmight.server.GymTime
 import com.unyieldingmight.server.auth.Passwords
 import com.unyieldingmight.server.repo.insertAddress
 import com.unyieldingmight.server.repo.insertClass
@@ -31,7 +32,7 @@ import java.time.temporal.TemporalAdjusters
  */
 object DevSeeder {
     private val log = LoggerFactory.getLogger(DevSeeder::class.java)
-    private val gymZone: ZoneId = ZoneId.of("Pacific/Auckland")
+    private val gymZone: ZoneId = GymTime.zone
     const val DEMO_PASSWORD = "password123"
 
     private data class WeeklyClass(

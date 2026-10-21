@@ -88,7 +88,7 @@ fun CaloriesScreen(user: UserDto) {
                             { "${it.name} · ${it.group}" },
                         )
                         Text("Duration: ${minutes.roundToInt()} min", style = MaterialTheme.typography.labelLarge)
-                        Slider(value = minutes, onValueChange = { minutes = it }, valueRange = 5f..180f, steps = 34)
+                        Slider(value = minutes, onValueChange = { minutes = (it / 5).roundToInt() * 5f }, valueRange = 5f..180f)
                         UmTextField(
                             weightText, { weightText = it.filter { c -> c.isDigit() || c == '.' }.take(5) }, "Your weight",
                             keyboardType = KeyboardType.Decimal, suffix = if (metric) "kg" else "lb",

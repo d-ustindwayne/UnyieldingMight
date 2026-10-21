@@ -1,6 +1,7 @@
 package com.unyieldingmight.server.service
 
 import com.unyieldingmight.server.ApiException
+import com.unyieldingmight.server.GymTime
 import com.unyieldingmight.server.auth.Codes
 import com.unyieldingmight.server.auth.JwtService
 import com.unyieldingmight.server.auth.Passwords
@@ -197,7 +198,7 @@ class AuthService(
             } catch (_: DateTimeParseException) {
                 throw ApiException.badRequest("Enter a valid date of birth", "validation")
             }
-            val age = java.time.Period.between(date, LocalDate.now()).years
+            val age = java.time.Period.between(date, GymTime.today()).years
             if (age !in 13..120) throw ApiException.badRequest("You must be at least 13 years old to register", "validation")
             return date
         }

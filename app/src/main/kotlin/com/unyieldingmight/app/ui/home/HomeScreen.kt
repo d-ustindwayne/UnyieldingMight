@@ -161,7 +161,7 @@ private fun Greeting(user: UserDto) {
         in 5..11 -> "Good morning"
         in 12..17 -> "Good afternoon"
         in 18..21 -> "Good evening"
-        else -> "Welcome back"
+        else -> "Hi"
     }
     Column {
         Text(

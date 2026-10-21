@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -87,7 +86,8 @@ fun Intensity.label() = name.lowercase().replaceFirstChar { it.uppercase() }
 fun ClassArt(category: ClassCategory, modifier: Modifier = Modifier, iconSize: Dp = 56.dp) {
     Box(modifier.background(Brush.linearGradient(category.colors))) {
         if (category == ClassCategory.COMBAT) {
-            Image(painterResource(R.drawable.boxfit), null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize().alpha(0.55f))
+            // matchParentSize: the photo must not influence the card's measured height.
+            Image(painterResource(R.drawable.boxfit), null, contentScale = ContentScale.Crop, modifier = Modifier.matchParentSize().alpha(0.55f))
         }
         Icon(
             category.icon, null,

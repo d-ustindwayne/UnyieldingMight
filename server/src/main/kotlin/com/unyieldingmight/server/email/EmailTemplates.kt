@@ -1,5 +1,6 @@
 package com.unyieldingmight.server.email
 
+import com.unyieldingmight.server.GymTime
 import com.unyieldingmight.shared.domain.Money
 import com.unyieldingmight.shared.model.NewsletterType
 import com.unyieldingmight.shared.model.OrderDto
@@ -9,7 +10,7 @@ import java.time.format.DateTimeFormatter
 
 /** HTML email content. Newsletter copy is carried over from the original EmailNewsletter class. */
 object EmailTemplates {
-    private val zone: ZoneId = ZoneId.of("Pacific/Auckland")
+    private val zone: ZoneId = GymTime.zone
     private val whenFormat = DateTimeFormatter.ofPattern("EEE d MMM, h:mm a").withZone(zone)
 
     fun wrap(body: String) =

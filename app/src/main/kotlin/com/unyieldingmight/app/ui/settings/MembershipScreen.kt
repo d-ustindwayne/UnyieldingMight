@@ -185,7 +185,8 @@ private fun PlanCard(plan: MembershipPlanDto, highlighted: Boolean, busy: Boolea
                     Text(it, style = MaterialTheme.typography.bodySmall)
                 }
             }
-            PrimaryButton("Choose ${plan.name}", onBuy, Modifier.fillMaxWidth(), loading = busy)
+            if (highlighted) PrimaryButton("Choose ${plan.name}", onBuy, Modifier.fillMaxWidth(), loading = busy)
+            else SecondaryButton("Choose ${plan.name}", onBuy, Modifier.fillMaxWidth(), enabled = !busy)
         }
     }
 }

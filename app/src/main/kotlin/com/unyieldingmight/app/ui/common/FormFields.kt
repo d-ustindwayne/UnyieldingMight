@@ -1,5 +1,7 @@
 package com.unyieldingmight.app.ui.common
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -91,6 +94,11 @@ fun DateField(
     defaultDate: LocalDate = LocalDate.now().minusYears(25),
 ) {
     var open by rememberSaveable { mutableStateOf(false) }
+    // A read-only text field swallows clicks, so watch its press events to open the picker from anywhere on it.
+    val interaction = remember { MutableInteractionSource() }
+    LaunchedEffect(interaction) {
+        interaction.interactions.collect { if (it is PressInteraction.Release) open = true }
+    }
     val display = runCatching { LocalDate.parse(value).format(DateTimeFormatter.ofPattern("d MMMM yyyy")) }.getOrDefault("")
     OutlinedTextField(
         value = display,
@@ -101,6 +109,7 @@ fun DateField(
         supportingText = error?.let { { Text(it) } },
         trailingIcon = { IconButton(onClick = { open = true }) { Icon(Icons.Rounded.CalendarMonth, "Pick date") } },
         shape = MaterialTheme.shapes.medium,
+        interactionSource = interaction,
         modifier = modifier.fillMaxWidth(),
     )
     if (open) {

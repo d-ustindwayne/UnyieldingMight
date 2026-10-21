@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -155,7 +156,12 @@ fun AdminClassEditScreen(id: Int) {
                             UmTextField(capacity, { capacity = it.digitsOnly(3) }, "Max capacity", Modifier.weight(1f), error = shown["capacity"], keyboardType = KeyboardType.Number)
                             UmTextField(calories, { calories = it.digitsOnly(4) }, "Avg calories", Modifier.weight(1f), error = shown["calories"], keyboardType = KeyboardType.Number, suffix = "kcal")
                         }
-                        calories.toIntOrNull()?.let { Row { Text("Intensity: ", style = MaterialTheme.typography.bodySmall); IntensityPill(Intensity.fromCalories(it)) } }
+                        calories.toIntOrNull()?.let {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text("Intensity: ", style = MaterialTheme.typography.bodySmall)
+                                IntensityPill(Intensity.fromCalories(it))
+                            }
+                        }
                         UmTextField(
                             price, { price = it.filter { c -> c.isDigit() || c == '.' }.take(7) }, "Non-member price", error = shown["price"],
                             keyboardType = KeyboardType.Decimal, supporting = "Members always book for free. Use 0 for a free class.",

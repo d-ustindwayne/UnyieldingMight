@@ -1,5 +1,6 @@
 package com.unyieldingmight.server.repo
 
+import com.unyieldingmight.server.GymTime
 import com.unyieldingmight.server.db.Tx
 import com.unyieldingmight.server.db.enum
 import com.unyieldingmight.server.db.epochMillis
@@ -19,7 +20,6 @@ import java.sql.ResultSet
 import java.time.Instant
 import java.time.LocalDate
 import java.time.Period
-import java.time.ZoneOffset
 
 data class UserRecord(
     val id: Int,
@@ -41,7 +41,7 @@ data class UserRecord(
 ) {
     val fullName: String get() = "$firstName $lastName"
 
-    fun age(today: LocalDate = LocalDate.now(ZoneOffset.UTC)): Int = Period.between(dateOfBirth, today).years
+    fun age(today: LocalDate = GymTime.today()): Int = Period.between(dateOfBirth, today).years
 
     fun toDto(): UserDto = UserDto(
         id = id,
