@@ -188,10 +188,13 @@ fun AddressFields(input: AddressInput) {
 class BodyInput(heightCm: Double? = null, weightKg: Double? = null, units: UnitSystem = UnitSystem.METRIC) {
     var units by mutableStateOf(units)
     var heightCm by mutableStateOf(heightCm?.let { "%.1f".format(it).removeSuffix(".0") } ?: "")
-    var feet by mutableStateOf(heightCm?.let { (Units.cmToInches(it) / 12).toInt().toString() } ?: "")
-    var inches by mutableStateOf(heightCm?.let { (Units.cmToInches(it) % 12).toInt().toString() } ?: "")
+    var feet by mutableStateOf(heightCm?.let { (totalInches(it) / 12).toString() } ?: "")
+    var inches by mutableStateOf(heightCm?.let { (totalInches(it) % 12).toString() } ?: "")
     var weight by mutableStateOf(weightKg?.let { (if (units == UnitSystem.METRIC) it else Units.kgToLb(it)).let { w -> "%.1f".format(w).removeSuffix(".0") } } ?: "")
     var showErrors by mutableStateOf(false)
+
+    /** Rounded to the nearest inch so 180.3 cm reads as 5'11", not 5'10". */
+    private fun totalInches(cm: Double): Int = kotlin.math.round(Units.cmToInches(cm)).toInt()
 
     fun heightInCm(): Double? = when (units) {
         UnitSystem.METRIC -> heightCm.toDoubleOrNull()
@@ -211,8 +214,8 @@ class BodyInput(heightCm: Double? = null, weightKg: Double? = null, units: UnitS
         units = to
         cm?.let {
             heightCm = "%.1f".format(it).removeSuffix(".0")
-            feet = (Units.cmToInches(it) / 12).toInt().toString()
-            inches = (Units.cmToInches(it) % 12).toInt().toString()
+            feet = (totalInches(it) / 12).toString()
+            inches = (totalInches(it) % 12).toString()
         }
         kg?.let { weight = "%.1f".format(if (to == UnitSystem.METRIC) it else Units.kgToLb(it)).removeSuffix(".0") }
     }
