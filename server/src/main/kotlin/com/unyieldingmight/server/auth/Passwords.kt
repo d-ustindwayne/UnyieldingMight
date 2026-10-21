@@ -1,6 +1,8 @@
 package com.unyieldingmight.server.auth
 
 import at.favre.lib.crypto.bcrypt.BCrypt
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.security.MessageDigest
 import java.security.SecureRandom
 
@@ -11,10 +13,14 @@ import java.security.SecureRandom
 object Passwords {
     private const val COST = 12
 
-    fun hash(password: String): String = BCrypt.withDefaults().hashToString(COST, password.toCharArray())
+    // bcrypt is deliberately slow (~250 ms), so it runs on the CPU pool instead of a request thread.
+    suspend fun hash(password: String): String = withContext(Dispatchers.Default) { hashBlocking(password) }
 
-    fun verify(password: String, hash: String): Boolean =
+    suspend fun verify(password: String, hash: String): Boolean = withContext(Dispatchers.Default) {
         BCrypt.verifyer().verify(password.toCharArray(), hash).verified
+    }
+
+    fun hashBlocking(password: String): String = BCrypt.withDefaults().hashToString(COST, password.toCharArray())
 }
 
 object Codes {

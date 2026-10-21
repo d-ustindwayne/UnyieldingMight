@@ -3,6 +3,8 @@ package com.unyieldingmight.app.ui.shell
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -32,35 +34,37 @@ import com.unyieldingmight.shared.model.UserDto
 
 @Composable
 fun MainNavHost(nav: NavHostController, user: UserDto) {
+    // Read the user through State so the graph builder stays the same lambda when the profile changes;
+    // otherwise every profile update would rebuild the graph and reset the back stack.
+    val currentUser by rememberUpdatedState(user)
     NavHost(
         navController = nav,
         startDestination = HomeRoute,
         enterTransition = { fadeIn() },
         exitTransition = { fadeOut() },
     ) {
-        composable<HomeRoute> { HomeScreen(user) }
+        composable<HomeRoute> { HomeScreen(currentUser) }
         composable<ClassesRoute> { ClassesScreen() }
         composable<ShopRoute> { ShopScreen() }
-        composable<CaloriesRoute> { CaloriesScreen(user) }
+        composable<CaloriesRoute> { CaloriesScreen(currentUser) }
         composable<NewsRoute> { NewsScreen() }
-        composable<SettingsRoute> { SettingsScreen(user) }
+        composable<SettingsRoute> { SettingsScreen(currentUser) }
 
-        composable<ClassDetailRoute> { ClassDetailScreen(it.toRoute<ClassDetailRoute>().id, user) }
+        composable<ClassDetailRoute> { ClassDetailScreen(it.toRoute<ClassDetailRoute>().id, currentUser) }
         composable<BookingsRoute> { BookingsScreen() }
         composable<CartRoute> { CartScreen() }
         composable<OrdersRoute> { OrdersScreen() }
-        composable<ProfileRoute> { ProfileScreen(user) }
-        composable<MembershipRoute> { MembershipScreen(user) }
+        composable<ProfileRoute> { ProfileScreen(currentUser) }
+        composable<MembershipRoute> { MembershipScreen(currentUser) }
         composable<AboutRoute> { AboutScreen() }
 
-        if (user.isAdmin) {
-            composable<AdminRoute> { AdminDashboardScreen() }
-            composable<AdminClassesRoute> { AdminClassesScreen() }
-            composable<AdminClassEditRoute> { AdminClassEditScreen(it.toRoute<AdminClassEditRoute>().id) }
-            composable<AdminTrainersRoute> { AdminTrainersScreen() }
-            composable<AdminShopRoute> { AdminShopScreen() }
-            composable<AdminUsersRoute> { AdminUsersScreen(user) }
-            composable<AdminNewsletterRoute> { AdminNewsletterScreen() }
-        }
+        // Admin routes are always registered (the server enforces access); the drawer only shows them to admins.
+        composable<AdminRoute> { AdminDashboardScreen() }
+        composable<AdminClassesRoute> { AdminClassesScreen() }
+        composable<AdminClassEditRoute> { AdminClassEditScreen(it.toRoute<AdminClassEditRoute>().id) }
+        composable<AdminTrainersRoute> { AdminTrainersScreen() }
+        composable<AdminShopRoute> { AdminShopScreen() }
+        composable<AdminUsersRoute> { AdminUsersScreen(currentUser) }
+        composable<AdminNewsletterRoute> { AdminNewsletterScreen() }
     }
 }

@@ -108,7 +108,11 @@ fun ClassDetailScreen(id: Int, user: UserDto) {
     var confirmCancel by remember { mutableStateOf<BookingDto?>(null) }
 
     pending?.let { intent ->
-        LaunchedEffect(intent.paymentId) { payments.launch(intent) }
+        LaunchedEffect(intent.paymentId) {
+            // Clear first so a rotation doesn't present the payment sheet a second time.
+            vm.pendingPayment.value = null
+            payments.launch(intent)
+        }
     }
 
     ScreenScaffold(

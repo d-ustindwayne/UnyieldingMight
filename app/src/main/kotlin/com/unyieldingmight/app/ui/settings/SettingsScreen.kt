@@ -84,8 +84,12 @@ fun SettingsScreen(user: UserDto) {
                         }
                     }
                     Group("Account") {
-                        SettingsRow(Icons.Rounded.Person, "Profile & body stats", "Name, address, height, weight") { shell.nav.navigate(ProfileRoute) }
-                        SettingsRow(Icons.Rounded.CardMembership, "Membership", if (user.isMember) "Active" else "Link or buy a membership") { shell.nav.navigate(MembershipRoute) }
+                        if (user.isAdmin) {
+                            SettingsRow(Icons.Rounded.Person, "Profile", "Name and address") { shell.nav.navigate(ProfileRoute) }
+                        } else {
+                            SettingsRow(Icons.Rounded.Person, "Profile & body stats", "Name, address, height, weight") { shell.nav.navigate(ProfileRoute) }
+                            SettingsRow(Icons.Rounded.CardMembership, "Membership", if (user.isMember) "Active" else "Link or buy a membership") { shell.nav.navigate(MembershipRoute) }
+                        }
                         SettingsRow(Icons.Rounded.Lock, "Change password", null) { changingPassword = true }
                     }
                     Group("Notifications") {

@@ -85,7 +85,11 @@ fun MembershipScreen(user: UserDto) {
     var membershipId by rememberSaveable { mutableStateOf("") }
     val payments = rememberPaymentLauncher { vm.onPaymentFinished() }
 
-    pending?.let { intent -> LaunchedEffect(intent.paymentId) { payments.launch(intent) } }
+    pending?.let { intent -> LaunchedEffect(intent.paymentId) {
+            // Clear first so a rotation doesn't present the payment sheet a second time.
+            vm.pendingPayment.value = null
+            payments.launch(intent)
+        } }
 
     ScreenScaffold("Membership") { padding ->
         LoadContent(state, vm::refresh, Modifier.padding(padding)) { plans ->

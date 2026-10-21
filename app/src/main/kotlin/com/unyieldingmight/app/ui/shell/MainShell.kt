@@ -226,7 +226,7 @@ private fun DrawerContent(
         }
         Text("YOU", style = Overline, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp))
         DrawerItem("My profile", Icons.Rounded.Person, destination.isRoute(ProfileRoute)) { onNavigate(ProfileRoute) }
-        DrawerItem("Membership", Icons.Rounded.CardMembership, destination.isRoute(MembershipRoute)) { onNavigate(MembershipRoute) }
+        if (!user.isAdmin) DrawerItem("Membership", Icons.Rounded.CardMembership, destination.isRoute(MembershipRoute)) { onNavigate(MembershipRoute) }
         DrawerItem("My bookings", Icons.Rounded.EventAvailable, destination.isRoute(BookingsRoute)) { onNavigate(BookingsRoute) }
         DrawerItem("Orders", Icons.Rounded.Receipt, destination.isRoute(OrdersRoute)) { onNavigate(OrdersRoute) }
         if (includeSettings) {

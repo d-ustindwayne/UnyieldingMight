@@ -70,7 +70,7 @@ object DevSeeder {
         val hasUsers = db.txBlocking { count("SELECT COUNT(*) FROM user_account") > 0 }
         if (hasUsers) return
         log.info("Seeding demo data")
-        val passwordHash = Passwords.hash(DEMO_PASSWORD)
+        val passwordHash = Passwords.hashBlocking(DEMO_PASSWORD)
 
         db.txBlocking {
             val now = Instant.now()
