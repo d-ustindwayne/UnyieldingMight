@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
     <color name="umBlack">#0E0E0E</color>
     <color name="umGrey">#4E4E4E</color>
-    <color name="ic_launcher_background">#FFFFFF</color>
+    <color name="umEmber">#FF6B2C</color>
+    <color name="ic_launcher_background">#0E0E0E</color>
 </resources>

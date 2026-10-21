@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The splash icon is drawn inside a 2/3 safe zone; inset keeps the wide logo from being clipped. -->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/unyielding_might_logo"
+    android:inset="18%" />

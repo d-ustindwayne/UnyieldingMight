@@ -1,9 +1,14 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.UnyieldingMight" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+<resources>
+    <!-- Compose draws the UI; this theme only covers the window before the first frame. -->
+    <style name="Theme.UnyieldingMight" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/umBlack</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
-    <!-- Customize your theme here. -->
-    <style name="Theme.UnyieldingMight" parent="Base.Theme.UnyieldingMight" />
+
+    <style name="Theme.UnyieldingMight.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/umBlack</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_logo</item>
+        <item name="postSplashScreenTheme">@style/Theme.UnyieldingMight</item>
+    </style>
 </resources>

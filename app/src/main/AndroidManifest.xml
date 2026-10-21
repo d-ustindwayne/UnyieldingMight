@@ -1,44 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".UnyieldingMightApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.UnyieldingMight">
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.UnyieldingMight">
+            android:theme="@style/Theme.UnyieldingMight.Splash"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.LoginActivity"/>
-        <activity android:name=".activities.RegisterActivity"/>
-        <activity android:name=".activities.VerifyActivity"/>
-        <activity android:name=".activities.MembershipActivity"/>
-        <activity android:name=".activities.ProfileActivity"/>
-        <activity android:name=".activities.LinkmembershipActivity"/>
-        <activity android:name=".activities.ActivitylevelActivity"/>
-        <activity android:name=".activities.StatsActivity"/>
-        <activity android:name=".activities.DoneActivity"/>
-        <activity android:name=".activities.HomeActivity"/>
-        <activity android:name=".activities.InfoActivity"/>
-        <activity android:name=".activities.EditClassActivity"/>
 
-        <meta-data
-            android:name="preloaded_fonts"
-            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>
