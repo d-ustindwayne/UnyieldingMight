@@ -1,0 +1,27 @@
+# Local MySQL 8 for the Unyielding Might API.
+#   docker compose up -d
+# then set in local.properties:
+#   MYSQL_URL=jdbc:mysql://localhost:3307/unyielding_might
+#   MYSQL_USER=um_app
+#   MYSQL_PASSWORD=um_app_dev_password
+# The server creates the tables and demo data on first start.
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: unyielding-might-mysql
+    environment:
+      MYSQL_DATABASE: unyielding_might
+      MYSQL_USER: um_app
+      MYSQL_PASSWORD: um_app_dev_password
+      MYSQL_ROOT_PASSWORD: um_root_dev_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      retries: 20
+
+volumes:
+  mysql-data:

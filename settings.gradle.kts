@@ -23,5 +23,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "UnyieldingMight"
-include(":app")
- 
+include(":app", ":server", ":shared")

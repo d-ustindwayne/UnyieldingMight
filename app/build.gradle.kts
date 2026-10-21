@@ -1,115 +1,110 @@
-import java.util.Properties;
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
+}
+
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
 }
 
 android {
-    namespace = "com.example.unyieldingmight"
+    namespace = "com.unyieldingmight.app"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.unyieldingmight"
-        minSdk = 24
+        applicationId = "com.unyieldingmight.app"
+        minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "2.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        val properties = Properties().apply {
-            val propertiesFile = project.rootProject.file("local.properties")
-            if (propertiesFile.exists()) {
-                load(propertiesFile.inputStream())
-            }
-        }
-        
-        val QEV_apiKey = properties.getProperty("QEV_APIKEY") ?: ""
-        buildConfigField("String", "QEV_APIKEY", "\"$QEV_apiKey\"")
-        val DB_HOST = properties.getProperty("DB_HOST") ?: ""
-        buildConfigField("String", "DB_HOST", "\"$DB_HOST\"")
-        val DB_PORT = properties.getProperty("DB_PORT") ?: ""
-        buildConfigField("String", "DB_PORT", "\"$DB_PORT\"")
-        val DB_USER = properties.getProperty("DB_USER") ?: ""
-        buildConfigField("String", "DB_USER", "\"$DB_USER\"")
-        val DB_PASSWORD = properties.getProperty("DB_PASSWORD") ?: ""
-        buildConfigField("String", "DB_PASSWORD", "\"$DB_PASSWORD\"")
-        val DB_NAME = properties.getProperty("DB_NAME") ?: ""
-        buildConfigField("String", "DB_NAME", "\"$DB_NAME\"")
-        val SMTP_HOST = properties.getProperty("SMTP_HOST") ?: ""
-        buildConfigField("String", "SMTP_HOST", "\"$SMTP_HOST\"")
-        val SMTP_PORT = properties.getProperty("SMTP_PORT") ?: ""
-        buildConfigField("String", "SMTP_PORT", "\"$SMTP_PORT\"")
-        val SMTP_USER = properties.getProperty("SMTP_USER") ?: ""
-        buildConfigField("String", "SMTP_USER", "\"$SMTP_USER\"")
-        val SMTP_PASS = properties.getProperty("SMTP_PASS") ?: ""
-        buildConfigField("String", "SMTP_PASS", "\"$SMTP_PASS\"")
+
+        // The app only knows where the API lives. Every secret (database, SMTP, Stripe secret key,
+        // NewsAPI key) stays on the server. 10.0.2.2 is the host machine as seen from the emulator.
+        val apiBaseUrl = localProperties.getProperty("API_BASE_URL") ?: "http://10.0.2.2:8080/"
+        buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
     }
 
     buildFeatures {
         buildConfig = true
-        viewBinding = true
+        compose = true
     }
 
-    sourceSets {
-        getByName("main") {
-            java.setSrcDirs(listOf("src/main/kotlin"))
+    buildTypes {
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            // Signed with the debug key so the showcase APK installs without extra setup.
+            signingConfig = signingConfigs.getByName("debug")
         }
-        getByName("test") {
-            java.setSrcDirs(listOf("src/test/kotlin"))
-        }
-        getByName("androidTest") {
-            java.setSrcDirs(listOf("src/androidTest/kotlin"))
-        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
-            excludes += "/META-INF/NOTICE.md"
-            excludes += "/META-INF/LICENSE.md"
+            excludes += "/META-INF/INDEX.LIST"
+            excludes += "/META-INF/io.netty.versions.properties"
         }
     }
 
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-}
-
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+    testOptions {
+        unitTests.isReturnDefaultValues = true
     }
 }
 
 dependencies {
-    implementation(libs.activity.ktx)
-    implementation(libs.appcompat)
-    implementation(libs.material)
-    implementation(libs.activity)
-    implementation(libs.gson)
-    implementation(libs.constraintlayout)
-    implementation(libs.mail.android)
-    implementation(libs.activation.android)
-    implementation(libs.jtds)
-    implementation(libs.navigation.fragment)
-    implementation(libs.navigation.ui)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.ext.junit)
-    androidTestImplementation(libs.espresso.core)
-    implementation(libs.material.v130alpha03)
-    
-    // Coroutines & Lifecycle
+    implementation(project(":shared"))
+
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.core.splashscreen)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.browser)
+
+    implementation(platform(libs.compose.bom))
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.graphics)
+    implementation(libs.compose.ui.text.google.fonts)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.material3)
+    implementation(libs.compose.material3.window.size)
+    implementation(libs.compose.material.icons.extended)
+    debugImplementation(libs.compose.ui.tooling)
+    debugImplementation(libs.compose.ui.test.manifest)
+
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.lifecycle.viewmodel.ktx)
-    implementation(libs.lifecycle.runtime.ktx)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.client.logging)
+    implementation(libs.ktor.serialization.json)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.ktor)
+    implementation(libs.stripe.android)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlin.test.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.ktor.client.mock)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.compose.ui.test.junit4)
 }
