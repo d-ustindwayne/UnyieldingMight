@@ -14,3 +14,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Personal notes (contain API keys)
+notebook_content.txt

@@ -113,7 +113,13 @@
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
 
-    <string name="class_created">Class Created!</string>
+    <string name="registration_complete">Registration Complete!</string>
+    <string name="membership_linked_profile_set">Your membership has been linked and your profile is set.</string>
+    <string name="booking_successful">Booking Successful!</string>
+    <string name="booking_success_message">You have successfully booked the class.</string>
+    <string name="back_to_classes">Back to Classes</string>
+    <string name="class_updated">Class Updated</string>
+    <string name="class_updated_message">The class has been successfully updated.</string>
     <string name="view_class">View Class</string>
     <string name="successful">Successful!</string>
     <string name="exit_page">Exit Page</string>

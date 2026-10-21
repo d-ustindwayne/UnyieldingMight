@@ -1,4 +1,4 @@
-# Unyielding Might Booking Application
+# Unyielding Might (Booking Application)
 
 Welcome to **Unyielding Might (UM)**, an Android application designed to eliminate booking friction and streamline gym operations. 
 
