@@ -3,7 +3,8 @@ import { Box, Button, Chip, IconButton, Paper, Stack, Tooltip, Typography } from
 import GitHubIcon from '@mui/icons-material/GitHub';
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
-import { REPO_URL, rewriteDiff } from '../data';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import { DOC_URL, REPO_URL, rewriteDiff } from '../data';
 import { mono } from '../theme';
 
 const cloneCmd = `git clone ${REPO_URL}.git`;
@@ -50,28 +51,35 @@ export default function Intro() {
       <Box sx={{ minWidth: 0 }}>
         <Stack direction="row" spacing={1} sx={{ mb: 2.5, flexWrap: 'wrap', rowGap: 1 }}>
           <Chip size="small" variant="outlined" label="portfolio · academic project" />
-          <Chip size="small" variant="outlined" label="not deployed" />
+          <Chip size="small" variant="outlined" label="502.633 Software Engineering" />
+          <Chip size="small" variant="outlined" label="API not hosted yet" />
         </Stack>
         <Typography variant="h1" component="h1" sx={{ mb: 1.5 }}>
           Unyielding<Box component="span" sx={{ color: 'primary.main' }}>Might</Box>
         </Typography>
         <Typography color="text.secondary" sx={{ maxWidth: 520, mb: 3 }}>
-          A gym class booking app that began as a group project and was rebuilt solo in Kotlin.
-          This page covers the engineering, not the product.
+          A gym class booking app for Android. It began as a group Software Engineering assignment in Java
+          and was rebuilt solo in Kotlin with a proper API. This page walks through the process, design
+          decisions and code.
         </Typography>
         <Stack spacing={1.5} sx={{ maxWidth: 520 }}>
           <CloneBox />
-          <Button
-            href={REPO_URL}
-            target="_blank"
-            rel="noopener"
-            variant="contained"
-            size="large"
-            startIcon={<GitHubIcon />}
-            sx={{ alignSelf: 'flex-start', boxShadow: '0 8px 30px -10px rgba(247,151,29,0.6)' }}
-          >
-            Read the source
-          </Button>
+          <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 1.25 }}>
+            <Button
+              href={REPO_URL}
+              target="_blank"
+              rel="noopener"
+              variant="contained"
+              size="large"
+              startIcon={<GitHubIcon />}
+              sx={{ boxShadow: '0 8px 30px -10px rgba(247,151,29,0.6)' }}
+            >
+              Read the source
+            </Button>
+            <Button href={DOC_URL} target="_blank" rel="noopener" variant="outlined" size="large" startIcon={<DescriptionOutlinedIcon />}>
+              Documentation (PDF)
+            </Button>
+          </Stack>
         </Stack>
       </Box>
 

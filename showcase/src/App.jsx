@@ -1,21 +1,33 @@
 import { useEffect, useState } from 'react';
 import { Box, Button, Container, GlobalStyles, Link, Typography } from '@mui/material';
 import GitHubIcon from '@mui/icons-material/GitHub';
-import { REPO_SLUG, REPO_URL } from './data';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import { DOC_URL, REPO_SLUG, REPO_URL } from './data';
 import { ember, glass, mono } from './theme';
 import Intro from './components/Intro';
 import Section from './components/Section';
 import Architecture from './components/Architecture';
 import Problems from './components/Problems';
-import Metrics from './components/Metrics';
 import Screens from './components/Screens';
+import Process from './components/Process';
+import Requirements from './components/Requirements';
+import Decision from './components/Decision';
+import Patterns from './components/Patterns';
+import Quality from './components/Quality';
+import Stack from './components/Stack';
+import Documentation from './components/Documentation';
 
 const toc = [
   { id: 'readme', label: 'README' },
+  { id: 'process', label: 'process/' },
+  { id: 'requirements', label: 'requirements/' },
   { id: 'architecture', label: 'architecture/' },
+  { id: 'patterns', label: 'patterns/' },
   { id: 'problems', label: 'problems-solved/' },
-  { id: 'metrics', label: 'metrics/' },
+  { id: 'quality', label: 'quality/' },
+  { id: 'stack', label: 'stack/' },
   { id: 'screens', label: 'screens/' },
+  { id: 'docs', label: 'docs.pdf' },
 ];
 
 // Highlights the section currently in view in the side index.
@@ -48,6 +60,9 @@ function TopBar() {
       <Typography sx={{ fontFamily: mono, fontSize: '0.8rem', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {REPO_SLUG}
       </Typography>
+      <Button href={DOC_URL} target="_blank" rel="noopener" size="small" startIcon={<DescriptionOutlinedIcon />}>
+        Docs
+      </Button>
       <Button href={REPO_URL} target="_blank" rel="noopener" size="small" variant="outlined" startIcon={<GitHubIcon />}>
         GitHub
       </Button>
@@ -112,17 +127,33 @@ export default function App() {
           <SideIndex active={active} />
           <Box component="main" sx={{ minWidth: 0 }}>
             <Intro />
-            <Section id="architecture" index="01" title="Architecture" aside="click a module">
+            <Section id="process" index="01" title="Process" aside="Scrum, then a solo rewrite">
+              <Process />
+            </Section>
+            <Section id="requirements" index="02" title="Requirements">
+              <Requirements />
+            </Section>
+            <Section id="architecture" index="03" title="Architecture" aside="click a module">
+              <Decision />
               <Architecture />
             </Section>
-            <Section id="problems" index="02" title="Problems solved" aside="real excerpts">
+            <Section id="patterns" index="04" title="Design patterns">
+              <Patterns />
+            </Section>
+            <Section id="problems" index="05" title="Problems solved" aside="real excerpts">
               <Problems />
             </Section>
-            <Section id="metrics" index="03" title="Metrics">
-              <Metrics />
+            <Section id="quality" index="06" title="Quality and metrics">
+              <Quality />
             </Section>
-            <Section id="screens" index="04" title="Screens" aside="scroll →">
+            <Section id="stack" index="07" title="Tech stack">
+              <Stack />
+            </Section>
+            <Section id="screens" index="08" title="Screens" aside="scroll →">
               <Screens />
+            </Section>
+            <Section id="docs" index="09" title="Documentation">
+              <Documentation />
             </Section>
           </Box>
         </Box>
@@ -132,7 +163,7 @@ export default function App() {
           sx={{ borderTop: '1px solid', borderColor: 'divider', py: 4, mb: 2, display: 'flex', flexWrap: 'wrap', gap: 2, justifyContent: 'space-between' }}
         >
           <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 560 }}>
-            Academic portfolio project, not a commercial product. Payments use Stripe test mode. Began as a group project with{' '}
+            Academic portfolio project. Payments use Stripe test mode. Began as a group project for 502.633 Software Engineering at Manukau Institute of Technology with{' '}
             <Link href="https://github.com/SaplingBeing" target="_blank" rel="noopener">SaplingBeing</Link> and{' '}
             <Link href="https://github.com/darawesome" target="_blank" rel="noopener">darawesome</Link>; the Kotlin rewrite is by{' '}
             <Link href="https://github.com/d-ustindwayne" target="_blank" rel="noopener">d-ustindwayne</Link>.
