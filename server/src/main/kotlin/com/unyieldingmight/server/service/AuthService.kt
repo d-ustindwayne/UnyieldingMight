@@ -28,6 +28,7 @@ import com.unyieldingmight.server.repo.updatePassword
 import com.unyieldingmight.server.validate
 import com.unyieldingmight.shared.domain.Validation
 import com.unyieldingmight.shared.model.AddressDto
+import com.unyieldingmight.shared.model.AdminCreateUserRequest
 import com.unyieldingmight.shared.model.AuthResponse
 import com.unyieldingmight.shared.model.MembershipPreview
 import com.unyieldingmight.shared.model.MembershipStatus
@@ -56,6 +57,8 @@ class AuthService(
         if (user == null || !Passwords.verify(password, user.passwordHash)) {
             throw ApiException.unauthorized("Incorrect email or password", "invalid_credentials")
         }
+        // Checked after the password so a deactivated account doesn't reveal that the email exists.
+        if (!user.active) throw ApiException.forbidden("This account has been deactivated. Please contact the gym.", "account_deactivated")
         return AuthResponse(jwt.sessionToken(user.id, user.role), user.toDto())
     }
 
@@ -110,12 +113,44 @@ class AuthService(
         return AuthResponse(jwt.sessionToken(user.id, user.role), user.toDto())
     }
 
+    /**
+     * Staff create an account for someone at the front desk. The email was given in person, so it isn't verified
+     * by code. Without a password, the account gets an unguessable one and the member sets their own through
+     * "Forgot your password?", as the welcome email explains.
+     */
+    suspend fun createAccountForMember(req: AdminCreateUserRequest): Int {
+        validate(
+            Validation.email(req.email),
+            req.password?.let { Validation.password(it) },
+            Validation.name(req.firstName, "First name"),
+            Validation.name(req.lastName, "Last name"),
+            Validation.heightCm(req.heightCm),
+            Validation.weightKg(req.weightKg),
+            validateAddress(req.address),
+        )
+        val dateOfBirth = parseDateOfBirth(req.dateOfBirth)
+        val email = req.email.trim().lowercase()
+        val passwordHash = Passwords.hash(req.password ?: Codes.randomSecret())
+        val userId = db.tx {
+            if (emailExists(email)) throw ApiException.conflict("An account with this email already exists", "email_taken")
+            req.membershipId?.let { requireLinkableMembership(it, email) }
+            val id = insertUser(email, passwordHash, req.firstName, req.lastName, dateOfBirth, req.gender, Role.CUSTOMER, insertAddress(req.address))
+            insertCustomerProfile(id, req.heightCm, req.weightKg, req.activityLevel, req.membershipId)
+            id
+        }
+        if (req.password == null) {
+            val (subject, body) = EmailTemplates.accountCreated(req.firstName.trim(), email)
+            emailSender.send(Email(email, req.firstName.trim(), subject, body))
+        }
+        return userId
+    }
+
     // ---------- Passwords ----------
 
     suspend fun forgotPassword(email: String) {
         validate(Validation.email(email))
         // Always respond the same way; only send a code if the account exists.
-        if (db.tx { emailExists(email) }) sendOtp(email, OtpPurpose.RESET_PASSWORD, "reset your password")
+        if (db.tx { findUserByEmail(email) }?.active == true) sendOtp(email, OtpPurpose.RESET_PASSWORD, "reset your password")
     }
 
     suspend fun resetPassword(email: String, code: String, newPassword: String) {

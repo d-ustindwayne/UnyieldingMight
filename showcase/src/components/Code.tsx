@@ -1,30 +1,39 @@
+import type { ReactNode } from 'react';
 import { Box } from '@mui/material';
 import { ember, mono } from '../theme';
 
 // Minimal Kotlin tokenizer: enough for short excerpts, no highlighter dependency.
 const TOKEN = /(\/\/.*$|\/\*.*?\*\/)|("(?:[^"\\]|\\.)*")|\b(fun|val|var|if|else|when|return|try|catch|interface|suspend|class|object)\b|\b([A-Z][A-Za-z0-9_]*)\b|\b(\d+)\b/gm;
 
-const colors = { comment: '#6B6B6B', string: '#8FD3A8', keyword: ember, type: '#E8C7A0', number: '#9CC4FF' };
+type TokenKind = 'comment' | 'string' | 'keyword' | 'type' | 'number';
 
-function highlight(code) {
-  const out = [];
+const colors: Record<TokenKind, string> = { comment: '#6B6B6B', string: '#8FD3A8', keyword: ember, type: '#E8C7A0', number: '#9CC4FF' };
+
+function highlight(code: string): ReactNode[] {
+  const out: ReactNode[] = [];
   let last = 0;
   let k = 0;
   for (const m of code.matchAll(TOKEN)) {
-    if (m.index > last) out.push(code.slice(last, m.index));
-    const kind = m[1] ? 'comment' : m[2] ? 'string' : m[3] ? 'keyword' : m[4] ? 'type' : 'number';
+    const index = m.index ?? 0;
+    if (index > last) out.push(code.slice(last, index));
+    const kind: TokenKind = m[1] ? 'comment' : m[2] ? 'string' : m[3] ? 'keyword' : m[4] ? 'type' : 'number';
     out.push(
       <span key={k++} style={{ color: colors[kind], fontStyle: kind === 'comment' ? 'italic' : undefined }}>
         {m[0]}
       </span>,
     );
-    last = m.index + m[0].length;
+    last = index + m[0].length;
   }
   out.push(code.slice(last));
   return out;
 }
 
-export default function Code({ code, file }) {
+interface CodeProps {
+  code: string;
+  file?: string;
+}
+
+export default function Code({ code, file }: CodeProps) {
   return (
     <Box
       sx={{

@@ -10,6 +10,7 @@ import com.unyieldingmight.server.routes.classRoutes
 import com.unyieldingmight.server.routes.meRoutes
 import com.unyieldingmight.server.routes.publicRoutes
 import com.unyieldingmight.server.routes.shopRoutes
+import com.unyieldingmight.server.routes.uploadedImageRoutes
 import com.unyieldingmight.shared.model.ApiError
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
@@ -30,6 +31,7 @@ import io.ktor.server.plugins.ratelimit.RateLimitName
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.request.path
 import io.ktor.server.response.respond
+import io.ktor.server.http.content.staticResources
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import kotlinx.coroutines.delay
@@ -44,7 +46,10 @@ fun main() {
     val config = AppConfig.load()
     val services = Services.fromConfig(config)
     Migrations.migrate(services.db)
-    if (config.seedDemoData) DevSeeder.seedIfEmpty(services.db)
+    if (config.seedDemoData) {
+        DevSeeder.seedIfEmpty(services.db)
+        DevSeeder.attachDemoImages(services.db)
+    }
 
     log.info(
         "Payments: {} | Email: {} | News: {}",
@@ -87,7 +92,11 @@ fun Application.module(services: Services) {
         jwt(AUTH_JWT) {
             realm = services.jwt.realm
             verifier(services.jwt.verifier)
-            validate { credential -> JWTPrincipal(credential.payload) }
+            // A deactivated account's existing sessions stop working straight away, not when the token expires.
+            validate { credential ->
+                val userId = credential.payload.subject?.toIntOrNull()
+                if (userId != null && services.users.isActive(userId)) JWTPrincipal(credential.payload) else null
+            }
             challenge { _, _ ->
                 call.respond(HttpStatusCode.Unauthorized, ApiError("unauthorized", "Your session has expired. Please log in again."))
             }
@@ -103,6 +112,9 @@ fun Application.module(services: Services) {
     }
 
     routing {
+        // Class and product photos bundled with the server (resources/static/images).
+        staticResources("/images", "static/images")
+        uploadedImageRoutes(services)
         route("/api") {
             publicRoutes(services)
             authRoutes(services)
@@ -114,13 +126,14 @@ fun Application.module(services: Services) {
     }
 }
 
-/** Every 5 minutes: complete finished classes (emailing attendees) and expire lapsed memberships. */
+/** Every 5 minutes: complete finished classes (emailing attendees), expire lapsed memberships and drop unused photos. */
 fun Application.startBackgroundJobs(services: Services) {
     val job = launch {
         while (true) {
             runCatching {
                 services.classes.completeFinishedClasses()
                 services.db.tx { expireMemberships() }
+                services.admin.deleteUnusedImages()
             }.onFailure { log.warn("Background job failed: {}", it.message) }
             delay(5.minutes)
         }

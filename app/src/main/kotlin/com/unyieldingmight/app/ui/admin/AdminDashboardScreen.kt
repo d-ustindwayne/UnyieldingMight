@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
-import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.CardMembership
 import androidx.compose.material.icons.rounded.EventAvailable
 import androidx.compose.material.icons.rounded.FitnessCenter
@@ -22,7 +21,6 @@ import androidx.compose.material.icons.rounded.Inventory2
 import androidx.compose.material.icons.rounded.Mail
 import androidx.compose.material.icons.rounded.Payments
 import androidx.compose.material.icons.rounded.Person
-import androidx.compose.material.icons.rounded.Storefront
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -41,11 +39,8 @@ import com.unyieldingmight.app.ui.common.LoadViewModel
 import com.unyieldingmight.app.ui.common.SectionHeader
 import com.unyieldingmight.app.ui.common.StatTile
 import com.unyieldingmight.app.ui.common.containerViewModel
-import com.unyieldingmight.app.ui.navigation.AdminClassesRoute
 import com.unyieldingmight.app.ui.navigation.AdminNewsletterRoute
-import com.unyieldingmight.app.ui.navigation.AdminShopRoute
 import com.unyieldingmight.app.ui.navigation.AdminTrainersRoute
-import com.unyieldingmight.app.ui.navigation.AdminUsersRoute
 import com.unyieldingmight.app.ui.shell.LocalShell
 import com.unyieldingmight.app.ui.shell.ScreenScaffold
 import com.unyieldingmight.shared.domain.Money
@@ -57,11 +52,9 @@ class AdminDashboardViewModel(container: AppContainer) : LoadViewModel<AdminStat
 
 private data class AdminSection(val title: String, val text: String, val icon: ImageVector, val route: Any)
 
+/** Classes, the shop and members are tabs of their own; these are the remaining management pages. */
 private val sections = listOf(
-    AdminSection("Classes", "Schedule, edit, cancel and see who's booked", Icons.Rounded.CalendarMonth, AdminClassesRoute),
     AdminSection("Trainers", "Coach profiles shown on classes", Icons.Rounded.Person, AdminTrainersRoute),
-    AdminSection("Shop", "Products, prices and stock", Icons.Rounded.Storefront, AdminShopRoute),
-    AdminSection("Members & roles", "Search accounts and manage admin access", Icons.Rounded.Group, AdminUsersRoute),
     AdminSection("Newsletter", "Email every opted-in member", Icons.Rounded.Mail, AdminNewsletterRoute),
 )
 
@@ -72,7 +65,7 @@ fun AdminDashboardScreen() {
     val shell = LocalShell.current
     LaunchedEffect(Unit) { vm.refresh() }
 
-    ScreenScaffold("Admin dashboard") { padding ->
+    ScreenScaffold("Dashboard", topLevel = true) { padding ->
         LoadContent(state, vm::refresh, Modifier.padding(padding)) { stats ->
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(160.dp),

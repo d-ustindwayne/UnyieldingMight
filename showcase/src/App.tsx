@@ -17,7 +17,7 @@ import Quality from './components/Quality';
 import Stack from './components/Stack';
 import Documentation from './components/Documentation';
 
-const toc = [
+const toc: { id: string; label: string }[] = [
   { id: 'readme', label: 'README' },
   { id: 'process', label: 'process/' },
   { id: 'requirements', label: 'requirements/' },
@@ -30,15 +30,17 @@ const toc = [
   { id: 'docs', label: 'docs.pdf' },
 ];
 
+const tocIds = toc.map((t) => t.id);
+
 // Highlights the section currently in view in the side index.
-function useActiveSection(ids) {
+function useActiveSection(ids: string[]): string {
   const [active, setActive] = useState(ids[0]);
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id)),
       { rootMargin: '-30% 0px -60% 0px' },
     );
-    ids.forEach((id) => {
+    ids.forEach((id: string) => {
       const el = document.getElementById(id);
       if (el) observer.observe(el);
     });
@@ -70,7 +72,7 @@ function TopBar() {
   );
 }
 
-function SideIndex({ active }) {
+function SideIndex({ active }: { active: string }) {
   return (
     <Box component="aside" sx={{ display: { xs: 'none', lg: 'block' }, position: 'sticky', top: 104, alignSelf: 'start' }}>
       <Typography sx={{ fontFamily: mono, fontSize: '0.72rem', color: 'text.secondary', mb: 1.5 }}>~/UnyieldingMight</Typography>
@@ -97,7 +99,7 @@ function SideIndex({ active }) {
 }
 
 export default function App() {
-  const active = useActiveSection(toc.map((t) => t.id));
+  const active = useActiveSection(tocIds);
 
   return (
     <>

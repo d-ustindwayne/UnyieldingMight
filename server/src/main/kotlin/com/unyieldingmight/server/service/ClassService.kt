@@ -13,6 +13,7 @@ import com.unyieldingmight.server.repo.findBookingRowById
 import com.unyieldingmight.server.repo.findClass
 import com.unyieldingmight.server.repo.findFinishedClassIds
 import com.unyieldingmight.server.repo.findPayment
+import com.unyieldingmight.server.repo.findUpcomingBookingRows
 import com.unyieldingmight.server.repo.findTrainer
 import com.unyieldingmight.server.repo.findUserById
 import com.unyieldingmight.server.repo.insertClass
@@ -149,6 +150,24 @@ class ClassService(
 
     // ---------- Admin ----------
 
+    /**
+     * Frees every upcoming spot held by an account being deactivated. The gym made this decision, not the member,
+     * so paid bookings are refunded in full regardless of the 24-hour window. Returns (cancelled, refunded).
+     */
+    suspend fun releaseUpcomingBookings(userId: Int, now: Instant = Instant.now()): Pair<Int, Int> {
+        val rows = db.tx {
+            findUpcomingBookingRows(userId, now).onEach {
+                setBookingStatus(it.id, BookingStatus.CANCELLED)
+                releaseSpot(it.classId)
+            }
+        }
+        val refunded = rows.count { row ->
+            val payment = row.paymentId?.let { db.tx { findPayment(it) } }
+            payment?.status == PaymentStatus.SUCCEEDED && payments.refund(payment)
+        }
+        return rows.size to refunded
+    }
+
     suspend fun create(req: ClassUpsertRequest): GymClassDto {
         validateClass(req)
         val id = db.tx {
@@ -243,6 +262,7 @@ class ClassService(
             if (req.maxCapacity !in 1..500) "Capacity must be between 1 and 500" else null,
             if (req.avgCalories !in 0..3000) "Average calories must be between 0 and 3000" else null,
             if (req.priceCents !in 0..100_000) "Price must be between $0 and $1000" else null,
+            Validation.imageUrl(req.imageUrl),
         )
     }
 

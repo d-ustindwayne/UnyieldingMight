@@ -66,6 +66,29 @@ object DevSeeder {
         WeeklyClass("Strongman Sunday", "Flip commercial truck tires, carry logs, and build unyielding might.", ClassCategory.STRENGTH, 0, DayOfWeek.SUNDAY, LocalTime.of(9, 0), 120, 10, 880, 3000),
     )
 
+    /** "Spin & Sweat" -> "spin-sweat": the file name of a demo photo under resources/static/images. */
+    fun slug(name: String): String = name.lowercase().replace(Regex("[^a-z0-9]+"), "-").trim('-')
+
+    private fun bundledImage(folder: String, name: String): String? {
+        val path = "/images/$folder/${slug(name)}.jpg"
+        return path.takeIf { DevSeeder::class.java.getResource("/static$path") != null }
+    }
+
+    /**
+     * Links bundled demo photos to classes and shop items that don't have one yet, matched by name.
+     * Runs on every start so photos added later also reach an already-seeded database.
+     */
+    fun attachDemoImages(db: Database) {
+        val linked = db.txBlocking {
+            val classes = query("SELECT id, name FROM gym_class WHERE image_url IS NULL") { it.getInt(1) to it.getString(2) }
+                .sumOf { (id, name) -> bundledImage("classes", name)?.let { update("UPDATE gym_class SET image_url = ? WHERE id = ?", it, id) } ?: 0 }
+            val items = query("SELECT id, name FROM shop_item WHERE image_url IS NULL") { it.getInt(1) to it.getString(2) }
+                .sumOf { (id, name) -> bundledImage("shop", name)?.let { update("UPDATE shop_item SET image_url = ? WHERE id = ?", it, id) } ?: 0 }
+            classes + items
+        }
+        if (linked > 0) log.info("Linked {} demo photo(s)", linked)
+    }
+
     fun seedIfEmpty(db: Database, weeks: Int = 3, today: LocalDate = LocalDate.now(gymZone)) {
         val hasUsers = db.txBlocking { count("SELECT COUNT(*) FROM user_account") > 0 }
         if (hasUsers) return

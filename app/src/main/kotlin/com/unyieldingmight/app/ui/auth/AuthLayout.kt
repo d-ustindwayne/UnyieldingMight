@@ -24,6 +24,7 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
@@ -56,38 +57,41 @@ fun AuthLayout(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val wide = windowSize.widthSizeClass != WindowWidthSizeClass.Compact
-    Row(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-        if (wide) BrandPanel(Modifier.weight(0.9f).fillMaxHeight())
-        Box(Modifier.weight(1f).fillMaxHeight().safeDrawingPadding(), contentAlignment = Alignment.TopCenter) {
-            Column(
-                Modifier
-                    .widthIn(max = 460.dp)
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
-                    .imePadding()
-                    .padding(horizontal = 24.dp, vertical = 16.dp),
-            ) {
-                Box(Modifier.fillMaxWidth().height(48.dp)) {
-                    onBack?.let {
-                        IconButton(onClick = it, modifier = Modifier.align(Alignment.CenterStart)) {
-                            Icon(Icons.AutoMirrored.Rounded.ArrowBack, "Back")
+    // A Surface (not just a background) so text without an explicit colour uses onBackground, not black.
+    Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+        Row(Modifier.fillMaxSize()) {
+            if (wide) BrandPanel(Modifier.weight(0.9f).fillMaxHeight())
+            Box(Modifier.weight(1f).fillMaxHeight().safeDrawingPadding(), contentAlignment = Alignment.TopCenter) {
+                Column(
+                    Modifier
+                        .widthIn(max = 460.dp)
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                        .imePadding()
+                        .padding(horizontal = 24.dp, vertical = 16.dp),
+                ) {
+                    Box(Modifier.fillMaxWidth().height(48.dp)) {
+                        onBack?.let {
+                            IconButton(onClick = it, modifier = Modifier.align(Alignment.CenterStart)) {
+                                Icon(Icons.AutoMirrored.Rounded.ArrowBack, "Back")
+                            }
                         }
                     }
+                    if (!wide) {
+                        UmLogo(Modifier.size(width = 120.dp, height = 72.dp).align(Alignment.CenterHorizontally))
+                        Spacer(Modifier.height(16.dp))
+                    } else {
+                        Spacer(Modifier.height(48.dp))
+                    }
+                    Text(title, style = MaterialTheme.typography.headlineMedium)
+                    subtitle?.let {
+                        Spacer(Modifier.height(6.dp))
+                        Text(it, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    Spacer(Modifier.height(24.dp))
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp), content = content)
+                    Spacer(Modifier.height(24.dp))
                 }
-                if (!wide) {
-                    UmLogo(Modifier.size(width = 120.dp, height = 72.dp).align(Alignment.CenterHorizontally))
-                    Spacer(Modifier.height(16.dp))
-                } else {
-                    Spacer(Modifier.height(48.dp))
-                }
-                Text(title, style = MaterialTheme.typography.headlineMedium)
-                subtitle?.let {
-                    Spacer(Modifier.height(6.dp))
-                    Text(it, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                Spacer(Modifier.height(24.dp))
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp), content = content)
-                Spacer(Modifier.height(24.dp))
             }
         }
     }

@@ -2,6 +2,7 @@ package com.unyieldingmight.app.ui.admin
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,14 +17,17 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -31,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.unyieldingmight.app.AppContainer
+import com.unyieldingmight.app.ui.classes.ClassArt
 import com.unyieldingmight.app.ui.classes.IntensityPill
 import com.unyieldingmight.app.ui.common.Centered
 import com.unyieldingmight.app.ui.common.DateField
@@ -38,7 +43,9 @@ import com.unyieldingmight.app.ui.common.DropdownField
 import com.unyieldingmight.app.ui.common.Format
 import com.unyieldingmight.app.ui.common.LoadContent
 import com.unyieldingmight.app.ui.common.LoadViewModel
+import com.unyieldingmight.app.ui.common.PhotoField
 import com.unyieldingmight.app.ui.common.PrimaryButton
+import com.unyieldingmight.app.ui.common.rememberLeaveGuard
 import com.unyieldingmight.app.ui.common.SectionHeader
 import com.unyieldingmight.app.ui.common.UmTextField
 import com.unyieldingmight.app.ui.common.containerViewModel
@@ -87,8 +94,10 @@ fun AdminClassEditScreen(id: Int) {
     val state by vm.state.collectAsState()
     val saving by vm.saving.collectAsState()
     val shell = LocalShell.current
+    var dirty by remember { mutableStateOf(false) }
+    val leave = rememberLeaveGuard(dirty) { shell.nav.navigateUp() }
 
-    ScreenScaffold(if (id > 0) "Edit class" else "New class") { padding ->
+    ScreenScaffold(if (id > 0) "Edit class" else "New class", onBack = leave) { padding ->
         LoadContent(state, vm::refresh, Modifier.padding(padding)) { data ->
             val existing = data.existing
             val zone = ZoneId.systemDefault()
@@ -102,8 +111,13 @@ fun AdminClassEditScreen(id: Int) {
             var capacity by rememberSaveable { mutableStateOf(existing?.maxCapacity?.toString() ?: "15") }
             var calories by rememberSaveable { mutableStateOf(existing?.avgCalories?.toString() ?: "400") }
             var price by rememberSaveable { mutableStateOf(existing?.let { "%.2f".format(it.priceCents / 100.0) } ?: "15.00") }
+            var imageUrl by rememberSaveable { mutableStateOf(existing?.imageUrl.orEmpty()) }
             var pickingTime by rememberSaveable { mutableStateOf(false) }
             var showErrors by rememberSaveable { mutableStateOf(false) }
+
+            val form = listOf(name, description, category, trainerId, date, time, duration, capacity, calories, price, imageUrl)
+            val initialForm = remember { form }
+            SideEffect { dirty = form != initialForm }
 
             val startTime = runCatching { LocalTime.parse(time) }.getOrNull()
             val start = runCatching { LocalDate.parse(date).atTime(startTime).atZone(zone).toInstant().toEpochMilli() }.getOrNull()
@@ -166,6 +180,12 @@ fun AdminClassEditScreen(id: Int) {
                             price, { price = it.filter { c -> c.isDigit() || c == '.' }.take(7) }, "Non-member price", error = shown["price"],
                             keyboardType = KeyboardType.Decimal, supporting = "Members always book for free. Use 0 for a free class.",
                         )
+                        SectionHeader("Photo", modifier = Modifier.padding(top = 8.dp))
+                        PhotoField(imageUrl.ifBlank { null }, { imageUrl = it.orEmpty() }, aspectRatio = 16f / 9f) { photo ->
+                            Surface(shape = MaterialTheme.shapes.large) {
+                                ClassArt(category, Modifier.fillMaxWidth().aspectRatio(16f / 9f), imageUrl = photo)
+                            }
+                        }
                         PrimaryButton(
                             if (id > 0) "Save changes" else "Create class",
                             onClick = {
@@ -182,6 +202,7 @@ fun AdminClassEditScreen(id: Int) {
                                         maxCapacity = capacity.toInt(),
                                         avgCalories = calories.toInt(),
                                         priceCents = Math.round(price.toDouble() * 100).toInt(),
+                                        imageUrl = imageUrl.ifBlank { null },
                                     )
                                 ) { shell.nav.navigateUp() }
                             },

@@ -45,7 +45,7 @@ class Services(
     val classes = ClassService(db, payments, notifications)
     val shop = ShopService(db, payments, notifications)
     val news = NewsService(http, newsApiKey)
-    val admin = AdminService(db, notifications)
+    val admin = AdminService(db, notifications, classes)
 
     init {
         payments.register(classes)

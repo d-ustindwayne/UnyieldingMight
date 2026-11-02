@@ -21,16 +21,17 @@ import com.unyieldingmight.app.R
 // Brand palette carried over from the original app (umBlack / umGrey) plus one accent.
 val UmBlack = Color(0xFF0E0E0E)
 val UmGrey = Color(0xFF4E4E4E)
-val Ember = Color(0xFFFF6B2C)
-val EmberDark = Color(0xFFC24A12)
+// Brand amber. The light theme uses a deeper shade of the same hue so text on white stays readable (~4.9:1).
+val Ember = Color(0xFFF7971D)
+val EmberDark = Color(0xFFA85C00)
 val Success = Color(0xFF2E9E5B)
 val Warning = Color(0xFFE0A100)
 
 private val DarkColors = darkColorScheme(
     primary = Ember,
-    onPrimary = Color(0xFF1A0A00),
-    primaryContainer = Color(0xFF3A1A08),
-    onPrimaryContainer = Color(0xFFFFDBCB),
+    onPrimary = Color(0xFF1F1200),
+    primaryContainer = Color(0xFF3D2604),
+    onPrimaryContainer = Color(0xFFFFDDB5),
     secondary = Color(0xFFD8D8D8),
     onSecondary = UmBlack,
     secondaryContainer = Color(0xFF2A2A2A),
@@ -51,13 +52,17 @@ private val DarkColors = darkColorScheme(
     outlineVariant = Color(0xFF333333),
     error = Color(0xFFFF6B6B),
     onError = Color(0xFF2B0000),
+    // Snackbars: neutral greys and the brand amber instead of Material's default lavender.
+    inverseSurface = Color(0xFFEDEDED),
+    inverseOnSurface = UmBlack,
+    inversePrimary = EmberDark,
 )
 
 private val LightColors = lightColorScheme(
     primary = EmberDark,
     onPrimary = Color.White,
-    primaryContainer = Color(0xFFFFDBCB),
-    onPrimaryContainer = Color(0xFF3A1200),
+    primaryContainer = Color(0xFFFFE3C2),
+    onPrimaryContainer = Color(0xFF3A2200),
     secondary = UmBlack,
     onSecondary = Color.White,
     secondaryContainer = Color(0xFFE6E6E6),
@@ -77,6 +82,9 @@ private val LightColors = lightColorScheme(
     outline = Color(0xFF9A9A9A),
     outlineVariant = Color(0xFFDADADA),
     error = Color(0xFFC62828),
+    inverseSurface = Color(0xFF2A2A2A),
+    inverseOnSurface = Color(0xFFF2F2F2),
+    inversePrimary = Ember,
 )
 
 private val fontProvider = GoogleFont.Provider(

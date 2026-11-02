@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">Unyielding Might</string>
+    <!-- Short label under the launcher icon; the full name is used inside the app. -->
+    <string name="app_name">UM Hub</string>
+    <string name="app_full_name">Unyielding Might Hub</string>
 </resources>

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.AccessTime
 import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.EventBusy
@@ -53,6 +54,7 @@ import com.unyieldingmight.app.ui.shell.LocalShell
 import com.unyieldingmight.app.ui.shell.ScreenScaffold
 import com.unyieldingmight.app.ui.theme.Overline
 import com.unyieldingmight.shared.domain.Money
+import com.unyieldingmight.shared.model.AdminBookingDto
 import com.unyieldingmight.shared.model.BookingDto
 import com.unyieldingmight.shared.model.BookingStatus
 import com.unyieldingmight.shared.model.ClassStatus
@@ -64,16 +66,21 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
-data class ClassDetail(val gymClass: GymClassDto, val booking: BookingDto?)
+/** [attendees] is only loaded for admins, who manage the class instead of booking it. */
+data class ClassDetail(val gymClass: GymClassDto, val booking: BookingDto?, val attendees: List<AdminBookingDto>? = null)
 
-class ClassDetailViewModel(container: AppContainer, private val id: Int) : LoadViewModel<ClassDetail>(container) {
+class ClassDetailViewModel(container: AppContainer, private val id: Int, private val isAdmin: Boolean) : LoadViewModel<ClassDetail>(container) {
     val busy = MutableStateFlow(false)
     val pendingPayment = MutableStateFlow<PaymentIntentDto?>(null)
 
     override suspend fun load(): ClassDetail = coroutineScope {
         val gymClass = async { container.api.gymClass(id) }
-        val bookings = async { container.api.myBookings() }
-        ClassDetail(gymClass.await(), bookings.await().firstOrNull { it.gymClass.id == id && it.status == BookingStatus.BOOKED })
+        if (isAdmin) {
+            ClassDetail(gymClass.await(), booking = null, attendees = container.api.classAttendees(id))
+        } else {
+            val bookings = async { container.api.myBookings() }
+            ClassDetail(gymClass.await(), bookings.await().firstOrNull { it.gymClass.id == id && it.status == BookingStatus.BOOKED })
+        }
     }
 
     init { refresh() }
@@ -99,7 +106,7 @@ class ClassDetailViewModel(container: AppContainer, private val id: Int) : LoadV
 
 @Composable
 fun ClassDetailScreen(id: Int, user: UserDto) {
-    val vm = containerViewModel(key = "class-$id") { ClassDetailViewModel(it, id) }
+    val vm = containerViewModel(key = "class-$id") { ClassDetailViewModel(it, id, user.isAdmin) }
     val state by vm.state.collectAsState()
     val busy by vm.busy.collectAsState()
     val pending by vm.pendingPayment.collectAsState()
@@ -115,29 +122,31 @@ fun ClassDetailScreen(id: Int, user: UserDto) {
         }
     }
 
-    ScreenScaffold(
-        title = state.dataOrNull?.gymClass?.name ?: "Class",
-        actions = {
-            if (user.isAdmin) TextButton(onClick = { shell.nav.navigate(AdminClassEditRoute(id)) }) { Text("Edit") }
-        },
-    ) { padding ->
+    // Back from the editor: show the saved changes.
+    LaunchedEffect(Unit) { if (state.dataOrNull != null) vm.refresh() }
+
+    ScreenScaffold(title = state.dataOrNull?.gymClass?.name ?: "Class") { padding ->
         LoadContent(state, vm::refresh, Modifier.padding(padding)) { detail ->
             val c = detail.gymClass
             BoxWithConstraints(Modifier.fillMaxSize()) {
                 val wide = maxWidth >= 760.dp
                 val booking: @Composable () -> Unit = {
-                    BookingPanel(
-                        detail, user, busy || payments.busy,
-                        onBook = vm::book,
-                        onCancel = { confirmCancel = it },
-                        onMembership = { shell.nav.navigate(MembershipRoute) },
-                    )
+                    if (user.isAdmin) {
+                        AdminClassPanel(detail, onEdit = { shell.nav.navigate(AdminClassEditRoute(id)) })
+                    } else {
+                        BookingPanel(
+                            detail, user, busy || payments.busy,
+                            onBook = vm::book,
+                            onCancel = { confirmCancel = it },
+                            onMembership = { shell.nav.navigate(MembershipRoute) },
+                        )
+                    }
                 }
                 if (wide) {
                     Row(Modifier.fillMaxSize().padding(24.dp), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
                         Column(Modifier.weight(1.4f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                             ClassInfo(c)
-                            TrainerCard(c)
+                            TrainerCard(c, user.isAdmin)
                         }
                         Box(Modifier.weight(1f)) { booking() }
                     }
@@ -146,7 +155,7 @@ fun ClassDetailScreen(id: Int, user: UserDto) {
                         // On phones the booking panel comes before the trainer so the main action is reached sooner.
                         ClassInfo(c)
                         booking()
-                        TrainerCard(c)
+                        TrainerCard(c, user.isAdmin)
                         Spacer(Modifier.height(16.dp))
                     }
                 }
@@ -179,7 +188,7 @@ fun ClassDetailScreen(id: Int, user: UserDto) {
 private fun ClassInfo(c: GymClassDto) {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Surface(shape = MaterialTheme.shapes.extraLarge) {
-            ClassArt(c.category, Modifier.fillMaxWidth().height(200.dp), iconSize = 80.dp)
+            ClassArt(c.category, Modifier.fillMaxWidth().height(200.dp), iconSize = 80.dp, imageUrl = c.imageUrl)
         }
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(c.category.label.uppercase(), style = Overline, color = MaterialTheme.colorScheme.primary)
@@ -200,7 +209,7 @@ private fun ClassInfo(c: GymClassDto) {
 }
 
 @Composable
-private fun TrainerCard(c: GymClassDto) {
+private fun TrainerCard(c: GymClassDto, isAdmin: Boolean) {
     val t = c.trainer ?: return
     Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainer, modifier = Modifier.fillMaxWidth()) {
         Row(Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -208,7 +217,7 @@ private fun TrainerCard(c: GymClassDto) {
                 Icon(Icons.Rounded.Person, null, Modifier.padding(10.dp).size(28.dp), tint = MaterialTheme.colorScheme.onPrimaryContainer)
             }
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text("YOUR TRAINER", style = Overline, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(if (isAdmin) "TRAINER" else "YOUR TRAINER", style = Overline, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(t.fullName, style = MaterialTheme.typography.titleMedium)
                 Text(t.specialty, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
                 Text(t.bio, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -223,6 +232,34 @@ private fun InfoRow(icon: ImageVector, label: String, value: String) {
         Icon(icon, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
         Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.width(120.dp))
         Text(value, style = MaterialTheme.typography.bodyMedium)
+    }
+}
+
+/** What admins see instead of booking: who's coming, and a way to edit the class while it's still upcoming. */
+@Composable
+private fun AdminClassPanel(detail: ClassDetail, onEdit: () -> Unit) {
+    val c = detail.gymClass
+    val editable = c.status == ClassStatus.SCHEDULED && c.startsAt > System.currentTimeMillis()
+    val attendees = detail.attendees.orEmpty().filter { it.status != BookingStatus.CANCELLED }
+    Surface(shape = MaterialTheme.shapes.extraLarge, color = MaterialTheme.colorScheme.surfaceContainerHigh) {
+        Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            CapacityBar(c)
+            when {
+                c.status == ClassStatus.CANCELLED -> Text("This class has been cancelled.", style = MaterialTheme.typography.titleMedium)
+                !editable -> Text("This class has already started, so it can't be edited.", style = MaterialTheme.typography.titleMedium)
+                else -> PrimaryButton("Edit class", onEdit, Modifier.fillMaxWidth(), icon = Icons.Rounded.Edit)
+            }
+            Text("ATTENDEES", style = Overline, color = MaterialTheme.colorScheme.primary)
+            if (attendees.isEmpty()) {
+                Text("Nobody has booked this class yet.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            attendees.forEach { b ->
+                Column {
+                    Text(b.userName, style = MaterialTheme.typography.titleSmall)
+                    Text(b.userEmail, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+        }
     }
 }
 
@@ -269,7 +306,7 @@ private fun BookingPanel(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     PrimaryButton(if (free) "Book my spot" else "Book & pay", onBook, Modifier.fillMaxWidth(), loading = busy)
-                    if (!user.isMember && !user.isAdmin && c.priceCents > 0) {
+                    if (!user.isMember && c.priceCents > 0) {
                         TextButton(onClick = onMembership, modifier = Modifier.align(Alignment.CenterHorizontally)) { Text("View membership plans") }
                     }
                 }

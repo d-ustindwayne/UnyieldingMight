@@ -84,6 +84,7 @@ class AdminClassesViewModel(container: AppContainer) : LoadViewModel<List<GymCla
     fun showAttendees(c: GymClassDto) = act(block = { container.api.classAttendees(c.id) }) { attendees.value = c to it }
 }
 
+/** The admin's Classes tab: the full schedule with edit, cancel, delete and attendee actions on each class. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminClassesScreen() {
@@ -96,7 +97,8 @@ fun AdminClassesScreen() {
     LaunchedEffect(Unit) { vm.refresh() }
 
     ScreenScaffold(
-        title = "Manage classes",
+        title = "Classes",
+        topLevel = true,
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = { shell.nav.navigate(AdminClassEditRoute()) },

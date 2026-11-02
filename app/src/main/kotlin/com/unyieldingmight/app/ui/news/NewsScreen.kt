@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -37,17 +39,19 @@ import com.unyieldingmight.app.ui.common.EmptyState
 import com.unyieldingmight.app.ui.common.Format
 import com.unyieldingmight.app.ui.common.LoadContent
 import com.unyieldingmight.app.ui.common.LoadViewModel
+import com.unyieldingmight.app.ui.common.Pill
 import com.unyieldingmight.app.ui.common.containerViewModel
 import com.unyieldingmight.app.ui.shell.ScreenScaffold
 import com.unyieldingmight.app.ui.theme.Overline
 import com.unyieldingmight.shared.model.NewsArticleDto
 import com.unyieldingmight.shared.model.NewsTopic
 import kotlinx.coroutines.flow.MutableStateFlow
+import java.util.Locale
 
 class NewsViewModel(container: AppContainer) : LoadViewModel<List<NewsArticleDto>>(container) {
     val topic = MutableStateFlow(NewsTopic.FITNESS)
 
-    override suspend fun load() = container.api.news(topic.value)
+    override suspend fun load() = container.api.news(topic.value, Locale.getDefault().country.ifBlank { null })
 
     fun select(newTopic: NewsTopic) {
         if (newTopic == topic.value) return
@@ -112,12 +116,15 @@ private fun ArticleCard(article: NewsArticleDto, onClick: () -> Unit) {
                 }
             }
             Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(
-                    listOf(article.source, Format.ago(article.publishedAt)).filter { it.isNotBlank() }.joinToString(" · ").uppercase(),
-                    style = Overline,
-                    color = MaterialTheme.colorScheme.primary,
-                    maxLines = 1,
-                )
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    article.country?.let { Pill(it, MaterialTheme.colorScheme.primary) }
+                    Text(
+                        listOf(article.source, Format.ago(article.publishedAt)).filter { it.isNotBlank() }.joinToString(" · ").uppercase(),
+                        style = Overline,
+                        color = MaterialTheme.colorScheme.primary,
+                        maxLines = 1,
+                    )
+                }
                 Text(article.title, style = MaterialTheme.typography.titleMedium, maxLines = 3, overflow = TextOverflow.Ellipsis)
                 article.description?.let {
                     Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 3, overflow = TextOverflow.Ellipsis)

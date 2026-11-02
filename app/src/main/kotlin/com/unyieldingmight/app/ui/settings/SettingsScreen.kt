@@ -110,7 +110,7 @@ fun SettingsScreen(user: UserDto) {
                         )
                     }
                     Group("About") {
-                        SettingsRow(Icons.Rounded.Info, "About Unyielding Might", "Credits, version and tech") { shell.nav.navigate(AboutRoute) }
+                        SettingsRow(Icons.Rounded.Info, "About Unyielding Might Hub", "Credits, version and tech") { shell.nav.navigate(AboutRoute) }
                         SettingsRow(Icons.AutoMirrored.Rounded.Logout, "Log out", user.email) {
                             scope.launch {
                                 container.cart.clear()

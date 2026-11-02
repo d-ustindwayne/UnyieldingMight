@@ -33,6 +33,7 @@ data class UserRecord(
     val address: AddressDto?,
     val addressId: Int?,
     val newsletterOptIn: Boolean,
+    val active: Boolean,
     val createdAt: Long,
     val heightCm: Double?,
     val weightKg: Double?,
@@ -89,6 +90,7 @@ private fun ResultSet.toUserRecord(): UserRecord {
             AddressDto(getString("street"), getString("city"), getString("region"), getString("postcode"), getString("country"))
         },
         newsletterOptIn = getBoolean("newsletter_opt_in"),
+        active = getBoolean("active"),
         createdAt = epochMillis("created_at"),
         heightCm = getDouble("height_cm").takeUnless { wasNull() },
         weightKg = getDouble("weight_kg").takeUnless { wasNull() },
@@ -169,6 +171,18 @@ fun Tx.updateRole(userId: Int, role: Role) = update(
     "UPDATE user_account SET role = ?, updated_at = ? WHERE id = ?", role, Instant.now(), userId,
 )
 
+fun Tx.updateAccountDetails(id: Int, email: String, firstName: String, lastName: String, dateOfBirth: LocalDate, gender: Gender, addressId: Int?) = update(
+    "UPDATE user_account SET email = ?, first_name = ?, last_name = ?, date_of_birth = ?, gender = ?, address_id = ?, updated_at = ? WHERE id = ?",
+    email.trim().lowercase(), firstName.trim(), lastName.trim(), dateOfBirth, gender, addressId, Instant.now(), id,
+)
+
+fun Tx.setActive(userId: Int, active: Boolean) = update(
+    "UPDATE user_account SET active = ?, updated_at = ? WHERE id = ?", active, Instant.now(), userId,
+)
+
+fun Tx.isActive(userId: Int): Boolean =
+    queryOne("SELECT active FROM user_account WHERE id = ?", userId) { it.getBoolean(1) } == true
+
 fun Tx.findRole(userId: Int): Role? =
     queryOne("SELECT role FROM user_account WHERE id = ?", userId) { it.enum<Role>("role") }
 
@@ -176,19 +190,20 @@ fun Tx.setCustomerMembership(userId: Int, membershipId: Int) = update(
     "UPDATE customer_profile SET membership_id = ? WHERE user_id = ?", membershipId, userId,
 )
 
-fun Tx.listUsers(search: String?): List<AdminUserDto> {
+/** Active accounts, or only deactivated ones when [deactivated] is true. */
+fun Tx.listUsers(search: String?, deactivated: Boolean = false): List<AdminUserDto> {
     val like = "%${search?.trim().orEmpty()}%"
     return query(
         """
-        SELECT u.id, u.email, u.first_name, u.last_name, u.role, u.created_at,
+        SELECT u.id, u.email, u.first_name, u.last_name, u.role, u.created_at, u.active,
                (m.status = 'ACTIVE' AND (m.expires_at IS NULL OR m.expires_at > ?)) AS is_member
         FROM user_account u
         LEFT JOIN customer_profile cp ON cp.user_id = u.id
         LEFT JOIN membership m ON m.id = cp.membership_id
-        WHERE u.email LIKE ? OR u.first_name LIKE ? OR u.last_name LIKE ?
+        WHERE u.active = ? AND (u.email LIKE ? OR u.first_name LIKE ? OR u.last_name LIKE ?)
         ORDER BY u.created_at DESC
         """,
-        Instant.now(), like, like, like,
+        Instant.now(), !deactivated, like, like, like,
     ) {
         AdminUserDto(
             id = it.getInt("id"),
@@ -198,10 +213,11 @@ fun Tx.listUsers(search: String?): List<AdminUserDto> {
             role = it.enum("role"),
             isMember = it.getBoolean("is_member"),
             createdAt = it.epochMillis("created_at"),
+            active = it.getBoolean("active"),
         )
     }
 }
 
 /** Opted-in customers to receive a newsletter: (email, first name). */
 fun Tx.newsletterRecipients(): List<Pair<String, String>> =
-    query("SELECT email, first_name FROM user_account WHERE newsletter_opt_in = TRUE") { it.getString(1) to it.getString(2) }
+    query("SELECT email, first_name FROM user_account WHERE newsletter_opt_in = TRUE AND active = TRUE") { it.getString(1) to it.getString(2) }

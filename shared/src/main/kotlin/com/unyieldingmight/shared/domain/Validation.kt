@@ -38,5 +38,12 @@ object Validation {
     fun weightKg(value: Double?): String? =
         if (value == null || value !in 20.0..400.0) "Enter a weight between 20 and 400 kg" else null
 
+    /** Images are either hosted elsewhere over https, or hosted by the API under /images/. */
+    fun imageUrl(value: String?): String? = when {
+        value.isNullOrBlank() -> null
+        value.startsWith("https://") || value.startsWith("/images/") -> null
+        else -> "Image URL must start with https:// or /images/"
+    }
+
     fun otp(value: String): String? = if (value.length == 6 && value.all { it.isDigit() }) null else "Enter the 6-digit code"
 }

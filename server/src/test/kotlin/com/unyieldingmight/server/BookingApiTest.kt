@@ -18,6 +18,12 @@ import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
+import com.unyieldingmight.shared.model.ActiveUpdateRequest
+import com.unyieldingmight.shared.model.UserDto
+import io.ktor.client.request.put
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -131,6 +137,24 @@ class BookingApiTest {
 
         val bookings = client.get("/api/me/bookings") { bearerAuth(customer) }.body<List<BookingDto>>()
         assertEquals(BookingStatus.CLASS_CANCELLED, bookings.single { it.gymClass.id == classId }.status)
+    }
+
+    @Test
+    fun `deactivating an account frees its upcoming spots and refunds them in full`() = apiTest { env, client ->
+        // Inside the 24-hour window, where a member cancelling wouldn't be refunded.
+        val classId = env.newClass(startsIn = 2 * 3_600_000L)
+        val customer = client.login(CUSTOMER)
+        val payment = client.book(classId, customer).body<BookClassResponse>().payment!!
+        client.postJson("/api/payments/${payment.paymentId}/confirm", token = customer)
+
+        val admin = client.login(ADMIN)
+        val customerId = client.get("/api/me") { bearerAuth(customer) }.body<UserDto>().id
+        val r = client.put("/api/admin/users/$customerId/active") {
+            bearerAuth(admin); contentType(ContentType.Application.Json); setBody(ActiveUpdateRequest(false))
+        }
+        assertTrue("1 upcoming booking(s) cancelled and 1 refunded" in r.body<MessageResponse>().message)
+        assertEquals(1, env.gateway.refunded.size)
+        assertEquals(0, env.services.classes.get(classId, null).bookedCount)
     }
 
     @Test

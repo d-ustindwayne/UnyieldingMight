@@ -13,6 +13,8 @@ object Migrations {
     /** Listed explicitly because classpath directory listing doesn't work inside a jar. */
     private val scripts = listOf(
         1 to "V1__schema.sql",
+        2 to "V2__class_images.sql",
+        3 to "V3__accounts_and_uploads.sql",
     )
 
     fun migrate(db: Database) {

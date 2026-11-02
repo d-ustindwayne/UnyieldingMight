@@ -41,7 +41,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.unyieldingmight.app.R
+import coil3.compose.AsyncImage
 import com.unyieldingmight.app.ui.common.Format
+import com.unyieldingmight.app.ui.common.resolveImageUrl
 import com.unyieldingmight.app.ui.common.Pill
 import com.unyieldingmight.app.ui.theme.Overline
 import com.unyieldingmight.app.ui.theme.Success
@@ -64,7 +66,7 @@ val ClassCategory.icon: ImageVector
 
 private val ClassCategory.colors: List<Color>
     get() = when (this) {
-        ClassCategory.STRENGTH -> listOf(Color(0xFF3A1A08), Color(0xFFFF6B2C))
+        ClassCategory.STRENGTH -> listOf(Color(0xFF3D2604), Color(0xFFF7971D))
         ClassCategory.CARDIO -> listOf(Color(0xFF07283A), Color(0xFF2CA8FF))
         ClassCategory.COMBAT -> listOf(Color(0xFF2A0A0A), Color(0xFFE53935))
         ClassCategory.MIND_BODY -> listOf(Color(0xFF0B2A1E), Color(0xFF3CC48A))
@@ -83,9 +85,15 @@ fun Intensity.label() = name.lowercase().replaceFirstChar { it.uppercase() }
 
 /** Category artwork: a gradient with the category icon (combat classes reuse the original boxing photo). */
 @Composable
-fun ClassArt(category: ClassCategory, modifier: Modifier = Modifier, iconSize: Dp = 56.dp) {
+fun ClassArt(category: ClassCategory, modifier: Modifier = Modifier, iconSize: Dp = 56.dp, imageUrl: String? = null) {
+    val photo = resolveImageUrl(imageUrl)
     Box(modifier.background(Brush.linearGradient(category.colors))) {
-        if (category == ClassCategory.COMBAT) {
+        if (photo != null) {
+            // matchParentSize: the photo must not influence the card's measured height.
+            AsyncImage(model = photo, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.matchParentSize())
+            // Darken the corner under the category icon so it stays visible on bright photos.
+            Box(Modifier.matchParentSize().background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.45f)))))
+        } else if (category == ClassCategory.COMBAT) {
             // matchParentSize: the photo must not influence the card's measured height.
             Image(painterResource(R.drawable.boxfit), null, contentScale = ContentScale.Crop, modifier = Modifier.matchParentSize().alpha(0.55f))
         }
@@ -138,7 +146,7 @@ fun ClassCard(gymClass: GymClassDto, onClick: () -> Unit, modifier: Modifier = M
     Surface(onClick = onClick, modifier = modifier, shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainer) {
         // Height follows the text so large font sizes never clip; the artwork stretches to match.
         Row(Modifier.height(IntrinsicSize.Min)) {
-            ClassArt(gymClass.category, Modifier.width(88.dp).fillMaxHeight(), iconSize = 32.dp)
+            ClassArt(gymClass.category, Modifier.width(88.dp).fillMaxHeight(), iconSize = 32.dp, imageUrl = gymClass.imageUrl)
             Column(Modifier.weight(1f).padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(gymClass.category.label.uppercase(), style = Overline, color = MaterialTheme.colorScheme.primary, modifier = Modifier.weight(1f))

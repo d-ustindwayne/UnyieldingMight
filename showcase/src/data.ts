@@ -5,7 +5,27 @@ export const REPO_URL = 'https://github.com/d-ustindwayne/UnyieldingMight';
 export const REPO_SLUG = 'd-ustindwayne/UnyieldingMight';
 export const DOC_URL = 'SoftwareEngineering_ProjectDocumentation.pdf';
 
-export const rewriteDiff = [
+/* ---------- types ---------- */
+
+export type DiffLine = ['+' | '-', string];
+export type ModuleId = 'app' | 'shared' | 'server' | 'db';
+
+export interface Phase { phase: string; when: string; items: string[]; pending?: boolean }
+export interface Requirement { group: 'Customer' | 'Admin' | 'Non-functional'; name: string; now: string }
+export interface ArchOption { name: string; pro: string; con: string }
+export interface Decision { options: ArchOption[]; then: string; now: string }
+export interface Module { id: ModuleId; path: string; label: string; stack: string[]; notes: string[] }
+export interface Pattern { name: string; kind: 'creational' | 'behavioural' | 'structural'; then: string; now: string }
+export interface Problem { title: string; context: string; file: string; code: string }
+export interface StatTile { label: string; value: string; note: string }
+export interface Lesson { from: string; to: string }
+export interface ModuleSize { name: string; files: number; lines: number }
+export interface Metrics { modules: ModuleSize[]; tests: number; testKinds: string[] }
+export interface StackLayer { layer: string; items: string[] }
+export interface Screen { src: string; label: string }
+export interface Documentation { title: string; course: string; meta: string; chapters: [string, string][] }
+
+export const rewriteDiff: DiffLine[] = [
   ['-', 'Java Android app, partially finished'],
   ['-', 'Phone connects straight to SQL Server'],
   ['-', 'DB, mail and payment secrets inside the APK'],
@@ -19,7 +39,7 @@ export const rewriteDiff = [
 
 /* ---------- 01 process ---------- */
 
-export const process = [
+export const process: Phase[] = [
   {
     phase: 'Planning',
     when: 'coursework · group',
@@ -76,7 +96,7 @@ export const process = [
 
 /* ---------- 02 requirements ---------- */
 
-export const requirements = [
+export const requirements: Requirement[] = [
   { group: 'Customer', name: 'Registration', now: 'Email OTP, address check via QuickEmailVerification, JWT sessions' },
   { group: 'Customer', name: 'Booking without conflicts', now: 'UNIQUE (user, class) plus an atomic capacity update' },
   { group: 'Customer', name: 'Search by class or trainer', now: 'Filters on class name, description and trainer' },
@@ -93,7 +113,7 @@ export const requirements = [
 
 /* ---------- 03 architecture ---------- */
 
-export const decision = {
+export const decision: Decision = {
   options: [
     { name: 'MVC', pro: 'Layers test well in isolation', con: 'All logic runs on the device' },
     { name: 'CSM, 2-tier', pro: 'Lightweight client, no extra infrastructure', con: 'Client talks to the database directly' },
@@ -103,7 +123,7 @@ export const decision = {
   now: 'The rewrite moves to 3-tier. With 2-tier, the database login had to ship inside the APK, so anyone could extract it.',
 };
 
-export const modules = [
+export const modules: Module[] = [
   {
     id: 'app',
     path: 'app/',
@@ -152,7 +172,7 @@ export const modules = [
 
 /* ---------- 04 patterns ---------- */
 
-export const patterns = [
+export const patterns: Pattern[] = [
   {
     name: 'Builder',
     kind: 'creational',
@@ -181,7 +201,7 @@ export const patterns = [
 
 /* ---------- 05 problems ---------- */
 
-export const problems = [
+export const problems: Problem[] = [
   {
     title: 'Over-booking under concurrent requests',
     context: 'The original read the count, then wrote it, so two bookings could take the last spot. The check now lives inside one atomic UPDATE.',
@@ -277,7 +297,7 @@ export const problems = [
 
 /* ---------- 06 quality ---------- */
 
-export const courseworkMetrics = [
+export const courseworkMetrics: StatTile[] = [
   { label: 'Lines of code', value: '2,020', note: 'Java, MetricsTree' },
   { label: 'Maintainability index', value: '75.00', note: 'good band is 65 to 100' },
   { label: 'Cyclomatic complexity', value: '1.58', note: 'average v(G); 406 total' },
@@ -285,14 +305,14 @@ export const courseworkMetrics = [
   { label: 'Tests', value: '12 + 3', note: 'unit tests + integration fixes' },
 ];
 
-export const lessons = [
+export const lessons: Lesson[] = [
   { from: 'Few interfaces made mocking hard', to: 'Interfaces at the edges (PaymentGateway, EmailSender), H2 and MockEngine in tests' },
   { from: 'Low comment count', to: 'Comments explain decisions and edge cases' },
   { from: 'Dense methods, high Halstead volume', to: 'routes, service and repo layers with small functions' },
   { from: 'Integration testing done by hand', to: 'API tests on every push in GitHub Actions' },
 ];
 
-export const metrics = {
+export const metrics: Metrics = {
   modules: [
     { name: 'app', files: 50, lines: 7391 },
     { name: 'server', files: 38, lines: 4547 },
@@ -304,7 +324,7 @@ export const metrics = {
 
 /* ---------- 07 stack ---------- */
 
-export const stack = [
+export const stack: StackLayer[] = [
   { layer: 'Android app', items: ['Kotlin', 'Jetpack Compose', 'Material 3', 'Navigation Compose', 'Ktor client', 'kotlinx.serialization', 'DataStore', 'Coil', 'Stripe PaymentSheet'] },
   { layer: 'API server', items: ['Kotlin', 'Ktor (Netty)', 'JWT', 'bcrypt', 'HikariCP', 'JDBC', 'Jakarta Mail', 'Stripe Java', 'NewsAPI', 'QuickEmailVerification'] },
   { layer: 'Shared', items: ['Pure Kotlin', 'DTOs', 'Fitness maths', 'Recommender', 'Validation'] },
@@ -316,7 +336,7 @@ export const stack = [
 
 /* ---------- 08 screens ---------- */
 
-export const screens = [
+export const screens: Screen[] = [
   { src: 'screens/home.png', label: 'home · recommendations' },
   { src: 'screens/classes.png', label: 'classes' },
   { src: 'screens/class-detail.png', label: 'class detail' },
@@ -329,7 +349,7 @@ export const screens = [
 
 /* ---------- 09 docs ---------- */
 
-export const documentation = {
+export const documentation: Documentation = {
   title: 'Software Engineering Project Documentation',
   course: '502.633 Software Engineering · Manukau Institute of Technology',
   meta: '103 pages · PDF · 17.5 MB',

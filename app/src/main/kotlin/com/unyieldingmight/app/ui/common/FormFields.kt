@@ -35,14 +35,18 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.unyieldingmight.app.data.UnitSystem
+import com.unyieldingmight.shared.domain.Countries
 import com.unyieldingmight.shared.domain.Units
 import com.unyieldingmight.shared.model.ActivityLevel
 import com.unyieldingmight.shared.model.AddressDto
@@ -51,6 +55,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,6 +81,54 @@ fun <T> DropdownField(
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             options.forEach { option ->
                 DropdownMenuItem(text = { Text(optionLabel(option)) }, onClick = { onSelected(option); expanded = false })
+            }
+        }
+    }
+}
+
+/**
+ * Every country with its flag. Tapping the field clears it (the current country stays as a hint) so typing searches
+ * straight away; the full list shows until you type. Leaving without picking keeps the current country.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CountryField(selected: String, onSelected: (String) -> Unit, modifier: Modifier = Modifier) {
+    var expanded by remember { mutableStateOf(false) }
+    var query by remember(selected) { mutableStateOf(TextFieldValue(selected)) }
+    val matches = remember(query.text, selected) { if (query.text == selected) Countries.all else Countries.search(query.text) }
+    val selectedFlag = Countries.codeFor(selected)?.let(Countries::flag)
+    val current by rememberUpdatedState(selected)
+    // Clear on tap, so typing searches straight away instead of editing the current name.
+    val interaction = remember { MutableInteractionSource() }
+    LaunchedEffect(interaction) {
+        interaction.interactions.collect { if (it is PressInteraction.Release && query.text == current) query = TextFieldValue("") }
+    }
+
+    // Closing the list in any way without picking puts the current country back.
+    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it; if (!it) query = TextFieldValue(current) }, modifier = modifier) {
+        OutlinedTextField(
+            value = query,
+            onValueChange = { query = it; expanded = true },
+            label = { Text("Country") },
+            placeholder = { Text(selected) },
+            singleLine = true,
+            leadingIcon = selectedFlag?.takeIf { query.text == selected }?.let { { Text(it, style = MaterialTheme.typography.titleLarge) } },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+            shape = MaterialTheme.shapes.medium,
+            interactionSource = interaction,
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable)
+                .onFocusChanged { if (!it.hasFocus) query = TextFieldValue(current) },
+        )
+        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false; query = TextFieldValue(selected) }) {
+            if (matches.isEmpty()) DropdownMenuItem(text = { Text("No matching country") }, onClick = {}, enabled = false)
+            matches.forEach { country ->
+                DropdownMenuItem(
+                    text = { Text(country.name) },
+                    leadingIcon = { Text(Countries.flag(country.code), style = MaterialTheme.typography.titleLarge) },
+                    onClick = { onSelected(country.name); query = TextFieldValue(country.name); expanded = false },
+                )
             }
         }
     }
@@ -146,14 +199,16 @@ fun <T> SegmentedChoice(options: List<T>, selected: T, onSelected: (T) -> Unit, 
 
 fun Gender.label() = name.lowercase().replaceFirstChar { it.uppercase() }
 
-val Countries = listOf("New Zealand", "Australia")
+/** New addresses start on the phone's country, or New Zealand (the home gym) when the region isn't set. */
+private fun defaultCountry(): String =
+    Countries.validCode(Locale.getDefault().country)?.let(Countries::nameOf) ?: Countries.nameOf("NZ")
 
 class AddressInput(initial: AddressDto? = null) {
     var street by mutableStateOf(initial?.street.orEmpty())
     var city by mutableStateOf(initial?.city.orEmpty())
     var region by mutableStateOf(initial?.region.orEmpty())
     var postcode by mutableStateOf(initial?.postcode.orEmpty())
-    var country by mutableStateOf(initial?.country?.takeIf { it.isNotBlank() } ?: Countries.first())
+    var country by mutableStateOf(initial?.country?.takeIf { it.isNotBlank() } ?: defaultCountry())
     var showErrors by mutableStateOf(false)
 
     fun errors(): Map<String, String?> = mapOf(
@@ -178,8 +233,9 @@ fun AddressFields(input: AddressInput) {
             UmTextField(input.region, { input.region = it }, "Region", Modifier.weight(1f), error = errors["region"])
         }
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.Top) {
-            UmTextField(input.postcode, { input.postcode = it }, "Postcode", Modifier.weight(1f), error = errors["postcode"], keyboardType = KeyboardType.Number)
-            DropdownField("Country", Countries, input.country, { input.country = it }, { it }, Modifier.weight(1f))
+            UmTextField(input.postcode, { input.postcode = it }, "Postcode", Modifier.weight(1f), error = errors["postcode"], keyboardType = KeyboardType.Ascii)
+            // Wider than the postcode so longer country names fit next to the flag.
+            CountryField(input.country, { input.country = it }, Modifier.weight(1.6f))
         }
     }
 }

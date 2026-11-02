@@ -102,6 +102,7 @@ class Tx(val connection: Connection) {
                 is Enum<*> -> stmt.setString(i, value.name)
                 is Instant -> stmt.setTimestamp(i, Timestamp.valueOf(LocalDateTime.ofInstant(value, ZoneOffset.UTC)))
                 is LocalDate -> stmt.setDate(i, Date.valueOf(value))
+                is ByteArray -> stmt.setBytes(i, value)
                 else -> stmt.setObject(i, value)
             }
         }

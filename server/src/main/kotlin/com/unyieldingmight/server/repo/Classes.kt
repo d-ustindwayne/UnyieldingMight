@@ -66,6 +66,7 @@ private fun ResultSet.toGymClass(bookedByMe: Boolean = false): GymClassDto = Gym
     priceCents = getInt("price_cents"),
     status = enum("status"),
     bookedByMe = bookedByMe,
+    imageUrl = getString("image_url"),
 )
 
 /** Classes in a time window, flagged with whether [viewerId] holds an active booking. */
@@ -84,23 +85,23 @@ fun Tx.findClass(id: Int, viewerId: Int? = null): GymClassDto? {
 
 fun Tx.insertClass(req: ClassUpsertRequest, now: Instant = Instant.now()): Int = insert(
     """
-    INSERT INTO gym_class (name, description, category, trainer_id, starts_at, ends_at, max_capacity, booked_count, avg_calories, price_cents, status, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, 'SCHEDULED', ?, ?)
+    INSERT INTO gym_class (name, description, category, trainer_id, starts_at, ends_at, max_capacity, booked_count, avg_calories, price_cents, status, image_url, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, 'SCHEDULED', ?, ?, ?)
     """,
     req.name.trim(), req.description.trim(), req.category, req.trainerId,
     Instant.ofEpochMilli(req.startsAt), Instant.ofEpochMilli(req.endsAt),
-    req.maxCapacity, req.avgCalories, req.priceCents, now, now,
+    req.maxCapacity, req.avgCalories, req.priceCents, req.imageUrl?.trim()?.ifBlank { null }, now, now,
 )
 
 fun Tx.updateClass(id: Int, req: ClassUpsertRequest): Int = update(
     """
     UPDATE gym_class SET name = ?, description = ?, category = ?, trainer_id = ?, starts_at = ?, ends_at = ?,
-        max_capacity = ?, avg_calories = ?, price_cents = ?, updated_at = ?
+        max_capacity = ?, avg_calories = ?, price_cents = ?, image_url = ?, updated_at = ?
     WHERE id = ?
     """,
     req.name.trim(), req.description.trim(), req.category, req.trainerId,
     Instant.ofEpochMilli(req.startsAt), Instant.ofEpochMilli(req.endsAt),
-    req.maxCapacity, req.avgCalories, req.priceCents, Instant.now(), id,
+    req.maxCapacity, req.avgCalories, req.priceCents, req.imageUrl?.trim()?.ifBlank { null }, Instant.now(), id,
 )
 
 fun Tx.setClassStatus(id: Int, status: com.unyieldingmight.shared.model.ClassStatus): Int =
@@ -136,6 +137,12 @@ fun Tx.findBookingRow(userId: Int, classId: Int): BookingRow? =
 
 fun Tx.findBookingRowById(id: Int): BookingRow? =
     queryOne("SELECT * FROM class_booking WHERE id = ?", id) { it.toBookingRow() }
+
+/** A member's active bookings for classes that haven't started yet. */
+fun Tx.findUpcomingBookingRows(userId: Int, now: Instant): List<BookingRow> = query(
+    "SELECT b.* FROM class_booking b JOIN gym_class c ON c.id = b.class_id WHERE b.user_id = ? AND b.status = 'BOOKED' AND c.starts_at > ?",
+    userId, now,
+) { it.toBookingRow() }
 
 private fun ResultSet.toBookingRow() = BookingRow(getInt("id"), getInt("user_id"), getInt("class_id"), enum("status"), intOrNull("payment_id"))
 

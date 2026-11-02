@@ -6,6 +6,11 @@ import com.unyieldingmight.server.ApiException
 import com.unyieldingmight.server.Services
 import com.unyieldingmight.server.auth.CurrentUser
 import com.unyieldingmight.server.auth.currentUser
+import com.unyieldingmight.server.service.AdminService
+import com.unyieldingmight.shared.domain.Countries
+import com.unyieldingmight.shared.model.ActiveUpdateRequest
+import com.unyieldingmight.shared.model.AdminCreateUserRequest
+import com.unyieldingmight.shared.model.AdminUpdateUserRequest
 import com.unyieldingmight.shared.model.AppConfigDto
 import com.unyieldingmight.shared.model.ChangePasswordRequest
 import com.unyieldingmight.shared.model.CheckoutRequest
@@ -25,14 +30,20 @@ import com.unyieldingmight.shared.model.ShopItemUpsertRequest
 import com.unyieldingmight.shared.model.TrainerUpsertRequest
 import com.unyieldingmight.shared.model.UpdateProfileRequest
 import com.unyieldingmight.shared.model.VerifyOtpRequest
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.principal
 import io.ktor.server.plugins.ratelimit.rateLimit
+import io.ktor.server.request.contentLength
+import io.ktor.server.request.contentType
 import io.ktor.server.request.receive
+import io.ktor.server.response.header
 import io.ktor.server.response.respond
+import io.ktor.server.response.respondBytes
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
@@ -52,6 +63,24 @@ private suspend fun ApplicationCall.requireAdmin(services: Services): CurrentUse
     val user = currentUser()
     if (!services.admin.isAdmin(user.id)) throw ApiException.forbidden()
     return user
+}
+
+/** Booking, shopping and memberships are for customers; admin accounts only manage the gym. */
+private suspend fun ApplicationCall.requireCustomer(services: Services): CurrentUser {
+    val user = currentUser()
+    if (services.admin.isAdmin(user.id)) {
+        throw ApiException.forbidden("Admin accounts manage the gym and can't book classes, shop or buy memberships", "admin_account")
+    }
+    return user
+}
+
+/** Photos uploaded by admins, stored in the database. Each upload gets a new id, so they can be cached forever. */
+fun Route.uploadedImageRoutes(services: Services) {
+    get("/images/uploads/{id}") {
+        val image = services.admin.image(call.intParam("id"))
+        call.response.header(HttpHeaders.CacheControl, "public, max-age=31536000, immutable")
+        call.respondBytes(image.data, ContentType.parse(image.contentType))
+    }
 }
 
 fun Route.publicRoutes(services: Services) {
@@ -117,13 +146,13 @@ fun Route.classRoutes(services: Services) = route("/classes") {
     }
     authenticate(AUTH_JWT) {
         get("/recommended") { call.respond(services.classes.recommended(call.currentUser().id)) }
-        post("/{id}/book") { call.respond(services.classes.book(call.currentUser().id, call.intParam("id"))) }
+        post("/{id}/book") { call.respond(services.classes.book(call.requireCustomer(services).id, call.intParam("id"))) }
     }
 }
 
 fun Route.shopRoutes(services: Services) = authenticate(AUTH_JWT) {
     route("/shop") {
-        post("/checkout") { call.respond(services.shop.checkout(call.currentUser().id, call.receive<CheckoutRequest>())) }
+        post("/checkout") { call.respond(services.shop.checkout(call.requireCustomer(services).id, call.receive<CheckoutRequest>())) }
         get("/orders") { call.respond(services.shop.orders(call.currentUser().id)) }
     }
     route("/payments/{id}") {
@@ -135,7 +164,10 @@ fun Route.shopRoutes(services: Services) = authenticate(AUTH_JWT) {
     }
     get("/news") {
         val topic = call.request.queryParameters["topic"]?.let { runCatching { NewsTopic.valueOf(it) }.getOrNull() } ?: NewsTopic.FITNESS
-        call.respond(services.news.headlines(topic))
+        // Local news follows the country on the user's address, then the phone's region setting.
+        val country = Countries.codeFor(services.users.me(call.currentUser().id).address?.country)
+            ?: Countries.validCode(call.request.queryParameters["region"])
+        call.respond(services.news.headlines(topic, country))
     }
 }
 
@@ -149,10 +181,10 @@ fun Route.meRoutes(services: Services) = authenticate(AUTH_JWT) {
             call.respond(MessageResponse("Your password has been changed."))
         }
         post("/membership/link") {
-            call.respond(services.users.linkMembership(call.currentUser().id, call.receive<LinkMembershipRequest>().membershipId))
+            call.respond(services.users.linkMembership(call.requireCustomer(services).id, call.receive<LinkMembershipRequest>().membershipId))
         }
         post("/membership/purchase") {
-            call.respond(services.users.purchaseMembership(call.currentUser().id, call.receive<PurchaseMembershipRequest>().planId))
+            call.respond(services.users.purchaseMembership(call.requireCustomer(services).id, call.receive<PurchaseMembershipRequest>().planId))
         }
         get("/bookings") { call.respond(services.classes.myBookings(call.currentUser().id)) }
         delete("/bookings/{id}") { call.respond(services.classes.cancelBooking(call.currentUser().id, call.intParam("id"))) }
@@ -234,13 +266,40 @@ fun Route.adminRoutes(services: Services) = authenticate(AUTH_JWT) {
         route("/users") {
             get {
                 call.requireAdmin(services)
-                call.respond(services.admin.users(call.request.queryParameters["q"]))
+                val deactivated = call.request.queryParameters["deactivated"] == "true"
+                call.respond(services.admin.users(call.request.queryParameters["q"], deactivated))
+            }
+            post {
+                call.requireAdmin(services)
+                val id = services.auth.createAccountForMember(call.receive<AdminCreateUserRequest>())
+                call.respond(HttpStatusCode.Created, services.admin.user(id))
+            }
+            get("/{id}") {
+                call.requireAdmin(services)
+                call.respond(services.admin.user(call.intParam("id")))
+            }
+            put("/{id}") {
+                call.requireAdmin(services)
+                call.respond(services.admin.updateUser(call.intParam("id"), call.receive<AdminUpdateUserRequest>()))
+            }
+            put("/{id}/active") {
+                val admin = call.requireAdmin(services)
+                val active = call.receive<ActiveUpdateRequest>().active
+                call.respond(MessageResponse(services.admin.setActive(admin.id, call.intParam("id"), active)))
             }
             put("/{id}/role") {
                 val admin = call.requireAdmin(services)
                 services.admin.setRole(admin.id, call.intParam("id"), call.receive<RoleUpdateRequest>().role)
                 call.respond(MessageResponse("Role updated"))
             }
+        }
+
+        post("/images") {
+            call.requireAdmin(services)
+            val length = call.request.contentLength() ?: 0
+            if (length > AdminService.MAX_IMAGE_BYTES) throw ApiException.badRequest("Photos must be smaller than 5 MB")
+            val type = call.request.contentType().withoutParameters().toString()
+            call.respond(HttpStatusCode.Created, services.admin.uploadImage(type, call.receive<ByteArray>()))
         }
 
         post("/newsletter") {

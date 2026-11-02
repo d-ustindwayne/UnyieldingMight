@@ -8,6 +8,7 @@ import com.unyieldingmight.server.repo.findMembershipPlan
 import com.unyieldingmight.server.repo.findUserById
 import com.unyieldingmight.server.repo.insertAddress
 import com.unyieldingmight.server.repo.insertMembership
+import com.unyieldingmight.server.repo.isActive
 import com.unyieldingmight.server.repo.listMembershipPlans
 import com.unyieldingmight.server.repo.renewMembership
 import com.unyieldingmight.server.repo.setCustomerMembership
@@ -32,6 +33,8 @@ class UserService(
 ) : PaymentService.Fulfiller {
 
     override val purpose = PaymentPurpose.MEMBERSHIP
+
+    suspend fun isActive(userId: Int): Boolean = db.tx { isActive(userId) }
 
     suspend fun me(userId: Int): UserDto = (db.tx { findUserById(userId) } ?: throw ApiException.unauthorized()).toDto()
 

@@ -20,8 +20,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.unyieldingmight.app.BuildConfig
+import com.unyieldingmight.app.R
 import com.unyieldingmight.app.ui.common.Centered
 import com.unyieldingmight.app.ui.common.SectionHeader
 import com.unyieldingmight.app.ui.common.UmLogo
@@ -31,8 +33,8 @@ private data class Credit(val name: String, val role: String, val github: String
 
 private val credits = listOf(
     Credit("Dustin Dwayne Diaz", "Backend (original) · Kotlin, Ktor & Compose rewrite", "d-ustindwayne"),
-    Credit("SaplingBeing", "Frontend & technical documentation (original)", "SaplingBeing"),
-    Credit("darawesome", "Frontend & technical documentation (original)", "darawesome"),
+    Credit("Justin Grumal", "Frontend & technical documentation (original)", "SaplingBeing"),
+    Credit("Dara Sanglap", "Frontend & technical documentation (original)", "darawesome"),
 )
 
 @Composable
@@ -43,7 +45,7 @@ fun AboutScreen() {
             Centered(640.dp) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     UmLogo(Modifier.size(width = 140.dp, height = 84.dp))
-                    Text("Unyielding Might", style = MaterialTheme.typography.headlineMedium)
+                    Text(stringResource(R.string.app_full_name), style = MaterialTheme.typography.headlineMedium)
                     Text(
                         "A gym booking app that removes the friction from booking expert-led classes: free for members, pay-as-you-go for everyone else.",
                         style = MaterialTheme.typography.bodyLarge,
@@ -53,7 +55,7 @@ fun AboutScreen() {
 
                     SectionHeader("Credits", overline = "The team")
                     Text(
-                        "Unyielding Might started as a group project. This version is a ground-up rewrite that builds on the original team's design, flows and class content.",
+                        "Unyielding Might Hub started as a group project. This version is a ground-up rewrite that builds on the original team's design, flows and class content.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

@@ -1,13 +1,19 @@
 import { useState } from 'react';
 import { Box, ButtonBase, Chip, Paper, Stack, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
-import { modules } from '../data';
+import { modules, type Module, type ModuleId } from '../data';
 import { ember, glass, mono } from '../theme';
 
 // Edges of the system, shown as small labels between the module nodes.
-const links = { app: 'HTTPS · JSON · JWT', server: 'JDBC' };
+const links: Partial<Record<ModuleId, string>> = { app: 'HTTPS · JSON · JWT', server: 'JDBC' };
 
-function Node({ m, active, onSelect }) {
+interface NodeProps {
+  m: Module;
+  active: boolean;
+  onSelect: (id: ModuleId) => void;
+}
+
+function Node({ m, active, onSelect }: NodeProps) {
   return (
     <ButtonBase
       onClick={() => onSelect(m.id)}
@@ -27,7 +33,7 @@ function Node({ m, active, onSelect }) {
   );
 }
 
-function Edge({ label }) {
+function Edge({ label }: { label?: string }) {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, py: 0.5, fontFamily: mono, fontSize: '0.68rem', color: 'text.secondary' }}>
       <Box sx={{ width: '1px', height: 18, bgcolor: 'rgba(255,255,255,0.2)' }} />
@@ -37,9 +43,9 @@ function Edge({ label }) {
 }
 
 export default function Architecture() {
-  const [selected, setSelected] = useState('server');
-  const current = modules.find((m) => m.id === selected);
-  const byId = Object.fromEntries(modules.map((m) => [m.id, m]));
+  const [selected, setSelected] = useState<ModuleId>('server');
+  const byId = Object.fromEntries(modules.map((m) => [m.id, m])) as Record<ModuleId, Module>;
+  const current = byId[selected];
 
   return (
     <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '260px 1fr' }, gap: 3 }}>

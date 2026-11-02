@@ -31,6 +31,7 @@ import com.unyieldingmight.app.ui.common.PrimaryButton
 import com.unyieldingmight.app.ui.common.SectionHeader
 import com.unyieldingmight.app.ui.common.UmTextField
 import com.unyieldingmight.app.ui.common.containerViewModel
+import com.unyieldingmight.app.ui.common.rememberLeaveGuard
 import com.unyieldingmight.app.ui.common.label
 import com.unyieldingmight.app.ui.shell.Avatar
 import com.unyieldingmight.app.ui.shell.LocalShell
@@ -51,6 +52,10 @@ class ProfileViewModel(private val container: AppContainer, user: UserDto) : Vie
     var showErrors by mutableStateOf(false)
     val saving = MutableStateFlow(false)
     private val hasStats = user.stats != null
+
+    /** Everything editable, for detecting unsaved changes. */
+    fun snapshot(): List<Any?> = listOf(firstName, lastName, address.toDto(), body.heightInCm(), body.weightInKg(), activity)
+    val initial = snapshot()
 
     fun save(onSaved: () -> Unit) {
         showErrors = true
@@ -88,8 +93,9 @@ fun ProfileScreen(user: UserDto) {
     val vm = containerViewModel { ProfileViewModel(it, user) }
     val saving by vm.saving.collectAsState()
     val shell = LocalShell.current
+    val leave = rememberLeaveGuard(vm.snapshot() != vm.initial) { shell.nav.navigateUp() }
 
-    ScreenScaffold("My profile") { padding ->
+    ScreenScaffold("My profile", onBack = leave) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState())) {
             Centered(640.dp) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {

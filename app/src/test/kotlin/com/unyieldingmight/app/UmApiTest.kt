@@ -85,7 +85,7 @@ class UmApiTest {
     @Test
     fun `non-json failures still produce a message`() = runTest {
         val engine = MockEngine { respondError(HttpStatusCode.BadGateway) }
-        val error = assertFailsWith<ApiException> { api(engine = engine).news(com.unyieldingmight.shared.model.NewsTopic.GYM) }
+        val error = assertFailsWith<ApiException> { api(engine = engine).news(com.unyieldingmight.shared.model.NewsTopic.GYM, region = null) }
         assertTrue(error.message.contains("502"))
     }
 }

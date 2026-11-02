@@ -17,10 +17,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Logout
-import androidx.compose.material.icons.rounded.AdminPanelSettings
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Badge
 import androidx.compose.material.icons.rounded.CardMembership
 import androidx.compose.material.icons.rounded.EventAvailable
 import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.Mail
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Receipt
@@ -68,7 +70,8 @@ import com.unyieldingmight.app.data.Cart
 import com.unyieldingmight.app.ui.common.LocalContainer
 import com.unyieldingmight.app.ui.common.UmLogo
 import com.unyieldingmight.app.ui.navigation.AboutRoute
-import com.unyieldingmight.app.ui.navigation.AdminRoute
+import com.unyieldingmight.app.ui.navigation.AdminNewsletterRoute
+import com.unyieldingmight.app.ui.navigation.AdminTrainersRoute
 import com.unyieldingmight.app.ui.navigation.BookingsRoute
 import com.unyieldingmight.app.ui.navigation.MembershipRoute
 import com.unyieldingmight.app.ui.navigation.OrdersRoute
@@ -93,7 +96,10 @@ fun MainShell(windowSize: WindowSizeClass, user: UserDto) {
     val scope = rememberCoroutineScope()
     val backStack by nav.currentBackStackEntryAsState()
     val destination = backStack?.destination
-    val cartCount = Cart.count(LocalContainer.current.cart.entries.collectAsState().value)
+    // Admins can't shop, so there's never a cart badge for them.
+    val cartCount = if (user.isAdmin) 0 else Cart.count(LocalContainer.current.cart.entries.collectAsState().value)
+    val tabs = TopLevel.forUser(user.isAdmin)
+    val closeDrawer: () -> Unit = { scope.launch { drawerState.close() } }
 
     val navigateTop: (TopLevel) -> Unit = { tab -> nav.navigateTopLevel(tab.route) }
     val navigateDrawer: (Any) -> Unit = { route ->
@@ -107,7 +113,7 @@ fun MainShell(windowSize: WindowSizeClass, user: UserDto) {
             PermanentNavigationDrawer(
                 drawerContent = {
                     PermanentDrawerSheet(Modifier.width(300.dp)) {
-                        DrawerContent(user, destination, includeTabs = true, onTab = navigateTop, onNavigate = { nav.navigate(it) { launchSingleTop = true } })
+                        DrawerContent(user, destination, includeTabs = true, onTab = navigateTop, onNavigate = { nav.navigate(it) { launchSingleTop = true } }, onClose = null)
                     }
                 },
             ) {
@@ -119,7 +125,7 @@ fun MainShell(windowSize: WindowSizeClass, user: UserDto) {
         WindowWidthSizeClass.Medium -> {
             ModalNavigationDrawer(
                 drawerState = drawerState,
-                drawerContent = { ModalDrawerSheet { DrawerContent(user, destination, includeTabs = false, onTab = {}, onNavigate = navigateDrawer) } },
+                drawerContent = { ModalDrawerSheet { DrawerContent(user, destination, includeTabs = false, onTab = {}, onNavigate = navigateDrawer, onClose = closeDrawer) } },
             ) {
                 Row(Modifier.fillMaxSize()) {
                     NavigationRail(
@@ -128,13 +134,13 @@ fun MainShell(windowSize: WindowSizeClass, user: UserDto) {
                         },
                     ) {
                         Spacer(Modifier.weight(1f))
-                        TopLevel.entries.forEach { tab ->
+                        tabs.forEach { tab ->
                             val selected = destination.isOn(tab)
                             NavigationRailItem(
                                 selected = selected,
                                 onClick = { navigateTop(tab) },
                                 icon = { TabIcon(tab, selected, if (tab == TopLevel.SHOP) cartCount else 0) },
-                                label = { Text(tab.label) },
+                                label = { Text(tab.label(user.isAdmin)) },
                             )
                         }
                         Spacer(Modifier.weight(1f))
@@ -150,21 +156,21 @@ fun MainShell(windowSize: WindowSizeClass, user: UserDto) {
         else -> {
             ModalNavigationDrawer(
                 drawerState = drawerState,
-                drawerContent = { ModalDrawerSheet { DrawerContent(user, destination, includeTabs = false, onTab = {}, onNavigate = navigateDrawer, includeSettings = true) } },
+                drawerContent = { ModalDrawerSheet { DrawerContent(user, destination, includeTabs = false, onTab = {}, onNavigate = navigateDrawer, onClose = closeDrawer, includeSettings = true) } },
             ) {
                 Scaffold(
                     contentWindowInsets = WindowInsets(0),
                     bottomBar = {
-                        val onTopLevel = TopLevel.entries.any { destination.isOn(it) }
+                        val onTopLevel = tabs.any { destination.isOn(it) }
                         if (onTopLevel) {
                             NavigationBar {
-                                TopLevel.bottomBar.forEach { tab ->
+                                TopLevel.bottomBar(user.isAdmin).forEach { tab ->
                                     val selected = destination.isOn(tab)
                                     NavigationBarItem(
                                         selected = selected,
                                         onClick = { navigateTop(tab) },
                                         icon = { TabIcon(tab, selected, if (tab == TopLevel.SHOP) cartCount else 0) },
-                                        label = { Text(tab.label, maxLines = 1) },
+                                        label = { Text(tab.label(user.isAdmin), maxLines = 1) },
                                     )
                                 }
                             }
@@ -207,35 +213,43 @@ private fun DrawerContent(
     includeTabs: Boolean,
     onTab: (TopLevel) -> Unit,
     onNavigate: (Any) -> Unit,
+    /** Closes a modal drawer; null for the permanent tablet sidebar, which can't be closed. */
+    onClose: (() -> Unit)?,
     includeSettings: Boolean = false,
 ) {
     val container = LocalContainer.current
     val scope = rememberCoroutineScope()
     Column(Modifier.fillMaxHeight().verticalScroll(rememberScrollState()).padding(horizontal = 12.dp, vertical = 16.dp)) {
-        UmLogo(Modifier.padding(start = 8.dp).size(width = 72.dp, height = 40.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            onClose?.let { IconButton(onClick = it) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, "Close menu") } }
+            UmLogo(Modifier.padding(start = 8.dp).size(width = 72.dp, height = 40.dp))
+        }
         Spacer(Modifier.height(12.dp))
         ProfileHeader(user, onClick = { onNavigate(ProfileRoute) })
         Spacer(Modifier.height(12.dp))
 
         if (includeTabs) {
-            TopLevel.entries.forEach { tab ->
+            TopLevel.forUser(user.isAdmin).forEach { tab ->
                 val selected = destination.isOn(tab)
-                DrawerItem(tab.label, if (selected) tab.selectedIcon else tab.icon, selected) { onTab(tab) }
+                DrawerItem(tab.label(user.isAdmin), if (selected) tab.selectedIcon else tab.icon, selected) { onTab(tab) }
             }
             HorizontalDivider(Modifier.padding(vertical = 8.dp))
         }
         Text("YOU", style = Overline, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp))
         DrawerItem("My profile", Icons.Rounded.Person, destination.isRoute(ProfileRoute)) { onNavigate(ProfileRoute) }
-        if (!user.isAdmin) DrawerItem("Membership", Icons.Rounded.CardMembership, destination.isRoute(MembershipRoute)) { onNavigate(MembershipRoute) }
-        DrawerItem("My bookings", Icons.Rounded.EventAvailable, destination.isRoute(BookingsRoute)) { onNavigate(BookingsRoute) }
-        DrawerItem("Orders", Icons.Rounded.Receipt, destination.isRoute(OrdersRoute)) { onNavigate(OrdersRoute) }
+        if (!user.isAdmin) {
+            DrawerItem("Membership", Icons.Rounded.CardMembership, destination.isRoute(MembershipRoute)) { onNavigate(MembershipRoute) }
+            DrawerItem("My bookings", Icons.Rounded.EventAvailable, destination.isRoute(BookingsRoute)) { onNavigate(BookingsRoute) }
+            DrawerItem("Orders", Icons.Rounded.Receipt, destination.isRoute(OrdersRoute)) { onNavigate(OrdersRoute) }
+        }
         if (includeSettings) {
             DrawerItem(TopLevel.SETTINGS.label, TopLevel.SETTINGS.icon, destination.isOn(TopLevel.SETTINGS)) { onNavigate(TopLevel.SETTINGS.route) }
         }
         if (user.isAdmin) {
             HorizontalDivider(Modifier.padding(vertical = 8.dp))
             Text("STAFF", style = Overline, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp))
-            DrawerItem("Admin dashboard", Icons.Rounded.AdminPanelSettings, destination.isRoute(AdminRoute)) { onNavigate(AdminRoute) }
+            DrawerItem("Trainers", Icons.Rounded.Badge, destination.isRoute(AdminTrainersRoute)) { onNavigate(AdminTrainersRoute) }
+            DrawerItem("Newsletter", Icons.Rounded.Mail, destination.isRoute(AdminNewsletterRoute)) { onNavigate(AdminNewsletterRoute) }
         }
         HorizontalDivider(Modifier.padding(vertical = 8.dp))
         DrawerItem("About", Icons.Rounded.Info, destination.isRoute(AboutRoute)) { onNavigate(AboutRoute) }

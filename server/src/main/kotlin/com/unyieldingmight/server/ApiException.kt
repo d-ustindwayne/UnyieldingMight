@@ -7,7 +7,7 @@ class ApiException(val status: HttpStatusCode, val code: String, override val me
     companion object {
         fun badRequest(message: String, code: String = "bad_request") = ApiException(HttpStatusCode.BadRequest, code, message)
         fun unauthorized(message: String = "Please log in again", code: String = "unauthorized") = ApiException(HttpStatusCode.Unauthorized, code, message)
-        fun forbidden(message: String = "You don't have permission to do that") = ApiException(HttpStatusCode.Forbidden, "forbidden", message)
+        fun forbidden(message: String = "You don't have permission to do that", code: String = "forbidden") = ApiException(HttpStatusCode.Forbidden, code, message)
         fun notFound(message: String) = ApiException(HttpStatusCode.NotFound, "not_found", message)
         fun conflict(message: String, code: String = "conflict") = ApiException(HttpStatusCode.Conflict, code, message)
         fun unavailable(message: String) = ApiException(HttpStatusCode.ServiceUnavailable, "unavailable", message)

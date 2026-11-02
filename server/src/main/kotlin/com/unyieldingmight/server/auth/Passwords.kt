@@ -29,6 +29,9 @@ object Codes {
     /** Six-digit one-time code, zero padded. */
     fun otp(): String = random.nextInt(1_000_000).toString().padStart(6, '0')
 
+    /** A random password nobody knows, for accounts whose owner sets their own through a reset code. */
+    fun randomSecret(): String = ByteArray(24).also(random::nextBytes).joinToString("") { "%02x".format(it) }
+
     fun sha256(text: String): String =
         MessageDigest.getInstance("SHA-256").digest(text.toByteArray()).joinToString("") { "%02x".format(it) }
 }

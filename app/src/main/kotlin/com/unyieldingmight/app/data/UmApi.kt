@@ -21,6 +21,7 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.content.ByteArrayContent
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
@@ -130,7 +131,9 @@ class UmApi(
     suspend fun cancelPayment(paymentId: Int): MessageResponse = call { post("payments/$paymentId/cancel", it) }
 
     // ---------- News ----------
-    suspend fun news(topic: NewsTopic): List<NewsArticleDto> = call { get("news") { it(); parameter("topic", topic.name) } }
+    /** [region] is the phone's country, used for local stories when the profile has no address. */
+    suspend fun news(topic: NewsTopic, region: String?): List<NewsArticleDto> =
+        call { get("news") { it(); parameter("topic", topic.name); region?.let { r -> parameter("region", r) } } }
 
     // ---------- Admin ----------
     suspend fun adminStats(): AdminStatsDto = call { get("admin/stats", it) }
@@ -147,7 +150,17 @@ class UmApi(
     suspend fun createShopItem(request: ShopItemUpsertRequest): ShopItemDto = call { post("admin/shop/items") { it(); setBody(request) } }
     suspend fun updateShopItem(id: Int, request: ShopItemUpsertRequest): ShopItemDto = call { put("admin/shop/items/$id") { it(); setBody(request) } }
     suspend fun deleteShopItem(id: Int): MessageResponse = call { delete("admin/shop/items/$id", it) }
-    suspend fun adminUsers(query: String?): List<AdminUserDto> = call { get("admin/users") { it(); query?.let { q -> parameter("q", q) } } }
+    suspend fun adminUsers(query: String?, deactivated: Boolean = false): List<AdminUserDto> = call {
+        get("admin/users") { it(); query?.let { q -> parameter("q", q) }; if (deactivated) parameter("deactivated", true) }
+    }
+    suspend fun adminUser(id: Int): UserDto = call { get("admin/users/$id", it) }
+    suspend fun createUser(request: AdminCreateUserRequest): UserDto = call { post("admin/users") { it(); setBody(request) } }
+    suspend fun updateUser(id: Int, request: AdminUpdateUserRequest): UserDto = call { put("admin/users/$id") { it(); setBody(request) } }
+    suspend fun setActive(userId: Int, active: Boolean): MessageResponse =
+        call { put("admin/users/$userId/active") { it(); setBody(ActiveUpdateRequest(active)) } }
+    /** Uploads a JPEG and returns where the server now hosts it. */
+    suspend fun uploadImage(jpeg: ByteArray): ImageUploadResponse =
+        call { post("admin/images") { it(); setBody(ByteArrayContent(jpeg, ContentType.Image.JPEG)) } }
     suspend fun setRole(userId: Int, role: Role): MessageResponse = call { put("admin/users/$userId/role") { it(); setBody(RoleUpdateRequest(role)) } }
     suspend fun sendNewsletter(request: NewsletterRequest): NewsletterResult = call { post("admin/newsletter") { it(); setBody(request) } }
 }

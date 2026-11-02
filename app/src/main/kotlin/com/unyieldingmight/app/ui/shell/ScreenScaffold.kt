@@ -28,8 +28,11 @@ import androidx.compose.ui.text.style.TextOverflow
 fun ScreenScaffold(
     title: String,
     topLevel: Boolean = false,
+    /** Replaces the back arrow's default (navigate up), e.g. to ask before discarding unsaved changes. */
+    onBack: (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
     floatingActionButton: @Composable () -> Unit = {},
+    snackbarHost: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit,
 ) {
@@ -42,7 +45,7 @@ fun ScreenScaffold(
                 title = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.titleLarge) },
                 navigationIcon = {
                     when {
-                        !topLevel -> IconButton(onClick = { shell.nav.navigateUp() }) {
+                        !topLevel -> IconButton(onClick = { onBack?.invoke() ?: shell.nav.navigateUp() }) {
                             Icon(Icons.AutoMirrored.Rounded.ArrowBack, "Back")
                         }
                         shell.openDrawer != null -> IconButton(onClick = shell.openDrawer) { Icon(Icons.Rounded.Menu, "Open menu") }
@@ -54,6 +57,7 @@ fun ScreenScaffold(
             )
         },
         floatingActionButton = floatingActionButton,
+        snackbarHost = snackbarHost,
         bottomBar = bottomBar,
         content = content,
     )

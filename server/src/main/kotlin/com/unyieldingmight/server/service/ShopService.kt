@@ -115,6 +115,6 @@ class ShopService(
         Validation.required(req.description, "Description", 1000),
         if (req.priceCents !in 0..1_000_000) "Price must be between $0 and $10,000" else null,
         if (req.stock !in 0..100_000) "Stock must be between 0 and 100,000" else null,
-        req.imageUrl?.takeIf { it.isNotBlank() && !it.startsWith("https://") }?.let { "Image URL must start with https://" },
+        Validation.imageUrl(req.imageUrl),
     )
 }

@@ -18,7 +18,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
-import androidx.compose.material.icons.rounded.AdminPanelSettings
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Bolt
 import androidx.compose.material.icons.rounded.CardMembership
@@ -49,7 +48,6 @@ import com.unyieldingmight.app.ui.common.LoadViewModel
 import com.unyieldingmight.app.ui.common.SectionHeader
 import com.unyieldingmight.app.ui.common.StatTile
 import com.unyieldingmight.app.ui.common.containerViewModel
-import com.unyieldingmight.app.ui.navigation.AdminRoute
 import com.unyieldingmight.app.ui.navigation.BookingsRoute
 import com.unyieldingmight.app.ui.navigation.CaloriesRoute
 import com.unyieldingmight.app.ui.navigation.ClassDetailRoute
@@ -96,11 +94,7 @@ fun HomeScreen(user: UserDto) {
                 Centered(1040.dp) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
                         Greeting(user)
-                        if (user.isAdmin) {
-                            ActionCard(Icons.Rounded.AdminPanelSettings, "Admin dashboard", "Manage classes, trainers, the shop and members.") {
-                                shell.nav.navigate(AdminRoute)
-                            }
-                        } else if (!user.isMember) {
+                        if (!user.isMember) {
                             ActionCard(Icons.Rounded.CardMembership, "Become a member", "Book every class for free. Plans from \$49 a month.") {
                                 shell.nav.navigate(MembershipRoute)
                             }
@@ -196,7 +190,7 @@ private fun RecommendationCard(rec: RecommendationDto, onClick: () -> Unit) {
     val c = rec.gymClass
     Surface(onClick = onClick, shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainer, modifier = Modifier.width(260.dp)) {
         Column {
-            ClassArt(c.category, Modifier.fillMaxWidth().height(110.dp), iconSize = 40.dp)
+            ClassArt(c.category, Modifier.fillMaxWidth().height(110.dp), iconSize = 40.dp, imageUrl = c.imageUrl)
             Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     IntensityPill(c.intensity)

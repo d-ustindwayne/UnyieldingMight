@@ -13,8 +13,9 @@ import com.unyieldingmight.app.ui.admin.AdminClassEditScreen
 import com.unyieldingmight.app.ui.admin.AdminClassesScreen
 import com.unyieldingmight.app.ui.admin.AdminDashboardScreen
 import com.unyieldingmight.app.ui.admin.AdminNewsletterScreen
-import com.unyieldingmight.app.ui.admin.AdminShopScreen
+import com.unyieldingmight.app.ui.admin.AdminShopItemEditScreen
 import com.unyieldingmight.app.ui.admin.AdminTrainersScreen
+import com.unyieldingmight.app.ui.admin.AdminUserEditScreen
 import com.unyieldingmight.app.ui.admin.AdminUsersScreen
 import com.unyieldingmight.app.ui.calories.CaloriesScreen
 import com.unyieldingmight.app.ui.classes.BookingsScreen
@@ -43,9 +44,10 @@ fun MainNavHost(nav: NavHostController, user: UserDto) {
         enterTransition = { fadeIn() },
         exitTransition = { fadeOut() },
     ) {
-        composable<HomeRoute> { HomeScreen(currentUser) }
-        composable<ClassesRoute> { ClassesScreen() }
-        composable<ShopRoute> { ShopScreen() }
+        // Admins share the same tabs but get the management version of each screen.
+        composable<HomeRoute> { if (currentUser.isAdmin) AdminDashboardScreen() else HomeScreen(currentUser) }
+        composable<ClassesRoute> { if (currentUser.isAdmin) AdminClassesScreen() else ClassesScreen() }
+        composable<ShopRoute> { ShopScreen(currentUser.isAdmin) }
         composable<CaloriesRoute> { CaloriesScreen(currentUser) }
         composable<NewsRoute> { NewsScreen() }
         composable<SettingsRoute> { SettingsScreen(currentUser) }
@@ -58,13 +60,12 @@ fun MainNavHost(nav: NavHostController, user: UserDto) {
         composable<MembershipRoute> { MembershipScreen(currentUser) }
         composable<AboutRoute> { AboutScreen() }
 
-        // Admin routes are always registered (the server enforces access); the drawer only shows them to admins.
-        composable<AdminRoute> { AdminDashboardScreen() }
-        composable<AdminClassesRoute> { AdminClassesScreen() }
+        // Admin routes are always registered (the server enforces access); only admins are shown ways to reach them.
         composable<AdminClassEditRoute> { AdminClassEditScreen(it.toRoute<AdminClassEditRoute>().id) }
+        composable<AdminShopItemEditRoute> { AdminShopItemEditScreen(it.toRoute<AdminShopItemEditRoute>().id) }
         composable<AdminTrainersRoute> { AdminTrainersScreen() }
-        composable<AdminShopRoute> { AdminShopScreen() }
         composable<AdminUsersRoute> { AdminUsersScreen(currentUser) }
+        composable<AdminUserEditRoute> { AdminUserEditScreen(it.toRoute<AdminUserEditRoute>().id) }
         composable<AdminNewsletterRoute> { AdminNewsletterScreen() }
     }
 }

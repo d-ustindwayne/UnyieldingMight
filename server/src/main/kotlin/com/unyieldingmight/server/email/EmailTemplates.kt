@@ -29,6 +29,13 @@ object EmailTemplates {
             "<p>It expires in 10 minutes. If you didn't request it, you can ignore this email.</p>",
     )
 
+    fun accountCreated(name: String, email: String) = Pair(
+        "Your Unyielding Might account is ready",
+        "<h1>Welcome, $name!</h1><p>The gym has created an Unyielding Might account for you ($email).</p>" +
+            "<p>To choose your password, open the Unyielding Might app, tap <b>Forgot your password?</b> " +
+            "and enter this email address. We'll send you a code to set it.</p>",
+    )
+
     fun newsletter(type: NewsletterType, name: String, message: String? = null, bullets: List<String> = emptyList()): Pair<String, String> {
         val (subject, intro) = when (type) {
             NewsletterType.INFORMATIONAL -> "Unyielding Insight: Knowledge for Today" to

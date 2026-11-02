@@ -192,6 +192,7 @@ data class GymClassDto(
     val priceCents: Int,
     val status: ClassStatus,
     val bookedByMe: Boolean = false,
+    val imageUrl: String? = null,
 ) {
     val intensity: Intensity get() = Intensity.fromCalories(avgCalories)
     val spotsLeft: Int get() = (maxCapacity - bookedCount).coerceAtLeast(0)
@@ -210,6 +211,7 @@ data class ClassUpsertRequest(
     val maxCapacity: Int,
     val avgCalories: Int,
     val priceCents: Int,
+    val imageUrl: String? = null,
 )
 
 @Serializable
@@ -324,6 +326,8 @@ data class NewsArticleDto(
     val imageUrl: String?,
     val source: String,
     val publishedAt: Long,
+    /** ISO code of the reader's country when this is a local story; local stories come first and are labelled. */
+    val country: String? = null,
 )
 
 // ---------- Admin ----------
@@ -347,10 +351,51 @@ data class AdminUserDto(
     val role: Role,
     val isMember: Boolean,
     val createdAt: Long,
+    val active: Boolean = true,
 )
 
 @Serializable
 data class RoleUpdateRequest(val role: Role)
+
+@Serializable
+data class ActiveUpdateRequest(val active: Boolean)
+
+/**
+ * An account created by staff, e.g. at the front desk for someone who isn't comfortable with the app.
+ * With a [password] the admin hands it over; without one, the member is emailed a code to set their own.
+ */
+@Serializable
+data class AdminCreateUserRequest(
+    val email: String,
+    val firstName: String,
+    val lastName: String,
+    val dateOfBirth: String,
+    val gender: Gender,
+    val address: AddressDto,
+    val heightCm: Double,
+    val weightKg: Double,
+    val activityLevel: ActivityLevel,
+    val password: String? = null,
+    val membershipId: Int? = null,
+)
+
+/** Staff edit of an account's details. Body stats only apply to customer accounts. */
+@Serializable
+data class AdminUpdateUserRequest(
+    val email: String,
+    val firstName: String,
+    val lastName: String,
+    val dateOfBirth: String,
+    val gender: Gender,
+    val address: AddressDto?,
+    val heightCm: Double? = null,
+    val weightKg: Double? = null,
+    val activityLevel: ActivityLevel? = null,
+)
+
+/** [url] is relative to the API host, e.g. `/images/uploads/12`. */
+@Serializable
+data class ImageUploadResponse(val url: String)
 
 @Serializable
 data class NewsletterRequest(
