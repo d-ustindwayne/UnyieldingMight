@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Box, Button, Container, GlobalStyles, Link, Typography } from '@mui/material';
+import { Box, Button, Container, Link, Typography } from '@mui/material';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import { DOC_URL, REPO_SLUG, REPO_URL } from './data';
 import { ember, glass, mono } from './theme';
+import Backdrop from './components/Backdrop';
 import Intro from './components/Intro';
 import Section from './components/Section';
 import Architecture from './components/Architecture';
@@ -103,25 +104,7 @@ export default function App() {
 
   return (
     <>
-      <GlobalStyles
-        styles={{
-          html: { scrollBehavior: 'smooth' },
-          body: { background: '#0E0E0E', overflowX: 'hidden' },
-          '@keyframes fadeIn': { from: { opacity: 0, transform: 'translateY(4px)' }, to: { opacity: 1, transform: 'none' } },
-          '@media (prefers-reduced-motion: reduce)': { html: { scrollBehavior: 'auto' }, '*': { animation: 'none !important' } },
-        }}
-      />
-      {/* Ambient glow behind the glass panels. */}
-      <Box
-        aria-hidden
-        sx={{
-          position: 'fixed', inset: 0, zIndex: -1, pointerEvents: 'none',
-          background: `
-            radial-gradient(600px 400px at 85% 10%, rgba(247,151,29,0.16), transparent 70%),
-            radial-gradient(500px 500px at 5% 70%, rgba(143,211,168,0.07), transparent 70%),
-            linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px) 0 0 / 100% 32px`,
-        }}
-      />
+      <Backdrop />
 
       <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3 } }}>
         <TopBar />
